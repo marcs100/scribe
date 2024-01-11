@@ -8,9 +8,9 @@ from note_window import NoteWindow
 import constants as CONSTANTS
 
 class MainWindow:
-    def __init__(self, root, database):
+    def __init__(self, root, database_in):
         self.__root = root
-        self.__db = database
+        self.__db = database_in
         self.__frame = tk.Frame(self.__root,bg=CONSTANTS.WIDGET_BACK_COLOUR)
         self.__menu_frame = tk.Frame(self.__root, bg=CONSTANTS.WIDGET_BACK_COLOUR)
         self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
@@ -132,7 +132,7 @@ class MainWindow:
         num_widgets_in_row = 1
 
         for recent_note in recent_notes:
-            print("pinned note id is " + str(recent_note[COLUMN.ID]))
+            print("recent note id is " + str(recent_note[COLUMN.ID]))
             note_id = recent_note[COLUMN.ID]
             self.__text_box = tk.Text(self.__frame, height=15, width=50, wrap=tk.WORD, bg=recent_note[COLUMN.BACK_COLOUR])
             self.__text_box.insert(tk.END, recent_note[COLUMN.CONTENT])

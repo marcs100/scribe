@@ -7,6 +7,7 @@
 
 DATABASE_FILENAME = 'marcnotes_db'
 APP_TITLE = " Scribe - ver 1.0 "
+CONFIG_FILE = "./scribe.config"
 
 #COLOURS
 WIDGET_BACK_COLOUR = '#303234' # blackish

@@ -8,6 +8,9 @@ import columns as COLUMN
 from note_window import NoteWindow
 import constants as CONSTANTS
 from main_window import MainWindow
+import configparser
+import os.path
+import config_file as conf
 
 def get_curr_screen_geometry():
     """
@@ -26,9 +29,19 @@ def get_curr_screen_geometry():
 
 
 def main():
+
+    path = CONSTANTS.CONFIG_FILE
+    check_file = os.path.isfile(path)
+
+    if check_file == False:
+        print("Config file not ... Creating new config")
+        conf.create_new_config_file()
+        print("Wrote new config" + CONSTANTS.CONFIG_FILE)
+    else:
+        print("Found config file " + CONSTANTS.CONFIG_FILE)
+
     init_main_window()
     # root.mainloop()
-
 
 def init_main_window():
     geometry = get_curr_screen_geometry()
@@ -39,12 +52,15 @@ def init_main_window():
     print(geometry)
     root.geometry(f'{width}x{height}')
     # root.geometry('1400x800')
-    root.title(CONSTANTS.APP_TITLE)
 
+    db_file = conf.read('main', 'database')
+    db = database(db_file)
+
+    root.title(CONSTANTS.APP_TITLE)
     main_win = MainWindow(root,db)
     
     # set default view (will read this from stored settings)
-    main_win.get_view("pinned")
+    main_win.get_view(conf.read('main_window','default_view'))
 
     root.mainloop()
 
@@ -53,8 +69,9 @@ def init_main_window():
     #view_label.grid(row=0, column=1)
 
 
+config = configparser.ConfigParser()
 #Global variables
-db = database("/home/marc/Documents/marcnotes_db")
+db = ""
 root = tk.Tk()
 
 # Press the green button in the gutter to run the script.
