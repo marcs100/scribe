@@ -4,6 +4,7 @@ import tkinter as tk
 import columns as COLUMN
 import constants as CONSTANTS
 import hashlib
+import datetime
 
 class NoteWindow:
 
@@ -33,7 +34,7 @@ class NoteWindow:
 
         self._save_button = tk.Button(self._menu_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR,
                                       fg=CONSTANTS.WIDGET_TEXT_COLOUR, relief="flat", text="Save",
-                                      command=self._save_note)
+                                      command=self.__save_note)
         self._save_button.pack(fill='y', side='left',  pady=2, padx=4)
 
         self._text_box = tk.Text(self._frame, wrap=tk.WORD)
@@ -59,7 +60,7 @@ class NoteWindow:
         self._text_box['bg'] = self._note[0][COLUMN.BACK_COLOUR]
         self._text_box.insert(tk.END, self._note[0][COLUMN.CONTENT])
 
-    def _save_note(self):
+    def __save_note(self):
         #check hash to see if note has changed
         current_hash = hashlib.sha1(self._text_box.get("1.0","end-1c")
                                     .encode('ascii', 'ignore')).hexdigest()
