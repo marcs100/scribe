@@ -12,20 +12,12 @@ import configparser
 import os.path
 import config_file as conf
 
-def get_curr_screen_geometry():
-    """
-    Workaround to get the size of the current screen in a multi-screen setup.
-    """
-    root = tk.Tk()
-    root.update_idletasks()
-    root.attributes('-fullscreen', True)
-    root.state('iconic')
-    #geometry = root.winfo_geometry()
-    width = root.winfo_width()
-    height = root.winfo_height()
+def window_closed():
+    width = str(root.winfo_width())
+    height = str(root.winfo_height())
+    conf.write_section('main_window','width',width,False)
+    conf.write_section('main_window', 'height', height, True)
     root.destroy()
-    return (width,height)
-
 
 
 def main():
@@ -50,18 +42,19 @@ def init_main_window():
     #print ("Width = " + str(width))
     #print("Height = " + str(height))
     #print(geometry)
-    width = conf.read('main window','width')
-    height = conf.read('main window','height')
+    width = conf.read_section('main_window','width')
+    height = conf.read_section('main_window','height')
     root.geometry(f'{width}x{height}')
 
-    db_file = conf.read('main', 'database')
+    db_file = conf.read_section('main', 'database')
     db = database(db_file)
 
     root.title(CONSTANTS.APP_TITLE)
     main_win = MainWindow(root,db)
     
     # set default view  - read this from stored settings
-    main_win.get_view(conf.read('main_window','default_view'))
+    main_win.get_view(conf.read_section('main_window','default_view'))
+    root.protocol("WM_DELETE_WINDOW", window_closed)
 
     root.mainloop()
 
@@ -70,7 +63,7 @@ def init_main_window():
     #view_label.grid(row=0, column=1)
 
 
-config = configparser.ConfigParser()
+# config = configparser.ConfigParser()
 #Global variables
 db = ""
 root = tk.Tk()

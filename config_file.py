@@ -18,6 +18,13 @@ def write_config():
     with open(CONSTANTS.CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 
-def read(section,parm):
+def write_section(section, param, param_value, write_to_file):
+    config[section][param] = param_value
+    if write_to_file is True:
+        write_config()
+
+
+
+def read_section(section,parm):
     config.read(CONSTANTS.CONFIG_FILE)
     return config[section][parm]
