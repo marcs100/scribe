@@ -44,14 +44,15 @@ def main():
     # root.mainloop()
 
 def init_main_window():
-    geometry = get_curr_screen_geometry()
-    width = round(geometry[0] * 0.9)
-    height = round(geometry[1] * 0.9)
-    print ("Width = " + str(width))
-    print("Height = " + str(height))
-    print(geometry)
+    #geometry = get_curr_screen_geometry()
+    #width = round(geometry[0] * 0.9)
+    #height = round(geometry[1] * 0.9)
+    #print ("Width = " + str(width))
+    #print("Height = " + str(height))
+    #print(geometry)
+    width = conf.read('main window','width')
+    height = conf.read('main window','height')
     root.geometry(f'{width}x{height}')
-    # root.geometry('1400x800')
 
     db_file = conf.read('main', 'database')
     db = database(db_file)
@@ -59,7 +60,7 @@ def init_main_window():
     root.title(CONSTANTS.APP_TITLE)
     main_win = MainWindow(root,db)
     
-    # set default view (will read this from stored settings)
+    # set default view  - read this from stored settings
     main_win.get_view(conf.read('main_window','default_view'))
 
     root.mainloop()
