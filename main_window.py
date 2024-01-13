@@ -6,7 +6,7 @@ from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
 import constants as CONSTANTS
-
+print 
 class MainWindow:
     def __init__(self, root, database_in):
         self.__root = root
@@ -15,6 +15,8 @@ class MainWindow:
         self.__menu_frame = tk.Frame(self.__root, bg=CONSTANTS.WIDGET_BACK_COLOUR)
         self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
         self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
+        self.width = 0
+        self.height = 0
         self.init_window()
 
     def init_window(self):
@@ -39,7 +41,7 @@ class MainWindow:
         self.__view_button.pack(fill=Y, side='right')
         print("leaving MainWindow.init_window.....")
 
-        # self.__root.mainloop()
+        self.__frame.bind("<Configure>", lambda event: self.__window_resized(event))
 
     def clear_frame(self):
         for widgets in self.__frame.winfo_children():
@@ -55,6 +57,11 @@ class MainWindow:
         print("notebook name is " + str(name))
         self.__get_note_pages_view(3, name)
 
+    def __window_resized(self,event):
+        # we will save these parameters to the config file on the window closed event
+        self.width = event.width   
+        self.height = event.height
+        print(f"Window resized to {self.width}x{self.height}")
 
 
     def get_view(self,view):
@@ -132,7 +139,7 @@ class MainWindow:
         num_widgets_in_row = 1
 
         for recent_note in recent_notes:
-            print("recent note id is " + str(recent_note[COLUMN.ID]))
+            print(" recent note id is " + str(recent_note[COLUMN.ID]))
             note_id = recent_note[COLUMN.ID]
             self.__text_box = tk.Text(self.__frame, height=15, width=50, wrap=tk.WORD, bg=recent_note[COLUMN.BACK_COLOUR])
             self.__text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
@@ -151,6 +158,16 @@ class MainWindow:
     def __get_pinned_notes_view(self, number_of_columns):
         self.clear_frame()
         self.__view_label["text"] = "Viewing: Pinned Notes"
+
+        #lets work out how many notes can fir into a column
+        #print(f"Window resized to {self.width}x{self.height}")
+        if self.width is 0:
+            # window has not been resized yet so get window dimension
+            self.width = self.__frame.winfo_width()
+        
+        print(f"window width is: {self.width}")
+
+
         pinned_notes = self.__db.getPinnedNotes()
         if pinned_notes is None:
             print("No pinned notes found")
