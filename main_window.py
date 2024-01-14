@@ -175,17 +175,34 @@ class MainWindow:
 
         col = 0
         row = 0
+        text_box_width = 50
+        self.calculate_columns(text_box_width,3)
+
         max_col = number_of_columns-1
         num_widgets_in_row = 1
         for pinned_note in pinned_notes:
             print("pinned note id is " + str(pinned_note[COLUMN.ID]))
             note_id = pinned_note[COLUMN.ID]
-            self.__text_box = tk.Text(self.__frame, height=15, width=50, wrap=tk.WORD, bg=pinned_note[COLUMN.BACK_COLOUR])
+            self.__text_box = tk.Text(self.__frame, height=15, width=text_box_width, wrap=tk.WORD, bg=pinned_note[COLUMN.BACK_COLOUR])
             self.__text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=3)
+            #self.calculate_columns(str(self.__text_box.cget('width')),1)
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
             else:
                 col += 1
+    #Calculate the maximum number of columns of textboxes that can be displayed in a given width
+    # for the current screen size
+    def calculate_columns(self, widget_width, border_size):
+        '''
+        The text widget width will be in characters we need to convert it to pixels
+        I am going to guess the pixel size for the standard font is.
+        Textbox size = 50, screen size for 3 notes is 2443, so 150 chars = 2443 pixels.
+        2443/150 = 16. So each character is 16 pixels wide, lets say 15 becuase of borders
+        '''
+        #Problem here is that on inital setup the screen size is always 1
+        print (f"in calculate columns function .. current screen size {self.__root.winfo_width()}")
+        columns = (widget_width + border_size) * 16
+
