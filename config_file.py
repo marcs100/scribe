@@ -12,6 +12,8 @@ def create_new_config_file():
     config['main_window']['default_view'] = "pinned"
     config['main_window']['width'] = "1000"
     config['main_window']['height'] = "600"
+    config['main_window']['note_width'] = "50"
+    config['main_window']['notebook_width'] = "30"
     write_config()
 
 def write_config():
