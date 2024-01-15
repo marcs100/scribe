@@ -7,6 +7,7 @@ import columns as COLUMN
 from note_window import NoteWindow
 import constants as CONSTANTS
 import config_file as conf
+from tkinter import ttk
 
 class MainWindow:
     def __init__(self, root, database_in):
@@ -15,18 +16,8 @@ class MainWindow:
         self.__main_frame = tk.Frame(self.__root,bg=CONSTANTS.WIDGET_BACK_COLOUR) # this frame is to hold the canvass for the scrollbar
         
         self.__menu_frame = tk.Frame(self.__root, bg=CONSTANTS.WIDGET_BACK_COLOUR)
-        
-        #Adding a scrollbar is tricky in tkinter!!!!!!
-        self.__canvas = tk.Canvas(self.__main_frame)
-        self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
-        self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, command=self.__canvas.yview)
-        self.__scrollbar.pack(side=RIGHT, fill=Y)
-        self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
-        self.__canvas.bind('<configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
-        
+        self.__canvas = tk.Canvas(self.__main_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR)
         self.__frame = tk.Frame(self.__canvas,bg=CONSTANTS.WIDGET_BACK_COLOUR)
-        
-        self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
 
         self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
         self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
@@ -34,6 +25,7 @@ class MainWindow:
         self.width = 0
         self.height = 0
         self.__current_view = 'none'
+        self._after_id = None
         self.init_window()
 
     def init_window(self):
@@ -51,17 +43,30 @@ class MainWindow:
         self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
-
+        
         spacer_label = tk.Label(self.__menu_frame, text="          ", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
 
-        self.__menu_frame.pack(fill='both', expand=FALSE)
-        self.__frame.pack(fill='both', expand=TRUE)
+
+        #Adding a scrollbar is tricky in tkinter!!!!!!
+        self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=25, 
+                bg=CONSTANTS.WIDGET_BACK_COLOUR, command=self.__canvas.yview)
+        self.__scrollbar.pack(side=RIGHT, fill=Y)
+        self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
+        self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
+        self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
+            
+
         self.__view_label.pack(fill=Y, side='right', padx=15, pady=6)
         spacer_label.pack(fill=Y, side='right')
         self.__view_button.pack(fill=Y, side='right')
         print("leaving MainWindow.init_window.....")
 
-        self.__frame.bind("<Configure>", lambda event: self.__window_resized(event))
+        self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
+        self.__main_frame.pack(fill=BOTH, expand=TRUE)
+        #self.__frame.pack(fill=BOTH, expand=TRUE) 
+
+        self.__main_frame.bind("<Configure>", lambda event: self.__window_resized(event))
 
     
     '''EVENTS'''
@@ -84,11 +89,10 @@ class MainWindow:
         # we will save these parameters to the config file on the window closed event
         self.width = event.width   
         self.height = event.height
-        #print(f"Window resized to {self.width}x{self.height}")
+        print(f"Window resized to {self.width}x{self.height}")
 
         #resize the widgets in the current view
         if self.__current_view != 'none':
-            #print(f"*** Updating current view: {self.__current_view} ***")
             self.get_view(self.__current_view)
 
 
@@ -247,7 +251,7 @@ class MainWindow:
 
         screen_size = self.__root.winfo_width()
 
-        num_chars = round(screen_size / 8)
+        num_chars = round(screen_size / 15)
 
         #number of widgets that can fit horizintally on screen
         num_columns = round(num_chars  / (widget_width + border_size))
