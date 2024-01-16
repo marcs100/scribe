@@ -87,13 +87,33 @@ class MainWindow:
 
     def __window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
-        self.width = event.width   
-        self.height = event.height
-        print(f"Window resized to {self.width}x{self.height}")
+        print("*** In Resize window eevent ***")
+        #try and control the amount og times the screen will get redrawn
+        prev_width = int(self.width)
+        prev_height = int(self.height)
+        new_width = int(event.width)
+        new_height = int(event.height)
 
-        #resize the widgets in the current view
-        if self.__current_view != 'none':
-            self.get_view(self.__current_view)
+        if new_width > prev_width:
+           diff1 = new_width - prev_width
+        else:
+            diff1 = prev_width - new_width
+
+        if new_height > prev_height:
+           diff2 = new_height - prev_height
+        else:
+            diff2 = prev_height - new_height
+
+        #save the new size
+        self.width = event.width
+        self.height = event.height       
+
+        if diff1 > 25 or diff2 > 25:
+            #resize the widgets in the current view
+            print("*** Redrwing screen ***")
+            if self.__current_view != 'none':
+                self.get_view(self.__current_view)
+
 
 
     '''END OF EVENTS'''
@@ -175,7 +195,7 @@ class MainWindow:
     def __get_recent_notes_view(self):
         self.clear_frame()
         self.__view_label["text"] = "Viewing: Recent Notes"
-        recent_notes = self.__db.getRecentNotes(4)
+        recent_notes = self.__db.getRecentNotes(int(conf.read_section('main', 'recent_notes_count')))
         if recent_notes is None:
             print("No recent notes found")
             return 

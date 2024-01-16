@@ -9,6 +9,7 @@ def create_new_config_file():
     config.add_section('main_window')
     config.add_section('note_window')
     config['main']['database'] = "/home/marc/Documents/marcnotes_db"
+    config['main']['recent_notes_count'] = "8"
     config['main_window']['default_view'] = "pinned"
     config['main_window']['width'] = "1000"
     config['main_window']['height'] = "600"

@@ -1,6 +1,7 @@
 from tkinter.constants import *
 from database import database
 import tkinter as tk
+#from tkinter import ttk as ttk
 import columns as COLUMN
 import constants as CONSTANTS
 import hashlib
@@ -34,6 +35,16 @@ class NoteWindow:
         spacer_label.pack(fill=Y, side='right')
         spacer_label2.pack(fill=Y, side='left')
         view_label.pack(fill=Y, side='right')
+
+        #To set colours on ttk.Comboxbox you have to configure a style and apply the theme.
+        #It can only be applied once else goves error 'theme alresdy applied'
+        #I will leave the combobobox as default for now as I do not really like the comboxbox
+        #and I will try to make a fancy menu instead
+        self.__selected_notebook = tk.StringVar()
+        self.__notebook_combo = ttk.Combobox(self.__menu_frame, textvariable=self.__selected_notebook)
+        self.__notebook_combo['values'] = ("Notebook")
+        self.__notebook_combo.pack(fill='y', side='left', pady=2,padx=2)
+
 
         self.__save_button = tk.Button(self.__menu_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR,
                                       fg=CONSTANTS.WIDGET_TEXT_COLOUR, relief="flat", text="Save",
