@@ -5,7 +5,6 @@ import tkinter as tk
 from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
-import constants as CONSTANTS
 import config_file as conf
 from tkinter import ttk
 
@@ -13,14 +12,14 @@ class MainWindow:
     def __init__(self, root, database_in):
         self.__root = root
         self.__db = database_in
-        self.__main_frame = tk.Frame(self.__root,bg=CONSTANTS.WIDGET_BACK_COLOUR) # this frame is to hold the canvass for the scrollbar
+        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
         
-        self.__menu_frame = tk.Frame(self.__root, bg=CONSTANTS.WIDGET_BACK_COLOUR)
-        self.__canvas = tk.Canvas(self.__main_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR)
-        self.__frame = tk.Frame(self.__canvas,bg=CONSTANTS.WIDGET_BACK_COLOUR)
+        self.__menu_frame = tk.Frame(self.__root, bg=conf.read_section('colours','widget_bg'))
+        self.__canvas = tk.Canvas(self.__main_frame, bg=conf.read_section('colours','widget_bg'))
+        self.__frame = tk.Frame(self.__canvas,bg=conf.read_section('colours','widget_bg'))
 
-        self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
-        self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
+        self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         
         self.width = 0
         self.height = 0
@@ -37,20 +36,20 @@ class MainWindow:
         self.__view_label["font"] = self.__lbl_font
 
         menu = tk.Menubutton()
-        self.__view_button.menu = tk.Menu(self.__view_button, bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
+        self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         self.__view_button["menu"] = self.__view_button.menu
 
         self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
         
-        spacer_label = tk.Label(self.__menu_frame, text="          ", bg=CONSTANTS.WIDGET_BACK_COLOUR, fg=CONSTANTS.WIDGET_TEXT_COLOUR)
+        spacer_label = tk.Label(self.__menu_frame, text="          ", bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
 
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
         self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=25, 
-                bg=CONSTANTS.WIDGET_BACK_COLOUR, command=self.__canvas.yview)
+                bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
         self.__scrollbar.pack(side=RIGHT, fill=Y)
         self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
         self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
@@ -87,7 +86,7 @@ class MainWindow:
 
     def __window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
-        print("*** In Resize window eevent ***")
+        #print("*** In Resize window eevent ***")
         #try and control the amount og times the screen will get redrawn
         prev_width = int(self.width)
         prev_height = int(self.height)
@@ -110,7 +109,7 @@ class MainWindow:
 
         if diff1 > 25 or diff2 > 25:
             #resize the widgets in the current view
-            print("*** Redrwing screen ***")
+            #print("*** Redrwing screen ***")
             if self.__current_view != 'none':
                 self.get_view(self.__current_view)
 

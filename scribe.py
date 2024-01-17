@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
-import constants as CONSTANTS
 from main_window import MainWindow
 import configparser
 import os.path
@@ -22,15 +21,15 @@ def window_closed():
 
 def main():
 
-    path = CONSTANTS.CONFIG_FILE
-    check_file = os.path.isfile(path)
+    config_file = "./scribe.config"
+    check_file = os.path.isfile(config_file)
 
     if check_file == False:
         print("Config file not ... Creating new config")
         conf.create_new_config_file()
-        print("Wrote new config" + CONSTANTS.CONFIG_FILE)
+        print("Wrote new config" + config_file)
     else:
-        print("Found config file " + CONSTANTS.CONFIG_FILE)
+        print("Found config file " + config_file)
 
     init_main_window()
     # root.mainloop()
@@ -49,7 +48,7 @@ def init_main_window():
     db_file = conf.read_section('main', 'database')
     db = database(db_file)
 
-    root.title(CONSTANTS.APP_TITLE)
+    root.title(conf.read_section('main', 'app_title'))
     main_win = MainWindow(root,db)
     
     # set default view  - read this from stored settings

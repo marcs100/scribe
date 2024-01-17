@@ -3,9 +3,9 @@ from database import database
 import tkinter as tk
 #from tkinter import ttk as ttk
 import columns as COLUMN
-import constants as CONSTANTS
 import hashlib
 import datetime
+import config_file as conf
 #from main_window import MainWindow
 
 
@@ -23,36 +23,26 @@ class NoteWindow:
         self.__current_notebook = None
         self.__main_window = main_window # This is a reference to the main view window so we can tell it to update views if notes gett added or removed
 
-        self.__frame = tk.Frame(self.__note_window, bg=CONSTANTS.WIDGET_BACK_COLOUR)
+        self.__frame = tk.Frame(self.__note_window, bg=conf.read_section('colours', 'widget_bg'))
 
-        self.__menu_frame = tk.Frame(self.__note_window, bg=CONSTANTS.WIDGET_BACK_COLOUR)
-        spacer_label = tk.Label(self.__menu_frame, text="       ", bg=CONSTANTS.WIDGET_BACK_COLOUR,
-                                fg=CONSTANTS.WIDGET_TEXT_COLOUR)
-        spacer_label2 = tk.Label(self.__menu_frame, text="       ", bg=CONSTANTS.WIDGET_BACK_COLOUR,
-                                fg=CONSTANTS.WIDGET_TEXT_COLOUR)
-        view_label = tk.Label(self.__menu_frame, text="dummy", bg=CONSTANTS.WIDGET_BACK_COLOUR,
-                              fg=CONSTANTS.WIDGET_TEXT_COLOUR)
+        self.__menu_frame = tk.Frame(self.__note_window, bg=conf.read_section('colours', 'widget_bg'))
+        spacer_label = tk.Label(self.__menu_frame, text="       ", bg=conf.read_section('colours', 'widget_bg'),
+                                fg=conf.read_section('colours', 'widget_text'))
+        spacer_label2 = tk.Label(self.__menu_frame, text="       ", bg=conf.read_section('colours', 'widget_bg'),
+                                fg=conf.read_section('colours', 'widget_text'))
+        view_label = tk.Label(self.__menu_frame, text="dummy", bg=conf.read_section('colours', 'widget_bg'),
+                              fg=conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
         spacer_label2.pack(fill=Y, side='left')
         view_label.pack(fill=Y, side='right')
 
-        #To set colours on ttk.Comboxbox you have to configure a style and apply the theme.
-        #It can only be applied once else goves error 'theme alresdy applied'
-        #I will leave the combobobox as default for now as I do not really like the comboxbox
-        #and I will try to make a fancy menu instead
-        self.__selected_notebook = tk.StringVar()
-        self.__notebook_combo = ttk.Combobox(self.__menu_frame, textvariable=self.__selected_notebook)
-        self.__notebook_combo['values'] = ("Notebook")
-        self.__notebook_combo.pack(fill='y', side='left', pady=2,padx=2)
-
-
-        self.__save_button = tk.Button(self.__menu_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR,
-                                      fg=CONSTANTS.WIDGET_TEXT_COLOUR, relief="flat", text="Save",
+        self.__save_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Save",
                                       command=self.__save_note)
         self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
 
-        self.__delete_button = tk.Button(self.__menu_frame, bg=CONSTANTS.WIDGET_BACK_COLOUR,
-                                      fg=CONSTANTS.WIDGET_TEXT_COLOUR, relief="flat", text="Delete",
+        self.__delete_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Delete",
                                       command=self.__delete_note)
         self.__delete_button.pack(fill='y', side='left',  pady=2, padx=2)
 
