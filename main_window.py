@@ -6,7 +6,7 @@ from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
 import config_file as conf
-from tkinter import ttk
+#from tkinter import ttk
 
 class MainWindow:
     def __init__(self, root, database_in):
@@ -49,7 +49,10 @@ class MainWindow:
         #Adding a scrollbar is tricky in tkinter!!!!!!
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
         self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=25, 
-                bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
+                   bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
+
+        #self.__scrollbar = ttk.Scrollbar(self.__main_frame, orient=VERTICAL, command=self.__canvas.yview)
+
         self.__scrollbar.pack(side=RIGHT, fill=Y)
         self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
         self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
