@@ -111,6 +111,7 @@ class NoteWindow:
             self.__db.addNote(self.__attrib.notebook, self.__attrib.tag, self.__text_box.get("1.0",END), 
                               self.__attrib.date_created, self.__attrib.pinned, self.__attrib.colour)
             self.__new_note_flag = False
+            self.__main_window.update_currrent_view()
             return
 
         # We also need to check if the user has switched o a different notebook - not implemented yet!!!!!!!!
@@ -122,6 +123,7 @@ class NoteWindow:
         self.__attrib.date_modified = datetime.datetime.now()
         self.__db.updateNote(self.__note[0][COLUMN.ID], self.__attrib.notebook, self.__attrib.tag, 
                              self.__text_box.get("1.0",END), self.__attrib.date_modified, self.__attrib.pinned, self.__attrib.colour)
+        self.__main_window.update_currrent_view()
   
     def __delete_note(self):
         if(self.__attrib.new_note == False):
