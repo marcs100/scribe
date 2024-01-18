@@ -7,6 +7,7 @@ import hashlib
 import datetime
 import config_file as conf
 import note_attributes
+from tkinter import colorchooser
 #from main_window import MainWindow
 
 
@@ -43,12 +44,18 @@ class NoteWindow:
 
         self.__save_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Save",
-                                      command=self.__save_note)
-        self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
+                                      command=self.__save_note)        
 
         self.__delete_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Delete",
                                       command=self.__delete_note)
+        
+        self.__colour_button =  tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Colour",
+                                      command=self.__get_colour)
+
+        self.__colour_button.pack(fill='y', side='right',  pady=2, padx=4)
+        self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
         self.__delete_button.pack(fill='y', side='left',  pady=2, padx=2)
 
         self.__text_box = tk.Text(self.__frame, wrap=tk.WORD)
@@ -107,7 +114,7 @@ class NoteWindow:
             return
 
         # We also need to check if the user has switched o a different notebook - not implemented yet!!!!!!!!
-        if current_hash == self.__note_hash:
+        if (current_hash == self.__attrib.hash) and (self.__attrib.modified == False):
             print("Note has not changed")
             return
         
@@ -130,6 +137,15 @@ class NoteWindow:
             self.__note_window.destroy()
 
 
+    def __get_colour(self):
+        col = colorchooser.askcolor()
+        if col != None:
+            col = str(col[1])
+            if self.__attrib.colour != col:
+                self.__attrib.colour = col
+                self.__text_box['bg'] = self.__attrib.colour 
+                self.__attrib.modified = True
+    
     def get_next_note(self):
         pass
 
