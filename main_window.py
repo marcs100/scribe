@@ -35,6 +35,7 @@ class MainWindow:
         self.__lbl_font = font.Font(weight="bold")
         self.__view_label["font"] = self.__lbl_font
 
+        # Select view menu button
         menu = tk.Menubutton()
         self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         self.__view_button["menu"] = self.__view_button.menu
@@ -48,11 +49,8 @@ class MainWindow:
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
-        self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=25, 
+        self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=15, 
                    bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
-
-        #self.__scrollbar = ttk.Scrollbar(self.__main_frame, orient=VERTICAL, command=self.__canvas.yview)
-
         self.__scrollbar.pack(side=RIGHT, fill=Y)
         self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
         self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
@@ -62,7 +60,13 @@ class MainWindow:
         self.__view_label.pack(fill=Y, side='right', padx=15, pady=6)
         spacer_label.pack(fill=Y, side='right')
         self.__view_button.pack(fill=Y, side='right')
-        print("leaving MainWindow.init_window.....")
+        #print("leaving MainWindow.init_window.....")
+
+        #New Note button
+        self.__new_note_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
+                                      command=self.__create_new_note)
+        self.__new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
         self.__main_frame.pack(fill=BOTH, expand=TRUE)
@@ -72,6 +76,11 @@ class MainWindow:
 
     
     '''EVENTS'''
+
+    def __create_new_note(self):
+        note_window = NoteWindow(self.__root, self)
+        note_window.open_note(None, self.__db)
+
     
     def clear_frame(self):
         for widgets in self.__frame.winfo_children():
@@ -122,11 +131,10 @@ class MainWindow:
 
     #Public facing function to get a main view
     def get_view(self,view):
-        print("Getting view: "+view)
+        #print("Getting view: "+view)
         self.__current_view = view
         match view:
             case 'pinned':
-                # I want to set the menu button checkbox thing here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 self.__get_pinned_notes_view()
             case 'recent':
                 self.__get_recent_notes_view()
@@ -180,7 +188,6 @@ class MainWindow:
             print("No notebooks found!")
             return
         for notebook_name in notebook_names:
-            #print("Notebook name is " + str(notebook_name[0]))
             colour = self.__db.getNotebookColour(notebook_name[0])
             self.__text_box = tk.Text(self.__frame, height=5, width=self.__notebook_width, wrap=tk.WORD, bg=colour)
             self.__text_box.insert(tk.END, str(notebook_name[0]))
@@ -210,15 +217,11 @@ class MainWindow:
         num_widgets_in_row = 1
 
         for recent_note in recent_notes:
-            #print(" recent note id is " + str(recent_note[COLUMN.ID]))
             note_id = recent_note[COLUMN.ID]
             self.__text_box = tk.Text(self.__frame, height=15, width=self.__note_width, wrap=tk.WORD, bg=recent_note[COLUMN.BACK_COLOUR])
             self.__text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event,sqlid=note_id: self.__clicked_note(event,sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-
-            #print("row = " + str(row)+ " column = "+ str(col))
-
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -239,16 +242,13 @@ class MainWindow:
         pad_x = 3
         max_col = self.calculate_columns(self.__note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
-        #max_col = number_of_columns-1
         num_widgets_in_row = 1
         for pinned_note in pinned_notes:
-            #print("pinned note id is " + str(pinned_note[COLUMN.ID]))
             note_id = pinned_note[COLUMN.ID]
             self.__text_box = tk.Text(self.__frame, height=15, width=self.__note_width, wrap=tk.WORD, bg=pinned_note[COLUMN.BACK_COLOUR])
             self.__text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            #self.calculate_columns(str(self.__text_box.cget('width')),1)
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -273,7 +273,7 @@ class MainWindow:
 
         screen_size = self.__root.winfo_width()
 
-        num_chars = round(screen_size / 15)
+        num_chars = round(screen_size / 8)
 
         #number of widgets that can fit horizintally on screen
         num_columns = round(num_chars  / (widget_width + border_size))

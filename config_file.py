@@ -12,6 +12,7 @@ def create_new_config_file():
     config['main']['app_title'] = "Scribe v1.0"
     config['main']['database'] = "/home/marc/Documents/marcnotes_db"
     config['main']['recent_notes_count'] = "8"
+    config['main']['default_notebook'] = "General"
     
     config['main_window']['default_view'] = "pinned"
     config['main_window']['width'] = "1000"
