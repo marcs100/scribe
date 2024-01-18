@@ -53,8 +53,15 @@ class NoteWindow:
         self.__colour_button =  tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Colour",
                                       command=self.__get_colour)
+        
+         # Select notebook button
+        self.__notebook_button = tk.Menubutton(self.__menu_frame, text="Notebook", relief="flat", 
+                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        self.__notebook_button.menu = tk.Menu(self.__notebook_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        self.__notebook_button["menu"] = self.__notebook_button.menu
 
         self.__colour_button.pack(fill='y', side='right',  pady=2, padx=4)
+        self.__notebook_button.pack(fill='y', side='left',pady=2, padx =4)
         self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
         self.__delete_button.pack(fill='y', side='left',  pady=2, padx=2)
 
@@ -65,8 +72,23 @@ class NoteWindow:
         self.__frame.pack(fill='both', expand=TRUE)
 
 
+    def __populate_notebook_menu(self):
+        notebooks = self.__db.getNotebookNames()
+        for notebook in notebooks:
+             notebook_str = str(notebook[0])
+             self.__notebook_button.menu.add_command(label=notebook_str, command=lambda notebook_in=notebook_str: self.__select_notebook(notebook_in))
+        
+
+    def __select_notebook(self, notebook_in):
+        self.__attrib.notebook = notebook_in
+        print(notebook_in)
+        self.__note_window.title("Notebook: " + self.__attrib.notebook)
+    
+    
     def open_note(self, sqlid, db_in):
         self.__db = db_in 
+
+        self.__populate_notebook_menu()
         
         #determine if this is a new note or an existing note
         if sqlid == None:
@@ -141,7 +163,7 @@ class NoteWindow:
 
     def __get_colour(self):
         col = colorchooser.askcolor()
-        if col != None:
+        if col != (None,None):
             col = str(col[1])
             if self.__attrib.colour != col:
                 self.__attrib.colour = col

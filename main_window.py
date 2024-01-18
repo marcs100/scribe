@@ -6,71 +6,76 @@ from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
 import config_file as conf
-#from tkinter import ttk
+from tkinter import ttk
 
 class MainWindow:
     def __init__(self, root, database_in):
         self.__root = root
         self.__db = database_in
-        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
-        
-        self.__menu_frame = tk.Frame(self.__root, bg=conf.read_section('colours','widget_bg'))
-        self.__canvas = tk.Canvas(self.__main_frame, bg=conf.read_section('colours','widget_bg'))
-        self.__frame = tk.Frame(self.__canvas,bg=conf.read_section('colours','widget_bg'))
-
-        self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
-        self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
-        
+       
         self.width = 0
         self.height = 0
         self.__current_view = 'none'
-        self._after_id = None
+        self.__selected_notebook = 'none'
         self.init_window()
 
     def init_window(self):
         self.__note_width = int(conf.read_section('main_window', 'note_width'))
         self.__notebook_width = int(conf.read_section('main_window', 'notebook_width'))
         
-        print("In MainWindow.init_window.....")
-        self.__lbl_font = font.Font(weight="bold")
-        self.__view_label["font"] = self.__lbl_font
 
-        # Select view menu button
-        menu = tk.Menubutton()
-        self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        #Adding a scrollbar is tricky in tkinter!!!!!!
+        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
+       
+          #print("In MainWindow.init_window.....")
+        
+        self.__canvas = tk.Canvas(self.__main_frame, bg=conf.read_section('colours','widget_bg'))
+        #self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=15, 
+        #           bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
+        self.__scrollbar = ttk.Scrollbar(self.__main_frame, orient=VERTICAL, command=self.__canvas.yview)
+        self.__scrollbar.pack(side=RIGHT, fill=Y)
+        self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
+        self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
+
+        #Thios is the frame inside the canvas that will be scrollable (do not pack as we will create a window in)
+        self.__frame = tk.Frame(self.__canvas,bg=conf.read_section('colours','widget_bg'))
+        self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
+            
+        #print("leaving MainWindow.init_window.....")
+
+        self.__menu_frame = tk.Frame(self.__root, bg=conf.read_section('colours','widget_bg'))
+        self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
+        self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", 
+                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+               
+        self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'), 
+                                     fg=conf.read_section('colours', 'widget_text'))
+        lbl_font = font.Font(weight="bold")
+        self.__view_label["font"] = lbl_font
+        #self.__frame.pack(fill=BOTH, expand=TRUE) 
+
+          #New Note button
+        self.__new_note_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
+                                      command=self.__create_new_note)
+        self.__new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
+
+         # Select view menu button
+        #menu = tk.Menubutton()
+        self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), 
+                                          fg=conf.read_section('colours', 'widget_text'))
         self.__view_button["menu"] = self.__view_button.menu
 
         self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
         
-        spacer_label = tk.Label(self.__menu_frame, text="          ", bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        self.__view_label.pack(fill=Y, side='right', padx=35, pady=6)
+        self.__view_button.pack(fill=Y, side='right',padx=30,pady=6)
 
-
-        #Adding a scrollbar is tricky in tkinter!!!!!!
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
-        self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=15, 
-                   bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
-        self.__scrollbar.pack(side=RIGHT, fill=Y)
-        self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
-        self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
-        self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
-            
 
-        self.__view_label.pack(fill=Y, side='right', padx=15, pady=6)
-        spacer_label.pack(fill=Y, side='right')
-        self.__view_button.pack(fill=Y, side='right')
-        #print("leaving MainWindow.init_window.....")
-
-        #New Note button
-        self.__new_note_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
-                                      command=self.__create_new_note)
-        self.__new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
-
-        self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
         self.__main_frame.pack(fill=BOTH, expand=TRUE)
-        #self.__frame.pack(fill=BOTH, expand=TRUE) 
 
         self.__main_frame.bind("<Configure>", lambda event: self.__window_resized(event))
 
@@ -93,7 +98,8 @@ class MainWindow:
         note_window.open_note(sqlid, self.__db)
 
     def __clicked_notebook(self,event, name):
-        print("notebook name is " + str(name))
+        print("notebook name is " + name)
+        self.__selected_notebook = name
         self.__get_note_pages_view(name)
 
     def __window_resized(self,event):
@@ -135,11 +141,18 @@ class MainWindow:
         self.__current_view = view
         match view:
             case 'pinned':
+                self.__selected_notebook = 'none'
                 self.__get_pinned_notes_view()
             case 'recent':
+                self.__selected_notebook = 'none'
                 self.__get_recent_notes_view()
             case 'notebooks':
+                self.__selected_notebook = 'none'
                 self.__get_notebooks_view()
+            case 'notebook_pages':
+                if self.__selected_notebook != 'none':
+                    self.__get_note_pages_view(self.__selected_notebook)
+    
 
     #public facing funtion to update current view (assuming it has been set
     #This can be called by other classes if the view needs updaing i.e. a note has been deleted
@@ -150,6 +163,7 @@ class MainWindow:
 
     def __get_note_pages_view(self, notebook):
         self.clear_frame()
+        self.__current_view = 'notebook_pages'
         self.__view_label["text"] = "Viewing Notebook: " + notebook
         note_pages = self.__db.getNotebook(notebook)
         if note_pages is None:
@@ -273,7 +287,7 @@ class MainWindow:
 
         screen_size = self.__root.winfo_width()
 
-        num_chars = round(screen_size / 8)
+        num_chars = round(screen_size / 15)
 
         #number of widgets that can fit horizintally on screen
         num_columns = round(num_chars  / (widget_width + border_size))
