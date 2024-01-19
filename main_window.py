@@ -280,6 +280,10 @@ class MainWindow:
         On main PC (HD screen) screen size for 3 notes is 1240, so 1240/150 = 8 pixels per character.
         This makes sens becuase my laptop is scaled to 200% - not sure how python could detect that fact!!!!!
         '''
+
+        #get screen scale value (multiplier)
+        scr_scale = int(conf.read_section('main', 'screen_scale'))
+
         
         #we need this becuase initially the screen size won't be reported becuase it has not gone through mainloop yet
         self.__root.update_idletasks()
@@ -287,7 +291,7 @@ class MainWindow:
 
         screen_size = self.__root.winfo_width()
 
-        num_chars = round(screen_size / 15)
+        num_chars = round(screen_size / (8 * scr_scale))
 
         #number of widgets that can fit horizintally on screen
         num_columns = round(num_chars  / (widget_width + border_size))
