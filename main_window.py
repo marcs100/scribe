@@ -25,10 +25,7 @@ class MainWindow:
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
-        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
-       
-          #print("In MainWindow.init_window.....")
-        
+        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar 
         self.__canvas = tk.Canvas(self.__main_frame, bg=conf.read_section('colours','widget_bg'))
         #self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=15, 
         #           bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
@@ -37,11 +34,10 @@ class MainWindow:
         self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
         self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
 
-        #Thios is the frame inside the canvas that will be scrollable (do not pack as we will create a window in)
+        #This is the frame inside the canvas that will be scrollable (do not pack as we will create a window in it)
         self.__frame = tk.Frame(self.__canvas,bg=conf.read_section('colours','widget_bg'))
         self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
             
-        #print("leaving MainWindow.init_window.....")
 
         self.__menu_frame = tk.Frame(self.__root, bg=conf.read_section('colours','widget_bg'))
         self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
@@ -59,6 +55,12 @@ class MainWindow:
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
                                       command=self.__create_new_note)
         self.__new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
+
+        # This should only be enabled when in 'view notebooks' view
+        self.__new_notebook_button = tk.Button(self.__menu_frame,  bg=conf.read_section('colours', 'widget_bg'),
+                                        fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Notebook",
+                                        state='disabled', command=self.__create_new_notebook)
+        self.__new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
          # Select view menu button
         #menu = tk.Menubutton()
@@ -81,6 +83,13 @@ class MainWindow:
 
     
     '''EVENTS'''
+
+    def __create_new_notebook(self):
+        #get existing notebook names as we do not want to create any duplicates
+        notebook_names = self.__db.getNotebookNames()
+
+        #ask user for the new notebook name and colour
+        pass
 
     def __create_new_note(self):
         note_window = NoteWindow(self.__root, self)
@@ -141,15 +150,19 @@ class MainWindow:
         self.__current_view = view
         match view:
             case 'pinned':
+                self.__new_notebook_button["state"]='disabled'
                 self.__selected_notebook = 'none'
                 self.__get_pinned_notes_view()
             case 'recent':
+                self.__new_notebook_button["state"]='disabled'
                 self.__selected_notebook = 'none'
                 self.__get_recent_notes_view()
             case 'notebooks':
+                self.__new_notebook_button["state"]='normal'
                 self.__selected_notebook = 'none'
                 self.__get_notebooks_view()
             case 'notebook_pages':
+                self.__new_notebook_button["state"]='disabled'
                 if self.__selected_notebook != 'none':
                     self.__get_note_pages_view(self.__selected_notebook)
     
