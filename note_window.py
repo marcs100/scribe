@@ -80,9 +80,11 @@ class NoteWindow:
         
 
     def __select_notebook(self, notebook_in):
-        self.__attrib.notebook = notebook_in
-        print(notebook_in)
-        self.__note_window.title("Notebook: " + self.__attrib.notebook)
+        if self.__attrib.notebook != notebook_in:
+            self.__attrib.notebook = notebook_in
+            print(notebook_in)
+            self.__note_window.title("Notebook: " + self.__attrib.notebook)
+            self.__attrib.modified = True # Set this so the change will be saved
     
     
     def open_note(self, sqlid, db_in):
