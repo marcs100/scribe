@@ -63,6 +63,14 @@ class MainWindow:
                                         state='disabled', command=self.__create_new_notebook)
         self.__new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
+        self.__search_input = tk.StringVar()
+        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours','widget_text'))
+        self.__search_entry.pack(side='left',padx=10)
+        self.__search_button = tk.Button(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
+                                           fg=conf.read_section('colours', 'widget_text'), relief="flat", text="search",
+                                           command=self.__get_search_inpt)
+        self.__search_button.pack(side='left', padx=5)
+
          # Select view menu button
         #menu = tk.Menubutton()
         self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), 
@@ -73,8 +81,8 @@ class MainWindow:
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
         
-        self.__view_label.pack(fill=Y, side='right', padx=35, pady=6)
-        self.__view_button.pack(fill=Y, side='right',padx=30,pady=6)
+        self.__view_label.pack(fill=Y, anchor='center', pady=3)
+        self.__view_button.pack(fill=Y, side='right',padx=30,pady=3)
 
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
@@ -84,6 +92,10 @@ class MainWindow:
 
     
     '''EVENTS'''
+
+    def __get_search_inpt(self):
+        print(f"Search input is {self.__search_input.get()}")
+        self.get_view('search results')
 
     def __create_new_notebook(self):
         #get existing notebook names as we do not want to create any duplicates
@@ -111,6 +123,8 @@ class MainWindow:
         # open note for editing in new window
         note_window = NoteWindow(self.__root, self)
         note_window.open_note(sqlid, self.__db)
+
+
 
     def __clicked_notebook(self,event, name):
         print("notebook name is " + name)
@@ -149,8 +163,9 @@ class MainWindow:
 
 
     '''END OF EVENTS'''
-
+    ##############################################################
     #Public facing function to get a main view
+    ##############################################################
     def get_view(self,view):
         #print("Getting view: "+view)
         self.__current_view = view
@@ -171,10 +186,16 @@ class MainWindow:
                 self.__new_notebook_button["state"]='disabled'
                 if self.__selected_notebook != 'none':
                     self.__get_note_pages_view(self.__selected_notebook)
+            case 'search results':
+                    self.__new_notebook_button["state"]='disabled'
+                    self.__selected_notebook = 'none'
+                    self.__get_search_results_view()
     
 
+    #################################################################################
     #public facing funtion to update current view (assuming it has been set
     #This can be called by other classes if the view needs updaing i.e. a note has been deleted
+    #################################################################################
     def update_currrent_view(self):        
         if self.__current_view != 'none':
             self.get_view(self.__current_view)
@@ -291,6 +312,38 @@ class MainWindow:
                 row += num_widgets_in_row
             else:
                 col += 1
+
+
+    def __get_search_results_view(self):
+        self.clear_frame()
+        self.__current_view = 'search results'
+        self.__view_label["text"] = "Viewing Search Results"
+        search_pages = self.__db.getSearchResults(self.__search_input.get(), 500, 0)
+        if search_pages is None:
+            print("No search results notes found")
+            return
+
+        pad_x = 3
+        col = 0
+        row = 0
+        max_col = self.calculate_columns(self.__note_width,6)
+        max_col -= 1 # -1 becuase of zero based index for grid
+        num_widgets_in_row = 1
+        for search_page in search_pages:
+            note_id = search_page[COLUMN.ID]
+
+            self.__text_box = tk.Text(self.__frame,height=15,width=self.__note_width, wrap=tk.WORD,
+                        bg=search_page[COLUMN.BACK_COLOUR])
+            self.__text_box.insert(tk.END, search_page[COLUMN.CONTENT])
+            self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id:self.__clicked_note(event, sqlid))
+            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self.__text_box['state'] = 'disabled'
+            if col == max_col:
+                col = 0
+                row += num_widgets_in_row
+            else:
+                col += 1
+
     #Calculate the maximum number of columns of textboxes that can be displayed in a given width
     # for the current screen size
     def calculate_columns(self, widget_width, border_size):

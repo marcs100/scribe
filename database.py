@@ -115,7 +115,7 @@ class database(object):
 
         rows = self.cursor.fetchall()
         return rows[0][0]
-
+    '''
     def getSearchResults(self, searchQuery, notebook, tag, resultsPerPage, startAt):
         if notebook == 'ALL' and tag == 'ALL':
             searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
@@ -144,7 +144,7 @@ class database(object):
 
         rows = self.cursor.fetchall()
         return rows
-
+    '''
     # get number of results for a given search type - override - removing tag search until I can reimplemenent this in the UI better than before!!!
     def getNumberOfSearchResults(self, searchQuery):
 
@@ -159,7 +159,7 @@ class database(object):
 
         searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
         self.cursor.execute(
-            "select id, notebook, tag, substr(content,0,1800) from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
+            "select id, notebook, tag, substr(content,0,1800), created, modified, pinned, BGColour from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
             searchTuple)
 
         rows = self.cursor.fetchall()
