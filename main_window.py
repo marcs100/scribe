@@ -7,7 +7,8 @@ import columns as COLUMN
 from note_window import NoteWindow
 import config_file as conf
 from tkinter import ttk
-
+from tkinter import simpledialog
+from tkinter import messagebox
 class MainWindow:
     def __init__(self, root, database_in):
         self.__root = root
@@ -88,8 +89,13 @@ class MainWindow:
         #get existing notebook names as we do not want to create any duplicates
         notebook_names = self.__db.getNotebookNames()
 
-        #ask user for the new notebook name and colour
-        pass
+        #ask user for the new notebook name - use default colour
+        new_notebook = simpledialog.askstring("Input", "Enter new notebook name...")
+        if new_notebook is not None:
+            self.__db.addToNotebookCovers(new_notebook, conf.read_section('colours', 'default_notebook_bg'))
+            messagebox.showinfo("Scribe","New notebook {} has been created".format(new_notebook))
+            self.update_currrent_view()
+        
 
     def __create_new_note(self):
         note_window = NoteWindow(self.__root, self)
@@ -195,6 +201,7 @@ class MainWindow:
             self.__text_box.insert(tk.END, note_page[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self.__text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -220,6 +227,7 @@ class MainWindow:
             self.__text_box.insert(tk.END, str(notebook_name[0]))
             self.__text_box.bind('<Double-1>', lambda event,name=str(notebook_name[0]): self.__clicked_notebook(event,name))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self.__text_box['state'] = 'disabled'
 
             if col == max_col:
                 col = 0
@@ -249,6 +257,7 @@ class MainWindow:
             self.__text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event,sqlid=note_id: self.__clicked_note(event,sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self.__text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -276,6 +285,7 @@ class MainWindow:
             self.__text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
             self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self.__text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row

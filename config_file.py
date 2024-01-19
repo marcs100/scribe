@@ -25,6 +25,7 @@ def create_new_config_file():
     config['colours']['widget_text'] = '#e7edef' # off white (hint of blue)
     config['colours']['note_text'] = '#484445'
     config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
+    config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
     
     write_config()
 
