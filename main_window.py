@@ -65,11 +65,17 @@ class MainWindow:
 
         self.__search_input = tk.StringVar()
         self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours','widget_text'))
-        self.__search_entry.pack(side='left',padx=10)
+
+        # right side spacer from edge of frame
+        spacer_label = tk.Label(self.__menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
+                                fg=conf.read_section('colours', 'widget_text'))
+        spacer_label.pack(fill=Y, side='right')
+
+        self.__search_entry.pack(fill=Y, side='right',padx=3, pady=1)
         self.__search_button = tk.Button(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
                                            fg=conf.read_section('colours', 'widget_text'), relief="flat", text="search",
                                            command=self.__get_search_inpt)
-        self.__search_button.pack(side='left', padx=5)
+        self.__search_button.pack(fill=Y, side='right', padx=5, pady=1)
 
          # Select view menu button
         #menu = tk.Menubutton()
@@ -80,9 +86,9 @@ class MainWindow:
         self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
-        
+
+        self.__view_button.pack(fill=Y, side='left',padx=30,pady=3)
         self.__view_label.pack(fill=Y, anchor='center', pady=3)
-        self.__view_button.pack(fill=Y, side='right',padx=30,pady=3)
 
         self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
