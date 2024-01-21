@@ -97,7 +97,8 @@ class NoteWindow:
             self.__attrib.id = 0
             self.__attrib.pinned= 0
             self.__attrib.new_note = True
-            self.__attrib.notebook = conf.read_section('main', 'default_notebook')
+            if self.__attrib.notebook == "":
+                self.__attrib.notebook = conf.read_section('main', 'default_notebook')
             self.__attrib.colour = conf.read_section('colours','default_note_bg')
         else:
             self.__attrib.id = sqlid
@@ -162,6 +163,13 @@ class NoteWindow:
             #close the deleted note
             self.__note_window.destroy()
 
+
+    ##########################################################
+    #Public facing function to override the default notebook
+    #setting for new notes
+    ##########################################################
+    def set_notebook_name(self, notebook_name):
+        self.__attrib.notebook = notebook_name
 
     def __get_colour(self):
         col = colorchooser.askcolor()

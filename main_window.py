@@ -117,6 +117,8 @@ class MainWindow:
 
     def __create_new_note(self):
         note_window = NoteWindow(self.__root, self)
+        if self.__selected_notebook != 'none':
+            note_window.set_notebook_name(self.__selected_notebook)
         note_window.open_note(None, self.__db)
 
     
