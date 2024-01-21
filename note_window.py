@@ -172,7 +172,7 @@ class NoteWindow:
         self.__attrib.notebook = notebook_name
 
     def __get_colour(self):
-        col = colorchooser.askcolor()
+        col = colorchooser.askcolor(title="Choose notebook colour", parent=self.__note_window)
         if col != (None,None):
             col = str(col[1])
             if self.__attrib.colour != col:
