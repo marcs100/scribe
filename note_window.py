@@ -36,11 +36,11 @@ class NoteWindow:
                                 fg=conf.read_section('colours', 'widget_text'))
         spacer_label2 = tk.Label(self.__menu_frame, text="       ", bg=conf.read_section('colours', 'widget_bg'),
                                 fg=conf.read_section('colours', 'widget_text'))
-        view_label = tk.Label(self.__menu_frame, text="dummy", bg=conf.read_section('colours', 'widget_bg'),
+        spacer_label3 = tk.Label(self.__menu_frame, text="  ", bg=conf.read_section('colours', 'widget_bg'),
                               fg=conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
         spacer_label2.pack(fill=Y, side='left')
-        view_label.pack(fill=Y, side='right')
+        spacer_label3.pack(fill=Y, side='right')
 
         self.__save_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Save",
@@ -53,17 +53,22 @@ class NoteWindow:
         self.__colour_button =  tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Colour",
                                       command=self.__get_colour)
-        
+        self.__pin_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Pin",
+                                      command=self.__toggle_pin)
+
          # Select notebook button
         self.__notebook_button = tk.Menubutton(self.__menu_frame, text="Notebook", relief="flat", 
                                            bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         self.__notebook_button.menu = tk.Menu(self.__notebook_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         self.__notebook_button["menu"] = self.__notebook_button.menu
 
-        self.__colour_button.pack(fill='y', side='right',  pady=2, padx=4)
+        self.__delete_button.pack(fill='y', side='right',  pady=2, padx=2)
         self.__notebook_button.pack(fill='y', side='left',pady=2, padx =4)
+        self.__pin_button.pack(fill='y', side='left',  pady=2, padx=4)
         self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
-        self.__delete_button.pack(fill='y', side='left',  pady=2, padx=2)
+        self.__colour_button.pack(fill='y', side='left',  pady=2, padx=4)
+
 
         self.__text_box = tk.Text(self.__frame, wrap=tk.WORD)
         self.__text_box.pack(fill='both', expand=TRUE)
@@ -96,6 +101,7 @@ class NoteWindow:
         if sqlid == None:
             self.__attrib.id = 0
             self.__attrib.pinned= 0
+            self.__pin_button['text'] = 'Pin'
             self.__attrib.new_note = True
             if self.__attrib.notebook == "":
                 self.__attrib.notebook = conf.read_section('main', 'default_notebook')
@@ -116,6 +122,10 @@ class NoteWindow:
             self.__attrib.content = self.__note[0][COLUMN.CONTENT]
             self.__text_box.insert(tk.END, self.__attrib.content)
             self.__attrib.pinned = self.__note[0][COLUMN.PINNED]
+            if self.__attrib.pinned is 0:
+                self.__pin_button['text'] = 'Pin'
+            else:
+                self.__pin_button['text'] = 'Unpin'
             self.__attrib.date_created = self.__note[0][COLUMN.CREATED]
             self.__attrib.date_modified = self.__note[0][COLUMN.MODIFIED]
             self.__attrib.tag = self.__note[0][COLUMN.TAG]
@@ -149,6 +159,24 @@ class NoteWindow:
         self.__db.updateNote(self.__note[0][COLUMN.ID], self.__attrib.notebook, self.__attrib.tag, 
                              self.__text_box.get("1.0",END), self.__attrib.date_modified, self.__attrib.pinned, self.__attrib.colour)
         self.__main_window.update_currrent_view()
+
+    ###########################################################
+    # pin button event to toggle pinned status for pinning and
+    # unpinning notes
+    ###########################################################
+    def __toggle_pin(self):
+        if self.__attrib.pinned is 0:
+            #pin note
+            self.__attrib.pinned = 1
+            self.__pin_button['text'] = 'Unpin'
+        else:
+            #unpin note
+            self.__attrib.pinned = 0
+            self.__pin_button['text'] = 'Pin'
+            pass
+        self.__attrib.modified = True # note will get updated on save
+        #self.__save_note()
+
   
     def __delete_note(self):
         if(self.__attrib.new_note == False):
@@ -172,7 +200,7 @@ class NoteWindow:
         self.__attrib.notebook = notebook_name
 
     def __get_colour(self):
-        col = colorchooser.askcolor(title="Choose notebook colour", parent=self.__note_window)
+        col = colorchooser.askcolor(title="Choose note colour", parent=self.__note_window)
         if col != (None,None):
             col = str(col[1])
             if self.__attrib.colour != col:

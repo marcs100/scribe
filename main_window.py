@@ -9,6 +9,8 @@ import config_file as conf
 from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
+from tkinter import colorchooser
+
 class MainWindow:
     def __init__(self, root, database_in):
         self.__root = root
@@ -133,11 +135,16 @@ class MainWindow:
         note_window.open_note(sqlid, self.__db)
 
 
-
     def __clicked_notebook(self,event, name):
         print("notebook name is " + name)
         self.__selected_notebook = name
         self.__get_note_pages_view(name)
+
+    def __right_click_notebook(self, event, name, textbox):
+        print(f"Right click event for notebook {name}")
+        menu = tk.Menu(self.__frame, tearoff = 0)
+        menu.add_command(label ="Change colour", command=lambda name=name: self.__change_notebook_colour(name))
+        menu.tk_popup(event.x_root, event.y_root)
 
     def __window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
@@ -254,7 +261,14 @@ class MainWindow:
             colour = self.__db.getNotebookColour(notebook_name[0])
             self.__text_box = tk.Text(self.__frame, height=5, width=self.__notebook_width, wrap=tk.WORD, bg=colour)
             self.__text_box.insert(tk.END, str(notebook_name[0]))
-            self.__text_box.bind('<Double-1>', lambda event,name=str(notebook_name[0]): self.__clicked_notebook(event,name))
+            self.__text_box.bind('<Double-1>',
+                                 lambda event,name=str(notebook_name[0]):self.__clicked_notebook(event,name))
+
+            #Trying to implement rigth click event here!!!!!!!!!!
+            self.__text_box.bind('<Button-3>',
+                                 lambda event, name=str(notebook_name[0]),
+                                 textbox=self.__text_box:self.__right_click_notebook(event,name, textbox))
+
             self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
             self.__text_box['state'] = 'disabled'
 
@@ -351,6 +365,16 @@ class MainWindow:
                 row += num_widgets_in_row
             else:
                 col += 1
+
+    def __change_notebook_colour(self, name):
+        print (f"Will chnage notebook colour for {name}")
+        colour = colorchooser.askcolor(title="Choose notebook colour", parent=self.__frame)
+        if colour != (None,None):
+            colour = str(colour[1])
+            self.__db.setNotebookColour(name,colour)
+            self.update_currrent_view()
+
+
 
     #Calculate the maximum number of columns of textboxes that can be displayed in a given width
     # for the current screen size
