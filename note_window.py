@@ -8,7 +8,7 @@ import datetime
 import config_file as conf
 import note_attributes
 from tkinter import colorchooser
-#from main_window import MainWindow
+from tkinter import messagebox
 
 
 class NoteWindow:
@@ -194,15 +194,17 @@ class NoteWindow:
     def __delete_note(self):
         if(self.__attrib.new_note == False):
             # to do - need to put a warning here that note will be deleted
+            if  messagebox.askyesno("Delete Note",
+                                    "Are you sure you want to delete this note?",
+                                    parent=self.__note_window) == True:
+                print(f"Deleting note {self.__attrib.id}")
+                self.__db.deleteNoteById(self.__attrib.id)
 
-            print(f"Deleting note {self.__attrib.id}")
-            self.__db.deleteNoteById(self.__attrib.id)
+                #need to tell main window to update teh current view
+                self.__main_window.update_currrent_view()
 
-            #need to tell main window to update teh current view
-            self.__main_window.update_currrent_view()
-
-            #close the deleted note
-            self.__note_window.destroy()
+                #close the deleted note
+                self.__note_window.destroy()
 
 
     ##########################################################
