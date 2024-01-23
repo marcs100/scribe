@@ -122,7 +122,7 @@ class NoteWindow:
             self.__attrib.content = self.__note[0][COLUMN.CONTENT]
             self.__text_box.insert(tk.END, self.__attrib.content)
             self.__attrib.pinned = self.__note[0][COLUMN.PINNED]
-            if self.__attrib.pinned is 0:
+            if self.__attrib.pinned == 0:
                 self.__pin_button['text'] = 'Pin'
             else:
                 self.__pin_button['text'] = 'Unpin'
@@ -131,8 +131,13 @@ class NoteWindow:
             self.__attrib.tag = self.__note[0][COLUMN.TAG]
         
         self.__note_window.title("Notebook: " + self.__attrib.notebook)
-        # to do ... update pinned widget here !!!!!!!!!
+        self.__note_window.protocol("WM_DELETE_WINDOW", self.__close_note)
 
+    # Note closing event
+    def __close_note(self):
+        self.__save_note()
+        self.__note_window.destroy()
+    
     def __save_note(self):
         #check hash to see if note has changed
         current_hash = hashlib.sha1(self.__text_box.get("1.0","end-1c")
@@ -165,7 +170,7 @@ class NoteWindow:
     # unpinning notes
     ###########################################################
     def __toggle_pin(self):
-        if self.__attrib.pinned is 0:
+        if self.__attrib.pinned == 0:
             #pin note
             self.__attrib.pinned = 1
             self.__pin_button['text'] = 'Unpin'
