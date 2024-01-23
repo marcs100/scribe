@@ -145,7 +145,7 @@ class NoteWindow:
             # addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
             self.__db.addNote(self.__attrib.notebook, self.__attrib.tag, self.__text_box.get("1.0",END), 
                               self.__attrib.date_created, self.__attrib.pinned, self.__attrib.colour)
-            self.__new_note_flag = False
+            self.__attrib.new_note = False
             self.__main_window.update_currrent_view()
             return
 
