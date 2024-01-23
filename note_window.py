@@ -42,9 +42,9 @@ class NoteWindow:
         spacer_label2.pack(fill=Y, side='left')
         spacer_label3.pack(fill=Y, side='right')
 
-        self.__save_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Save",
-                                      command=self.__save_note)        
+        self.__revert_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Revert",
+                                      command=self.__revert_text)
 
         self.__delete_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Delete",
@@ -66,7 +66,7 @@ class NoteWindow:
         self.__delete_button.pack(fill='y', side='right',  pady=2, padx=2)
         self.__notebook_button.pack(fill='y', side='left',pady=2, padx =4)
         self.__pin_button.pack(fill='y', side='left',  pady=2, padx=4)
-        self.__save_button.pack(fill='y', side='left',  pady=2, padx=4)
+        self.__revert_button.pack(fill='y', side='left',  pady=2, padx=4)
         self.__colour_button.pack(fill='y', side='left',  pady=2, padx=4)
 
 
@@ -182,7 +182,15 @@ class NoteWindow:
         self.__attrib.modified = True # note will get updated on save
         #self.__save_note()
 
-  
+    def __revert_text(self):
+        if self.__attrib.new_note == False:
+            #if it is not a new note then we shoul dhave the note id.
+            original_note = self.__db.getNoteByID(self.__attrib.id)
+            self.__attrib.content = original_note[0][COLUMN.CONTENT]
+            self.__text_box.delete('1.0', END)
+            self.__text_box.insert(tk.END, self.__attrib.content)
+
+
     def __delete_note(self):
         if(self.__attrib.new_note == False):
             # to do - need to put a warning here that note will be deleted
