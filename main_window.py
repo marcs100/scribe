@@ -66,7 +66,9 @@ class MainWindow:
         self.__new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         self.__search_input = tk.StringVar()
-        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours','widget_text'))
+        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input,      bg=conf.read_section('colours','widget_bg'),
+                                       fg=conf.read_section('colours','widget_text'),
+                                       highlightcolor=conf.read_section('colours', 'widget_highlight'))
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self.__menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
@@ -74,10 +76,11 @@ class MainWindow:
         spacer_label.pack(fill=Y, side='right')
 
         self.__search_entry.pack(fill=Y, side='right',padx=3, pady=1)
-        self.__search_button = tk.Button(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
-                                           fg=conf.read_section('colours', 'widget_text'), relief="flat", text="search",
-                                           command=self.__get_search_inpt)
-        self.__search_button.pack(fill=Y, side='right', padx=5, pady=1)
+        self.__search_label = tk.Label(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
+                                           fg=conf.read_section('colours', 'widget_text'), text="search: ")
+        self.__search_entry.bind('<Return>',lambda event: self.__get_search_input(event))
+
+        self.__search_label.pack(fill=Y, side='right', padx=5, pady=1)
 
          # Select view menu button
         #menu = tk.Menubutton()
@@ -101,9 +104,10 @@ class MainWindow:
     
     '''EVENTS'''
 
-    def __get_search_inpt(self):
+    def __get_search_input(self, event):
         print(f"Search input is {self.__search_input.get()}")
-        self.get_view('search results')
+        if len(self.__search_input.get()) != 0:
+            self.get_view('search results')
 
     def __create_new_notebook(self):
         #get existing notebook names as we do not want to create any duplicates
@@ -344,6 +348,8 @@ class MainWindow:
         if search_pages is None:
             print("No search results notes found")
             return
+
+        self.__view_label["text"] = f"Viewing Search Results ({str(len(search_pages))})"
 
         pad_x = 3
         col = 0
