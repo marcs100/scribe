@@ -10,6 +10,9 @@ from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
 from tkinter import colorchooser
+import run_script
+import os, glob, sys
+
 
 class MainWindow:
     def __init__(self, root, database_in):
@@ -74,6 +77,14 @@ class MainWindow:
         spacer_label = tk.Label(self.__menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
                                 fg=conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
+
+        self.__scripts_button = tk.Menubutton(self.__menu_frame, text="Scripts", relief="flat",
+                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+        self.__scripts_button.menu = tk.Menu(self.__scripts_button, bg=conf.read_section('colours','widget_bg'),
+                                          fg=conf.read_section('colours', 'widget_text'))
+        self.__scripts_button["menu"] = self.__scripts_button.menu
+        self.__populate_scripts_menu()
+        self.__scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
         self.__search_entry.pack(fill=Y, side='right',padx=3, pady=1)
         self.__search_label = tk.Label(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
@@ -379,6 +390,29 @@ class MainWindow:
             colour = str(colour[1])
             self.__db.setNotebookColour(name,colour)
             self.update_currrent_view()
+
+    def __populate_scripts_menu(self):
+        #self.__scripts_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
+        script_dir = self.__module_path() + "/scripts/"
+
+        script_files = glob.glob(script_dir+"*.py")
+
+        for script_file in script_files:
+            print(f"found script {script_file}")
+            head, script_file_name = os.path.split(script_file)
+            self.__scripts_button.menu.add_command(label=script_file_name,
+                command=lambda script=script_file: run_script.run_script(script))
+
+
+    def __we_are_frozen(self):
+        # All of the modules are built-in to the interpreter, e.g., by py2exe
+        return hasattr(sys, "frozen")
+
+    def __module_path(self):
+        encoding = sys.getfilesystemencoding()
+        if self.__we_are_frozen():
+            return os.path.dirname(str(sys.executable))
+        return os.path.dirname(str(__file__))
 
 
 
