@@ -1,6 +1,7 @@
 from subprocess import Popen, PIPE
 import tkinter as tk
 import config_file as conf
+import platform
 
 def update_text_box(text_box, line_in):
     text_box.insert(tk.END, line_in)
@@ -31,7 +32,11 @@ def run_script(script_name):
 
     root.update()
 
-    with Popen (["/usr/bin/python3", script_name], stderr=PIPE,stdout=PIPE) as process:
+    prog = '/usr/bin/python3'
+    if platform.system() == 'Windows':
+        prog = 'python'
+
+    with Popen ([prog, script_name], stderr=PIPE,stdout=PIPE) as process:
         while True:
             line = process.stdout.read1().decode("utf-8")
             text_box.insert(tk.END, line)
