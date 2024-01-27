@@ -81,7 +81,7 @@ class MainWindow:
         self.__scripts_button = tk.Menubutton(self.__menu_frame, text="Scripts", relief="flat",
                                            bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
         self.__scripts_button.menu = tk.Menu(self.__scripts_button, bg=conf.read_section('colours','widget_bg'),
-                                          fg=conf.read_section('colours', 'widget_text'))
+                                          fg=conf.read_section('colours', 'widget_text'), tearoff=0)
         self.__scripts_button["menu"] = self.__scripts_button.menu
         self.__populate_scripts_menu()
         self.__scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
@@ -96,7 +96,7 @@ class MainWindow:
          # Select view menu button
         #menu = tk.Menubutton()
         self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), 
-                                          fg=conf.read_section('colours', 'widget_text'))
+                                          fg=conf.read_section('colours', 'widget_text'), tearoff=0)
         self.__view_button["menu"] = self.__view_button.menu
 
         self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))

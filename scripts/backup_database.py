@@ -1,7 +1,6 @@
 import shutil
 import os
 import sys
-import errno
 import datetime
 
 def we_are_frozen():

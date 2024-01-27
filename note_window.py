@@ -25,7 +25,11 @@ class NoteWindow:
     def __init_window(self, root, main_window):
         self._root_window = root
         self.__note_window = tk.Toplevel(self._root_window)
-        self.__note_window.geometry('800x550')
+        mult_factor = int(conf.read_section('main','screen_scale'))
+        width = 800 * mult_factor
+        height = 550 * mult_factor
+        geometry = f"{width}x{height}"
+        self.__note_window.geometry(geometry)
        
         self.__main_window = main_window # This is a reference to the main view window so we can tell it to update views if notes gett added or removed
 
