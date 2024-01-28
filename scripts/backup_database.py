@@ -63,7 +63,7 @@ print (f"Creating backup {backup_location}{backup_file}\n")
 
 os.makedirs(backup_location, exist_ok=True)
 
-print(f"Copying {db_file_with_path} to {backup_file}")
+print(f"Copying {db_file_with_path} to {backup_location}{backup_file}")
 shutil.copyfile(db_file_with_path,backup_location+backup_file)
 
 print ("** Backup successful **")
