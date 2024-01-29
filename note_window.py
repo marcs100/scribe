@@ -21,7 +21,9 @@ class NoteWindow:
 
         self.__init_window(root, main_window)
                            
-
+    #-------------------------------------
+    # Initialise the main window
+    #-------------------------------------
     def __init_window(self, root, main_window):
         self._root_window = root
         self.__note_window = tk.Toplevel(self._root_window)
@@ -73,14 +75,18 @@ class NoteWindow:
         self.__revert_button.pack(fill='y', side='left',  pady=2, padx=4)
         self.__colour_button.pack(fill='y', side='left',  pady=2, padx=4)
 
-
         self.__text_box = tk.Text(self.__frame, wrap=tk.WORD)
+
+        #assign right click event so we can bring up a contaxt menu
+        self.__text_box.bind('<Button-3>', lambda event: self.__right_clicked_note(event))
         self.__text_box.pack(fill='both', expand=TRUE)
 
         self.__menu_frame.pack(fill='both', expand=FALSE)
         self.__frame.pack(fill='both', expand=TRUE)
 
-
+    #---------------------------------------------------------------
+    # Read all available notebooks and add the entries to a menu.
+    #--------------------------------------------------------------
     def __populate_notebook_menu(self):
         notebooks = self.__db.getNotebookNames()
         for notebook in notebooks:
@@ -88,6 +94,9 @@ class NoteWindow:
              self.__notebook_button.menu.add_command(label=notebook_str, command=lambda notebook_in=notebook_str: self.__select_notebook(notebook_in))
         
 
+    #---------------------------------------------------------
+    # allows use to change the notbook name for current note.
+    #---------------------------------------------------------
     def __select_notebook(self, notebook_in):
         if self.__attrib.notebook != notebook_in:
             self.__attrib.notebook = notebook_in
@@ -96,6 +105,9 @@ class NoteWindow:
             self.__attrib.modified = True # Set this so the change will be saved
     
     
+    #--------------------------------------------------------------------
+    # Open and display a new note or an existing note based on sql id.
+    #--------------------------------------------------------------------
     def open_note(self, sqlid, db_in):
         self.__db = db_in 
 
@@ -137,11 +149,18 @@ class NoteWindow:
         self.__note_window.title("Notebook: " + self.__attrib.notebook)
         self.__note_window.protocol("WM_DELETE_WINDOW", self.__close_note)
 
+    #------------------------------
     # Note closing event
+    #-----------------------------
     def __close_note(self):
         self.__save_note()
         self.__note_window.destroy()
     
+
+    #-------------------------------------------------------------
+    # Save the current note if is is a new note or a chnage to the
+    # note has been detected.
+    #-------------------------------------------------------------
     def __save_note(self):
         #check hash to see if note has changed
         current_hash = hashlib.sha1(self.__text_box.get("1.0","end-1c")
@@ -169,10 +188,10 @@ class NoteWindow:
                              self.__text_box.get("1.0",END), self.__attrib.date_modified, self.__attrib.pinned, self.__attrib.colour)
         self.__main_window.update_currrent_view()
 
-    ###########################################################
+    #--------------------------------------------------------------
     # pin button event to toggle pinned status for pinning and
     # unpinning notes
-    ###########################################################
+    #--------------------------------------------------------------
     def __toggle_pin(self):
         if self.__attrib.pinned == 0:
             #pin note
@@ -186,6 +205,9 @@ class NoteWindow:
         self.__attrib.modified = True # note will get updated on save
         #self.__save_note()
 
+    #-------------------------------------------------------
+    # Revert text to the original as saved in the database.
+    #-------------------------------------------------------
     def __revert_text(self):
         if self.__attrib.new_note == False:
             #if it is not a new note then we shoul dhave the note id.
@@ -195,6 +217,9 @@ class NoteWindow:
             self.__text_box.insert(tk.END, self.__attrib.content)
 
 
+    #----------------------------------------------------------------
+    # Delete the current note (after confirmation).
+    #----------------------------------------------------------------
     def __delete_note(self):
         if(self.__attrib.new_note == False):
             # to do - need to put a warning here that note will be deleted
@@ -210,11 +235,31 @@ class NoteWindow:
                 #close the deleted note
                 self.__note_window.destroy()
 
+    #-------------------------------------------------------
+    # Dsiplay a window showing current note properties
+    #-------------------------------------------------------
+    def __show_note_properties(self):
+        properties_window = tk.Toplevel(self.__note_window)
+        properties_window.title('Properties')
+        mult_factor = int(conf.read_section('main','screen_scale'))
+        width = 400 * mult_factor
+        height = 220 * mult_factor
+        geometry = f"{width}x{height}"
+        properties_window.geometry(geometry)
+        text_box = tk.Text(properties_window,bg=self.__attrib.colour,
+                           wrap=tk.WORD)
+        text_box.insert(tk.END,f"  Note id: {str(self.__attrib.id)}\n")
+        text_box.insert(tk.END,f"  Belongs to notebook: {self.__attrib.notebook}\n\n")
+        text_box.insert(tk.END,f"  Date Created: {self.__attrib.date_created}\n")
+        text_box.insert(tk.END,f"  Date Modified: {self.__attrib.date_modified}\n")
+        text_box.pack(fill='both', expand='true')
+        text_box['state'] = 'disabled'
 
-    ##########################################################
+
+    #----------------------------------------------------------
     #Public facing function to override the default notebook
     #setting for new notes
-    ##########################################################
+    #----------------------------------------------------------
     def set_notebook_name(self, notebook_name):
         self.__attrib.notebook = notebook_name
 
@@ -227,6 +272,17 @@ class NoteWindow:
                 self.__text_box['bg'] = self.__attrib.colour 
                 self.__attrib.modified = True
     
+
+    #--------------------------------------------------------------
+    # event when user right clicks the current note.
+    # Present a context menu.
+    #--------------------------------------------------------------
+    def __right_clicked_note(self, event):
+        #create a contaxt menu
+        menu = tk.Menu(self.__frame, tearoff = 0)
+        menu.add_command(label ="Properties", command=self.__show_note_properties)
+        menu.tk_popup(event.x_root, event.y_root)
+
     def get_next_note(self):
         pass
 

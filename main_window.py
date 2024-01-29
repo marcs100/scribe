@@ -155,6 +155,11 @@ class MainWindow:
         self.__selected_notebook = name
         self.__get_note_pages_view(name)
 
+    '''
+    Show the context menu now that user has right click the mouse
+        Change notebook colour
+        Delete notebook - ** to do **
+    '''
     def __right_click_notebook(self, event, name, textbox):
         print(f"Right click event for notebook {name}")
         menu = tk.Menu(self.__frame, tearoff = 0)
