@@ -28,6 +28,8 @@ def create_new_config_file():
     config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
     config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
     config['colours']['widget_highlight'] = "#5f6260"
+    config['colours']['search_bg'] = "#464646"
+
     
     write_config()
 

@@ -15,6 +15,10 @@ import os, glob, sys
 
 
 class MainWindow:
+
+    #-------------------------------------------------------
+    # Initialise the class
+    #-------------------------------------------------------
     def __init__(self, root, database_in):
         self.__root = root
         self.__db = database_in
@@ -25,6 +29,10 @@ class MainWindow:
         self.__selected_notebook = 'none'
         self.init_window()
 
+
+    #-------------------------------------------------------
+    # Initialise the main window
+    #-------------------------------------------------------
     def init_window(self):
         self.__note_width = int(conf.read_section('main_window', 'note_width'))
         self.__notebook_width = int(conf.read_section('main_window', 'notebook_width'))
@@ -69,9 +77,11 @@ class MainWindow:
         self.__new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         self.__search_input = tk.StringVar()
-        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input,      bg=conf.read_section('colours','widget_bg'),
+        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input,      bg=conf.read_section('colours','search_bg'),
                                        fg=conf.read_section('colours','widget_text'),
-                                       highlightcolor=conf.read_section('colours', 'widget_highlight'))
+                                       width=30,
+                                       font='Arial 11',
+                                       relief='sunken')
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self.__menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
@@ -86,7 +96,7 @@ class MainWindow:
         self.__populate_scripts_menu()
         self.__scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
-        self.__search_entry.pack(fill=Y, side='right',padx=3, pady=1)
+        self.__search_entry.pack(side='right',padx=3, pady=5)
         self.__search_label = tk.Label(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
                                            fg=conf.read_section('colours', 'widget_text'), text="search: ")
         self.__search_entry.bind('<Return>',lambda event: self.__get_search_input(event))
@@ -103,6 +113,8 @@ class MainWindow:
         self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
         self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
 
+        #self.__view_button.menu.bind("<FocusOut>", lambda event: self.__close_view_menu(event))
+
         self.__view_button.pack(fill=Y, side='left',padx=30,pady=3)
         self.__view_label.pack(fill=Y, anchor='center', pady=3)
 
@@ -115,11 +127,22 @@ class MainWindow:
     
     '''EVENTS'''
 
+    #-------------------------------------------------------
+    # Event (return pressed):
+    # Get search input fronm search entry widget
+    #-------------------------------------------------------
     def __get_search_input(self, event):
         print(f"Search input is {self.__search_input.get()}")
         if len(self.__search_input.get()) != 0:
             self.get_view('search results')
 
+    #-------------------------------------------------------
+    # Event (new notebook selected)
+    # Get all the notebook names from database.
+    # Ask user for name of new notebook, check it doesn't
+    # already exist. If all is good add the notebook to
+    # the database'
+    #-------------------------------------------------------
     def __create_new_notebook(self):
         #get existing notebook names as we do not want to create any duplicates
         notebook_names = self.__db.getNotebookNames()
@@ -132,17 +155,32 @@ class MainWindow:
             self.update_currrent_view()
         
 
+    #-------------------------------------------------------
+    # Event (new note selected)
+    # Create a new empty note.
+    # If the user in notebook view, the note will be created
+    # in the current notebook else it will use the default
+    # notebook.
+    #-------------------------------------------------------
     def __create_new_note(self):
         note_window = NoteWindow(self.__root, self)
         if self.__selected_notebook != 'none':
             note_window.set_notebook_name(self.__selected_notebook)
         note_window.open_note(None, self.__db)
 
-    
+    #-------------------------------------------------------
+    # Event (view chnaged or updating)
+    # Clear the contents of the main frame.
+    #-------------------------------------------------------
     def clear_frame(self):
         for widgets in self.__frame.winfo_children():
                 widgets.destroy()
 
+
+    #-------------------------------------------------------
+    # Event (note clicked)
+    # Open the note the user has clciked on.
+    #-------------------------------------------------------
     def __clicked_note(self,event,sqlid):
         print("note id is " + str(sqlid))
         # open note for editing in new window
@@ -150,22 +188,34 @@ class MainWindow:
         note_window.open_note(sqlid, self.__db)
 
 
+    #-------------------------------------------------------
+    # Event (notebook clocked)
+    # Open the notebook the user has clicked on.
+    #-------------------------------------------------------
     def __clicked_notebook(self,event, name):
         print("notebook name is " + name)
         self.__selected_notebook = name
         self.__get_note_pages_view(name)
 
-    '''
-    Show the context menu now that user has right click the mouse
-        Change notebook colour
-        Delete notebook - ** to do **
-    '''
+    #----------------------------------------------------------------
+    # Event (right click on notebook)
+    # Show the context menu now that user has right click the mouse
+    #    Change notebook colour
+    #    Delete notebook - ** to do **
+    #----------------------------------------------------------------
     def __right_click_notebook(self, event, name, textbox):
         print(f"Right click event for notebook {name}")
         menu = tk.Menu(self.__frame, tearoff = 0)
         menu.add_command(label ="Change colour", command=lambda name=name: self.__change_notebook_colour(name))
         menu.tk_popup(event.x_root, event.y_root)
 
+    #-------------------------------------------------------
+    # Event (window has been resized)
+    # Calculate a new layout for displayed notes based on the
+    # current window size.
+    # The new size is saved so the config can be updated when
+    # the main window closes.
+    #-------------------------------------------------------
     def __window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
         #print("*** In Resize window eevent ***")
@@ -198,9 +248,10 @@ class MainWindow:
 
 
     '''END OF EVENTS'''
-    ##############################################################
+
+    #------------------------------------------------
     #Public facing function to get a main view
-    ##############################################################
+    #------------------------------------------------
     def get_view(self,view):
         #print("Getting view: "+view)
         self.__current_view = view
@@ -227,10 +278,11 @@ class MainWindow:
                     self.__get_search_results_view()
     
 
-    #################################################################################
-    #public facing funtion to update current view (assuming it has been set
-    #This can be called by other classes if the view needs updaing i.e. a note has been deleted
-    #################################################################################
+    #-----------------------------------------------------------------------
+    # public facing funtion to update current view (assuming it has been set
+    # This can be called by other classes if the view needs updaing i.e. a
+    # note has been deleted
+    #-----------------------------------------------------------------------
     def update_currrent_view(self):        
         if self.__current_view != 'none':
             self.get_view(self.__current_view)
@@ -264,6 +316,9 @@ class MainWindow:
             else:
                 col += 1
 
+    #-------------------------------------------------------
+    # Display all the notebooks from the daatbase
+    #-------------------------------------------------------
     def __get_notebooks_view(self):
         self.clear_frame()
         self.__view_label["text"] = "Viewing: Notebooks"
@@ -298,7 +353,10 @@ class MainWindow:
             else:
                 col += 1
 
-
+    #-------------------------------------------------------
+    # Display recent notes from the database
+    # Number of notes to display is in the config file.
+    #-------------------------------------------------------
     def __get_recent_notes_view(self):
         self.clear_frame()
         self.__view_label["text"] = "Viewing: Recent Notes"
@@ -327,7 +385,9 @@ class MainWindow:
             else:
                 col += 1
 
-
+    #-------------------------------------------------------
+    # Dsiplay all the pinned notes from the database.
+    #-------------------------------------------------------
     def __get_pinned_notes_view(self):
         self.clear_frame()
         self.__view_label["text"] = "Viewing: Pinned Notes"
@@ -356,6 +416,10 @@ class MainWindow:
                 col += 1
 
 
+    #-------------------------------------------------------
+    # Display the search result (notes)
+    # Input is taken from the search entry wodget.
+    #-------------------------------------------------------
     def __get_search_results_view(self):
         self.clear_frame()
         self.__current_view = 'search results'
@@ -388,6 +452,9 @@ class MainWindow:
             else:
                 col += 1
 
+    #-------------------------------------------------------
+    # Aloow the user to slect a new notebook colour
+    #-------------------------------------------------------
     def __change_notebook_colour(self, name):
         print (f"Will chnage notebook colour for {name}")
         colour = colorchooser.askcolor(title="Choose notebook colour", parent=self.__frame)
@@ -396,6 +463,10 @@ class MainWindow:
             self.__db.setNotebookColour(name,colour)
             self.update_currrent_view()
 
+    #-------------------------------------------------------
+    # Helper function to automatically read al the script
+    # files and populate a menu with the values.
+    #-------------------------------------------------------
     def __populate_scripts_menu(self):
         #self.__scripts_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
         script_dir = self.__module_path() + "/scripts/"
@@ -409,10 +480,17 @@ class MainWindow:
                 command=lambda script=script_file: run_script.run_script(script))
 
 
+    #-------------------------------------------------------
+    # Helper function
+    # Thank you internet! - not sure if this is needed!!!!!!
+    #-------------------------------------------------------
     def __we_are_frozen(self):
         # All of the modules are built-in to the interpreter, e.g., by py2exe
         return hasattr(sys, "frozen")
 
+    #-------------------------------------------------------
+    # Get the path for the current source code.
+    #-------------------------------------------------------
     def __module_path(self):
         encoding = sys.getfilesystemencoding()
         if self.__we_are_frozen():
@@ -420,9 +498,10 @@ class MainWindow:
         return os.path.dirname(str(__file__))
 
 
-
-    #Calculate the maximum number of columns of textboxes that can be displayed in a given width
-    # for the current screen size
+    #----------------------------------------------------------------------
+    # Calculate the maximum number of columns of textboxes that can be
+    # displayed in a given width for the current screen size.
+    #----------------------------------------------------------------------
     def calculate_columns(self, widget_width, border_size):
         '''
         The text widget width will be in characters we need to convert it to pixels

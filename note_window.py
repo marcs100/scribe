@@ -5,6 +5,7 @@ import tkinter as tk
 import columns as COLUMN
 import hashlib
 import datetime
+import datetime_format
 import config_file as conf
 import note_attributes
 from tkinter import colorchooser
@@ -248,10 +249,12 @@ class NoteWindow:
         properties_window.geometry(geometry)
         text_box = tk.Text(properties_window,bg=self.__attrib.colour,
                            wrap=tk.WORD)
-        text_box.insert(tk.END,f"  Note id: {str(self.__attrib.id)}\n")
-        text_box.insert(tk.END,f"  Belongs to notebook: {self.__attrib.notebook}\n\n")
-        text_box.insert(tk.END,f"  Date Created: {self.__attrib.date_created}\n")
-        text_box.insert(tk.END,f"  Date Modified: {self.__attrib.date_modified}\n")
+        text_box.insert(tk.END,"\n\n    ------------------------------------------\n")
+        text_box.insert(tk.END,f"     Note id: {str(self.__attrib.id)}\n")
+        text_box.insert(tk.END,f"     Belongs to notebook: {self.__attrib.notebook}\n\n")
+        text_box.insert(tk.END,f"     Date Created:  {datetime_format.get_long_datetime(self.__attrib.date_created)}\n")
+        text_box.insert(tk.END,f"     Date Modified: {datetime_format.get_long_datetime(self.__attrib.date_modified)}\n")
+        text_box.insert(tk.END,"    ------------------------------------------")
         text_box.pack(fill='both', expand='true')
         text_box['state'] = 'disabled'
 
