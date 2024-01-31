@@ -96,7 +96,7 @@ class NoteWindow:
         
 
     #---------------------------------------------------------
-    # allows use to change the notbook name for current note.
+    # Allows use to change the notbook name for current note.
     #---------------------------------------------------------
     def __select_notebook(self, notebook_in):
         if self.__attrib.notebook != notebook_in:
@@ -190,7 +190,7 @@ class NoteWindow:
         self.__main_window.update_currrent_view()
 
     #--------------------------------------------------------------
-    # pin button event to toggle pinned status for pinning and
+    # Pin button event to toggle pinned status for pinning and
     # unpinning notes
     #--------------------------------------------------------------
     def __toggle_pin(self):
