@@ -287,7 +287,9 @@ class MainWindow:
         if self.__current_view != 'none':
             self.get_view(self.__current_view)
 
-
+    #----------------------------------------------------------------------
+    # Get all the note pages from the currently selected notebook. 
+    #----------------------------------------------------------------------
     def __get_note_pages_view(self, notebook):
         self.clear_frame()
         self.__current_view = 'notebook_pages'
@@ -317,7 +319,7 @@ class MainWindow:
                 col += 1
 
     #-------------------------------------------------------
-    # Display all the notebooks from the daatbase
+    # Display all the notebooks from the database
     #-------------------------------------------------------
     def __get_notebooks_view(self):
         self.clear_frame()
@@ -453,7 +455,7 @@ class MainWindow:
                 col += 1
 
     #-------------------------------------------------------
-    # Aloow the user to slect a new notebook colour
+    # Allow the user to slect a new notebook colour
     #-------------------------------------------------------
     def __change_notebook_colour(self, name):
         print (f"Will chnage notebook colour for {name}")
