@@ -6,8 +6,10 @@ config = configparser.ConfigParser()
 def create_new_config_file():
     config.add_section('main')
     config.add_section('main_window')
-    config.add_section('note_window')
+    #config.add_section('note_window')
     config.add_section('colours')
+    config.add_section('main screen key bindings')
+    onfig.add_section('note page key bindings')
     
     config['main']['app_title'] = "Scribe v1.0"
     config['main']['database'] = "/home/marc/Documents/marcnotes_db"
@@ -29,6 +31,14 @@ def create_new_config_file():
     config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
     config['colours']['widget_highlight'] = "#5f6260"
     config['colours']['search_bg'] = "#464646"
+
+    config['main window key bindings']['search'] = "<Control-f>"
+    config['main window key bindings']['new note'] = "<Control-n>"
+    config['main window key bindings']['show notebook view'] = "<Control-Alt-n>"
+    config['main window key bindings']['show pinned notes view'] = "<Control-Alt-p>"
+    config['main window key bindings']['show recent notes view'] = "<Control-Alt-r>"
+
+    config['note page key bindings']['search'] = "<Control-f>"
 
     
     write_config()

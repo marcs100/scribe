@@ -20,13 +20,13 @@ class MainWindow:
     # Initialise the class
     #-------------------------------------------------------
     def __init__(self, root, database_in):
-        self.__root = root
-        self.__db = database_in
+        self._root = root
+        self._db = database_in
        
         self.width = 0
         self.height = 0
-        self.__current_view = 'none'
-        self.__selected_notebook = 'none'
+        self._current_view = 'none'
+        self._selected_notebook = 'none'
         self.init_window()
 
 
@@ -34,106 +34,127 @@ class MainWindow:
     # Initialise the main window
     #-------------------------------------------------------
     def init_window(self):
-        self.__note_width = int(conf.read_section('main_window', 'note_width'))
-        self.__notebook_width = int(conf.read_section('main_window', 'notebook_width'))
+        self._note_width = int(conf.read_section('main_window', 'note_width'))
+        self._notebook_width = int(conf.read_section('main_window', 'notebook_width'))
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
-        self.__main_frame = tk.Frame(self.__root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar 
-        self.__canvas = tk.Canvas(self.__main_frame, bg=conf.read_section('colours','widget_bg'))
-        #self.__scrollbar = tk.Scrollbar(self.__main_frame, orient=VERTICAL, width=15, 
-        #           bg=conf.read_section('colours','widget_bg'), command=self.__canvas.yview)
-        self.__scrollbar = ttk.Scrollbar(self.__main_frame, orient=VERTICAL, command=self.__canvas.yview)
-        self.__scrollbar.pack(side=RIGHT, fill=Y)
-        self.__canvas.configure(yscrollcommand=self.__scrollbar.set)
-        self.__canvas.bind('<Configure>', lambda e: self.__canvas.configure(scrollregion=self.__canvas.bbox("all")))
+        self._main_frame = tk.Frame(self._root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
+        self._canvas = tk.Canvas(self._main_frame, bg=conf.read_section('colours','widget_bg'))
+        #self._scrollbar = tk.Scrollbar(self._main_frame, orient=VERTICAL, width=15,
+        #           bg=conf.read_section('colours','widget_bg'), command=self._canvas.yview)
+        self._scrollbar = ttk.Scrollbar(self._main_frame, orient=VERTICAL, command=self._canvas.yview)
+        self._scrollbar.pack(side=RIGHT, fill=Y)
+        self._canvas.configure(yscrollcommand=self._scrollbar.set)
+        self._canvas.bind('<Configure>', lambda e: self._canvas.configure(scrollregion=self._canvas.bbox("all")))
 
         #This is the frame inside the canvas that will be scrollable (do not pack as we will create a window in it)
-        self.__frame = tk.Frame(self.__canvas,bg=conf.read_section('colours','widget_bg'))
-        self.__canvas.create_window((0,0), window=self.__frame, anchor="nw")
+        self._frame = tk.Frame(self._canvas,bg=conf.read_section('colours','widget_bg'))
+        self._canvas.create_window((0,0), window=self._frame, anchor="nw")
             
 
-        self.__menu_frame = tk.Frame(self.__root, bg=conf.read_section('colours','widget_bg'))
-        self.__menu_frame.pack(fill=BOTH, expand=FALSE) 
-        self.__view_button = tk.Menubutton(self.__menu_frame, text="Select View", relief="flat", 
+        self._menu_frame = tk.Frame(self._root, bg=conf.read_section('colours','widget_bg'))
+        self._menu_frame.pack(fill=BOTH, expand=FALSE)
+        self._view_button = tk.Menubutton(self._menu_frame, text="Select View", relief="flat",
                                            bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
                
-        self.__view_label = tk.Label(self.__menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'), 
+        self._view_label = tk.Label(self._menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'),
                                      fg=conf.read_section('colours', 'widget_text'))
         lbl_font = font.Font(weight="bold")
-        self.__view_label["font"] = lbl_font
-        #self.__frame.pack(fill=BOTH, expand=TRUE) 
+        self._view_label["font"] = lbl_font
+        #self._frame.pack(fill=BOTH, expand=TRUE)
 
           #New Note button
-        self.__new_note_button = tk.Button(self.__menu_frame, bg=conf.read_section('colours', 'widget_bg'),
+        self._new_note_button = tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
                                       fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
-                                      command=self.__create_new_note)
-        self.__new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
+                                      command=self._create_new_note)
+        self._new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
-        self.__new_notebook_button = tk.Button(self.__menu_frame,  bg=conf.read_section('colours', 'widget_bg'),
+        self._new_notebook_button = tk.Button(self._menu_frame,  bg=conf.read_section('colours', 'widget_bg'),
                                         fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Notebook",
-                                        state='disabled', command=self.__create_new_notebook)
-        self.__new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
+                                        state='disabled', command=self._create_new_notebook)
+        self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
-        self.__search_input = tk.StringVar()
-        self.__search_entry = tk.Entry(self.__menu_frame,textvariable=self.__search_input,      bg=conf.read_section('colours','search_bg'),
+        self._search_input = tk.StringVar()
+        self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         bg=conf.read_section('colours','search_bg'),
                                        fg=conf.read_section('colours','widget_text'),
                                        width=30,
                                        font='Arial 11',
                                        relief='sunken')
 
         # right side spacer from edge of frame
-        spacer_label = tk.Label(self.__menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
+        spacer_label = tk.Label(self._menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
                                 fg=conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
 
-        self.__scripts_button = tk.Menubutton(self.__menu_frame, text="Scripts", relief="flat",
+        self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
                                            bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
-        self.__scripts_button.menu = tk.Menu(self.__scripts_button, bg=conf.read_section('colours','widget_bg'),
+        self._scripts_button.menu = tk.Menu(self._scripts_button, bg=conf.read_section('colours','widget_bg'),
                                           fg=conf.read_section('colours', 'widget_text'), tearoff=0)
-        self.__scripts_button["menu"] = self.__scripts_button.menu
-        self.__populate_scripts_menu()
-        self.__scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
+        self._scripts_button["menu"] = self._scripts_button.menu
+        self._populate_scripts_menu()
+        self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
-        self.__search_entry.pack(side='right',padx=3, pady=5)
-        self.__search_label = tk.Label(self.__menu_frame,bg=conf.read_section('colours', 'widget_bg'),
+        self._search_entry.pack(side='right',padx=3, pady=5)
+        self._search_label = tk.Label(self._menu_frame,bg=conf.read_section('colours', 'widget_bg'),
                                            fg=conf.read_section('colours', 'widget_text'), text="search: ")
-        self.__search_entry.bind('<Return>',lambda event: self.__get_search_input(event))
+        self._search_entry.bind('<Return>',lambda event: self._get_search_input(event))
 
-        self.__search_label.pack(fill=Y, side='right', padx=5, pady=1)
+        self._search_label.pack(fill=Y, side='right', padx=5, pady=1)
 
          # Select view menu button
         #menu = tk.Menubutton()
-        self.__view_button.menu = tk.Menu(self.__view_button, bg=conf.read_section('colours','widget_bg'), 
+        self._view_button.menu = tk.Menu(self._view_button, bg=conf.read_section('colours','widget_bg'),
                                           fg=conf.read_section('colours', 'widget_text'), tearoff=0)
-        self.__view_button["menu"] = self.__view_button.menu
+        self._view_button["menu"] = self._view_button.menu
 
-        self.__view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
-        self.__view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
-        self.__view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
+        self._view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
+        self._view_button.menu.add_command(label="Notebooks", command=lambda view="notebooks": self.get_view(view))
+        self._view_button.menu.add_command(label="Recent Notes", command=lambda view="recent": self.get_view(view))
 
-        #self.__view_button.menu.bind("<FocusOut>", lambda event: self.__close_view_menu(event))
+        #self._view_button.menu.bind("<FocusOut>", lambda event: self._close_view_menu(event))
 
-        self.__view_button.pack(fill=Y, side='left',padx=30,pady=3)
-        self.__view_label.pack(fill=Y, anchor='center', pady=3)
+        self._view_button.pack(fill=Y, side='left',padx=30,pady=3)
+        self._view_label.pack(fill=Y, anchor='center', pady=3)
 
-        self.__canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        self.__main_frame.pack(fill=BOTH, expand=TRUE)
+        self._main_frame.pack(fill=BOTH, expand=TRUE)
 
-        self.__main_frame.bind("<Configure>", lambda event: self.__window_resized(event))
+        self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
+
+        #Setup key bindings
+        self._root.bind('<Control-f>', lambda event: self._show_search_window(event))
 
     
     '''EVENTS'''
+
+    def _show_search_window(self, event):
+        print("**** Show search window *****")
+        search_window = tk.Toplevel(self._root)
+        mult_factor = int(conf.read_section('main','screen_scale'))
+        width = 400 * mult_factor
+        height = 150 * mult_factor
+        geometry = f"{width}x{height}"
+        search_window.geometry(geometry)
+        search_entry = tk.Entry(self._menu_frame,
+                                textvariable=self._search_input,                                                         bg=conf.read_section('colours','search_bg'),
+                                fg=conf.read_section('colours','widget_text'),
+                                width=30,
+                                font='Arial 11',
+                                relief='sunken')
+
+       search_entry.bind('<Return>', lambda event: ) #to do !!!!!!!!!!!!!!!!!
+
 
     #-------------------------------------------------------
     # Event (return pressed):
     # Get search input fronm search entry widget
     #-------------------------------------------------------
-    def __get_search_input(self, event):
-        print(f"Search input is {self.__search_input.get()}")
-        if len(self.__search_input.get()) != 0:
+    def _get_search_input(self, event):
+        print(f"Search input is {self._search_input.get()}")
+        if len(self._search_input.get()) != 0:
             self.get_view('search results')
 
     #-------------------------------------------------------
@@ -143,14 +164,14 @@ class MainWindow:
     # already exist. If all is good add the notebook to
     # the database'
     #-------------------------------------------------------
-    def __create_new_notebook(self):
+    def _create_new_notebook(self):
         #get existing notebook names as we do not want to create any duplicates
-        notebook_names = self.__db.getNotebookNames()
+        notebook_names = self._db.getNotebookNames()
 
         #ask user for the new notebook name - use default colour
         new_notebook = simpledialog.askstring("Input", "Enter new notebook name...")
         if new_notebook is not None:
-            self.__db.addToNotebookCovers(new_notebook, conf.read_section('colours', 'default_notebook_bg'))
+            self._db.addToNotebookCovers(new_notebook, conf.read_section('colours', 'default_notebook_bg'))
             messagebox.showinfo("Scribe","New notebook {} has been created".format(new_notebook))
             self.update_currrent_view()
         
@@ -162,18 +183,18 @@ class MainWindow:
     # in the current notebook else it will use the default
     # notebook.
     #-------------------------------------------------------
-    def __create_new_note(self):
-        note_window = NoteWindow(self.__root, self)
-        if self.__selected_notebook != 'none':
-            note_window.set_notebook_name(self.__selected_notebook)
-        note_window.open_note(None, self.__db)
+    def _create_new_note(self):
+        note_window = NoteWindow(self._root, self)
+        if self._selected_notebook != 'none':
+            note_window.set_notebook_name(self._selected_notebook)
+        note_window.open_note(None, self._db)
 
     #-------------------------------------------------------
     # Event (view chnaged or updating)
     # Clear the contents of the main frame.
     #-------------------------------------------------------
     def clear_frame(self):
-        for widgets in self.__frame.winfo_children():
+        for widgets in self._frame.winfo_children():
                 widgets.destroy()
 
 
@@ -181,21 +202,21 @@ class MainWindow:
     # Event (note clicked)
     # Open the note the user has clciked on.
     #-------------------------------------------------------
-    def __clicked_note(self,event,sqlid):
+    def _clicked_note(self,event,sqlid):
         print("note id is " + str(sqlid))
         # open note for editing in new window
-        note_window = NoteWindow(self.__root, self)
-        note_window.open_note(sqlid, self.__db)
+        note_window = NoteWindow(self._root, self)
+        note_window.open_note(sqlid, self._db)
 
 
     #-------------------------------------------------------
     # Event (notebook clocked)
     # Open the notebook the user has clicked on.
     #-------------------------------------------------------
-    def __clicked_notebook(self,event, name):
+    def _clicked_notebook(self,event, name):
         print("notebook name is " + name)
-        self.__selected_notebook = name
-        self.__get_note_pages_view(name)
+        self._selected_notebook = name
+        self._get_note_pages_view(name)
 
     #----------------------------------------------------------------
     # Event (right click on notebook)
@@ -203,10 +224,10 @@ class MainWindow:
     #    Change notebook colour
     #    Delete notebook - ** to do **
     #----------------------------------------------------------------
-    def __right_click_notebook(self, event, name, textbox):
+    def _right_click_notebook(self, event, name, textbox):
         print(f"Right click event for notebook {name}")
-        menu = tk.Menu(self.__frame, tearoff = 0)
-        menu.add_command(label ="Change colour", command=lambda name=name: self.__change_notebook_colour(name))
+        menu = tk.Menu(self._frame, tearoff = 0)
+        menu.add_command(label ="Change colour", command=lambda name=name: self._change_notebook_colour(name))
         menu.tk_popup(event.x_root, event.y_root)
 
     #-------------------------------------------------------
@@ -216,7 +237,7 @@ class MainWindow:
     # The new size is saved so the config can be updated when
     # the main window closes.
     #-------------------------------------------------------
-    def __window_resized(self,event):
+    def _window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
         #print("*** In Resize window eevent ***")
         #try and control the amount og times the screen will get redrawn
@@ -242,8 +263,8 @@ class MainWindow:
         if diff1 > 25 or diff2 > 25:
             #resize the widgets in the current view
             #print("*** Redrwing screen ***")
-            if self.__current_view != 'none':
-                self.get_view(self.__current_view)
+            if self._current_view != 'none':
+                self.get_view(self._current_view)
 
 
 
@@ -254,28 +275,28 @@ class MainWindow:
     #------------------------------------------------
     def get_view(self,view):
         #print("Getting view: "+view)
-        self.__current_view = view
+        self._current_view = view
         match view:
             case 'pinned':
-                self.__new_notebook_button["state"]='disabled'
-                self.__selected_notebook = 'none'
-                self.__get_pinned_notes_view()
+                self._new_notebook_button["state"]='disabled'
+                self._selected_notebook = 'none'
+                self._get_pinned_notes_view()
             case 'recent':
-                self.__new_notebook_button["state"]='disabled'
-                self.__selected_notebook = 'none'
-                self.__get_recent_notes_view()
+                self._new_notebook_button["state"]='disabled'
+                self._selected_notebook = 'none'
+                self._get_recent_notes_view()
             case 'notebooks':
-                self.__new_notebook_button["state"]='normal'
-                self.__selected_notebook = 'none'
-                self.__get_notebooks_view()
+                self._new_notebook_button["state"]='normal'
+                self._selected_notebook = 'none'
+                self._get_notebooks_view()
             case 'notebook_pages':
-                self.__new_notebook_button["state"]='disabled'
-                if self.__selected_notebook != 'none':
-                    self.__get_note_pages_view(self.__selected_notebook)
+                self._new_notebook_button["state"]='disabled'
+                if self._selected_notebook != 'none':
+                    self._get_note_pages_view(self._selected_notebook)
             case 'search results':
-                    self.__new_notebook_button["state"]='disabled'
-                    self.__selected_notebook = 'none'
-                    self.__get_search_results_view()
+                    self._new_notebook_button["state"]='disabled'
+                    self._selected_notebook = 'none'
+                    self._get_search_results_view()
     
 
     #-----------------------------------------------------------------------
@@ -284,17 +305,17 @@ class MainWindow:
     # note has been deleted
     #-----------------------------------------------------------------------
     def update_currrent_view(self):        
-        if self.__current_view != 'none':
-            self.get_view(self.__current_view)
+        if self._current_view != 'none':
+            self.get_view(self._current_view)
 
     #----------------------------------------------------------------------
     # Get all the note pages from the currently selected notebook. 
     #----------------------------------------------------------------------
-    def __get_note_pages_view(self, notebook):
+    def _get_note_pages_view(self, notebook):
         self.clear_frame()
-        self.__current_view = 'notebook_pages'
-        self.__view_label["text"] = "Viewing Notebook: " + notebook
-        note_pages = self.__db.getNotebook(notebook)
+        self._current_view = 'notebook_pages'
+        self._view_label["text"] = "Viewing Notebook: " + notebook
+        note_pages = self._db.getNotebook(notebook)
         if note_pages is None:
             print("No pinned notes found")
             return
@@ -302,16 +323,16 @@ class MainWindow:
         pad_x = 3
         col = 0
         row = 0
-        max_col = self.calculate_columns(self.__note_width,6)
+        max_col = self.calculate_columns(self._note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
         for note_page in note_pages:
             note_id = note_page[COLUMN.ID]
-            self.__text_box = tk.Text(self.__frame, height=15, width=self.__note_width, wrap=tk.WORD, bg=note_page[COLUMN.BACK_COLOUR])
-            self.__text_box.insert(tk.END, note_page[COLUMN.CONTENT])
-            self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
-            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            self.__text_box['state'] = 'disabled'
+            self._text_box = tk.Text(self._frame, height=15, width=self._note_width, wrap=tk.WORD, bg=note_page[COLUMN.BACK_COLOUR])
+            self._text_box.insert(tk.END, note_page[COLUMN.CONTENT])
+            self._text_box.bind('<Double-1>', lambda event, sqlid=note_id: self._clicked_note(event, sqlid))
+            self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -321,33 +342,33 @@ class MainWindow:
     #-------------------------------------------------------
     # Display all the notebooks from the database
     #-------------------------------------------------------
-    def __get_notebooks_view(self):
+    def _get_notebooks_view(self):
         self.clear_frame()
-        self.__view_label["text"] = "Viewing: Notebooks"
+        self._view_label["text"] = "Viewing: Notebooks"
         col=0
         row=0
         pad_x = 3
-        max_col = self.calculate_columns(self.__notebook_width,pad_x)
+        max_col = self.calculate_columns(self._notebook_width,pad_x)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
-        notebook_names = self.__db.getNotebookNames()
+        notebook_names = self._db.getNotebookNames()
         if notebook_names is None:
             print("No notebooks found!")
             return
         for notebook_name in notebook_names:
-            colour = self.__db.getNotebookColour(notebook_name[0])
-            self.__text_box = tk.Text(self.__frame, height=5, width=self.__notebook_width, wrap=tk.WORD, bg=colour)
-            self.__text_box.insert(tk.END, str(notebook_name[0]))
-            self.__text_box.bind('<Double-1>',
-                                 lambda event,name=str(notebook_name[0]):self.__clicked_notebook(event,name))
+            colour = self._db.getNotebookColour(notebook_name[0])
+            self._text_box = tk.Text(self._frame, height=5, width=self._notebook_width, wrap=tk.WORD, bg=colour)
+            self._text_box.insert(tk.END, str(notebook_name[0]))
+            self._text_box.bind('<Double-1>',
+                                 lambda event,name=str(notebook_name[0]):self._clicked_notebook(event,name))
 
             #Trying to implement rigth click event here!!!!!!!!!!
-            self.__text_box.bind('<Button-3>',
+            self._text_box.bind('<Button-3>',
                                  lambda event, name=str(notebook_name[0]),
-                                 textbox=self.__text_box:self.__right_click_notebook(event,name, textbox))
+                                 textbox=self._text_box:self._right_click_notebook(event,name, textbox))
 
-            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            self.__text_box['state'] = 'disabled'
+            self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_box['state'] = 'disabled'
 
             if col == max_col:
                 col = 0
@@ -359,10 +380,10 @@ class MainWindow:
     # Display recent notes from the database
     # Number of notes to display is in the config file.
     #-------------------------------------------------------
-    def __get_recent_notes_view(self):
+    def _get_recent_notes_view(self):
         self.clear_frame()
-        self.__view_label["text"] = "Viewing: Recent Notes"
-        recent_notes = self.__db.getRecentNotes(int(conf.read_section('main', 'recent_notes_count')))
+        self._view_label["text"] = "Viewing: Recent Notes"
+        recent_notes = self._db.getRecentNotes(int(conf.read_section('main', 'recent_notes_count')))
         if recent_notes is None:
             print("No recent notes found")
             return 
@@ -370,17 +391,17 @@ class MainWindow:
         pad_x = 3
         col=0
         row=0
-        max_col = self.calculate_columns(self.__note_width,pad_x)
+        max_col = self.calculate_columns(self._note_width,pad_x)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
 
         for recent_note in recent_notes:
             note_id = recent_note[COLUMN.ID]
-            self.__text_box = tk.Text(self.__frame, height=15, width=self.__note_width, wrap=tk.WORD, bg=recent_note[COLUMN.BACK_COLOUR])
-            self.__text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
-            self.__text_box.bind('<Double-1>', lambda event,sqlid=note_id: self.__clicked_note(event,sqlid))
-            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            self.__text_box['state'] = 'disabled'
+            self._text_box = tk.Text(self._frame, height=15, width=self._note_width, wrap=tk.WORD, bg=recent_note[COLUMN.BACK_COLOUR])
+            self._text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
+            self._text_box.bind('<Double-1>', lambda event,sqlid=note_id: self._clicked_note(event,sqlid))
+            self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -390,10 +411,10 @@ class MainWindow:
     #-------------------------------------------------------
     # Dsiplay all the pinned notes from the database.
     #-------------------------------------------------------
-    def __get_pinned_notes_view(self):
+    def _get_pinned_notes_view(self):
         self.clear_frame()
-        self.__view_label["text"] = "Viewing: Pinned Notes"
-        pinned_notes = self.__db.getPinnedNotes()
+        self._view_label["text"] = "Viewing: Pinned Notes"
+        pinned_notes = self._db.getPinnedNotes()
         if pinned_notes is None:
             print("No pinned notes found")
             return 
@@ -401,16 +422,16 @@ class MainWindow:
         col = 0
         row = 0
         pad_x = 3
-        max_col = self.calculate_columns(self.__note_width,6)
+        max_col = self.calculate_columns(self._note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
         for pinned_note in pinned_notes:
             note_id = pinned_note[COLUMN.ID]
-            self.__text_box = tk.Text(self.__frame, height=15, width=self.__note_width, wrap=tk.WORD, bg=pinned_note[COLUMN.BACK_COLOUR])
-            self.__text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
-            self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id: self.__clicked_note(event, sqlid))
-            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            self.__text_box['state'] = 'disabled'
+            self._text_box = tk.Text(self._frame, height=15, width=self._note_width, wrap=tk.WORD, bg=pinned_note[COLUMN.BACK_COLOUR])
+            self._text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
+            self._text_box.bind('<Double-1>', lambda event, sqlid=note_id: self._clicked_note(event, sqlid))
+            self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -422,32 +443,32 @@ class MainWindow:
     # Display the search result (notes)
     # Input is taken from the search entry wodget.
     #-------------------------------------------------------
-    def __get_search_results_view(self):
+    def _get_search_results_view(self):
         self.clear_frame()
-        self.__current_view = 'search results'
-        self.__view_label["text"] = "Viewing Search Results"
-        search_pages = self.__db.getSearchResults(self.__search_input.get(), 500, 0)
+        self._current_view = 'search results'
+        self._view_label["text"] = "Viewing Search Results"
+        search_pages = self._db.getSearchResults(self._search_input.get(), 500, 0)
         if search_pages is None:
             print("No search results notes found")
             return
 
-        self.__view_label["text"] = f"Viewing Search Results ({str(len(search_pages))})"
+        self._view_label["text"] = f"Viewing Search Results ({str(len(search_pages))})"
 
         pad_x = 3
         col = 0
         row = 0
-        max_col = self.calculate_columns(self.__note_width,6)
+        max_col = self.calculate_columns(self._note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
         for search_page in search_pages:
             note_id = search_page[COLUMN.ID]
 
-            self.__text_box = tk.Text(self.__frame,height=15,width=self.__note_width, wrap=tk.WORD,
+            self._text_box = tk.Text(self._frame,height=15,width=self._note_width, wrap=tk.WORD,
                         bg=search_page[COLUMN.BACK_COLOUR])
-            self.__text_box.insert(tk.END, search_page[COLUMN.CONTENT])
-            self.__text_box.bind('<Double-1>', lambda event, sqlid=note_id:self.__clicked_note(event, sqlid))
-            self.__text_box.grid(row=row, column=col, pady=3, padx=pad_x)
-            self.__text_box['state'] = 'disabled'
+            self._text_box.insert(tk.END, search_page[COLUMN.CONTENT])
+            self._text_box.bind('<Double-1>', lambda event, sqlid=note_id:self._clicked_note(event, sqlid))
+            self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
                 row += num_widgets_in_row
@@ -457,28 +478,28 @@ class MainWindow:
     #-------------------------------------------------------
     # Allow the user to slect a new notebook colour
     #-------------------------------------------------------
-    def __change_notebook_colour(self, name):
+    def _change_notebook_colour(self, name):
         print (f"Will chnage notebook colour for {name}")
-        colour = colorchooser.askcolor(title="Choose notebook colour", parent=self.__frame)
+        colour = colorchooser.askcolor(title="Choose notebook colour", parent=self._frame)
         if colour != (None,None):
             colour = str(colour[1])
-            self.__db.setNotebookColour(name,colour)
+            self._db.setNotebookColour(name,colour)
             self.update_currrent_view()
 
     #-------------------------------------------------------
     # Helper function to automatically read al the script
     # files and populate a menu with the values.
     #-------------------------------------------------------
-    def __populate_scripts_menu(self):
-        #self.__scripts_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
-        script_dir = self.__module_path() + "/scripts/"
+    def _populate_scripts_menu(self):
+        #self._scripts_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
+        script_dir = self._module_path() + "/scripts/"
 
         script_files = glob.glob(script_dir+"*.py")
 
         for script_file in script_files:
             print(f"found script {script_file}")
             head, script_file_name = os.path.split(script_file)
-            self.__scripts_button.menu.add_command(label=script_file_name,
+            self._scripts_button.menu.add_command(label=script_file_name,
                 command=lambda script=script_file: run_script.run_script(script))
 
 
@@ -486,16 +507,16 @@ class MainWindow:
     # Helper function
     # Thank you internet! - not sure if this is needed!!!!!!
     #-------------------------------------------------------
-    def __we_are_frozen(self):
+    def _we_are_frozen(self):
         # All of the modules are built-in to the interpreter, e.g., by py2exe
         return hasattr(sys, "frozen")
 
     #-------------------------------------------------------
     # Get the path for the current source code.
     #-------------------------------------------------------
-    def __module_path(self):
+    def _module_path(self):
         encoding = sys.getfilesystemencoding()
-        if self.__we_are_frozen():
+        if self._we_are_frozen():
             return os.path.dirname(str(sys.executable))
         return os.path.dirname(str(__file__))
 
@@ -520,10 +541,10 @@ class MainWindow:
 
         
         #we need this becuase initially the screen size won't be reported becuase it has not gone through mainloop yet
-        self.__root.update_idletasks()
-        self.__root.update()
+        self._root.update_idletasks()
+        self._root.update()
 
-        screen_size = self.__root.winfo_width()
+        screen_size = self._root.winfo_width()
 
         num_chars = round(screen_size / (8 * scr_scale))
 
