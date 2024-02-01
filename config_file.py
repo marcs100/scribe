@@ -30,7 +30,7 @@ def create_new_config_file():
     config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
     config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
     config['colours']['widget_highlight'] = "#5f6260"
-    config['colours']['search_bg'] = "#464646"
+    config['colours']['search_bg'] = "#6d7c7a"
 
     config['main window key bindings']['search'] = "<Control-f>"
     config['main window key bindings']['new note'] = "<Control-n>"

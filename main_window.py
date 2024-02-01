@@ -1,10 +1,10 @@
-import tkinter
+import tkinter as tk
 from tkinter.constants import *
 from database import database
-import tkinter as tk
 from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
+import search_window as search_window
 import config_file as conf
 from tkinter import ttk
 from tkinter import simpledialog
@@ -12,7 +12,6 @@ from tkinter import messagebox
 from tkinter import colorchooser
 import run_script
 import os, glob, sys
-
 
 class MainWindow:
 
@@ -76,12 +75,12 @@ class MainWindow:
                                         state='disabled', command=self._create_new_notebook)
         self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
-        self._search_input = tk.StringVar()
-        self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         bg=conf.read_section('colours','search_bg'),
-                                       fg=conf.read_section('colours','widget_text'),
-                                       width=30,
-                                       font='Arial 11',
-                                       relief='sunken')
+        #self._search_input = tk.StringVar()
+        #self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         #bg=conf.read_section('colours','search_bg'),
+        #                               fg=conf.read_section('colours','widget_text'),
+        #                               width=30,
+        #                               font='Arial 11',
+        #                               relief='sunken')
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
@@ -96,12 +95,12 @@ class MainWindow:
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
-        self._search_entry.pack(side='right',padx=3, pady=5)
-        self._search_label = tk.Label(self._menu_frame,bg=conf.read_section('colours', 'widget_bg'),
-                                           fg=conf.read_section('colours', 'widget_text'), text="search: ")
-        self._search_entry.bind('<Return>',lambda event: self._get_search_input(event))
+        #self._search_entry.pack(side='right',padx=3, pady=5)
+        #self._search_label = tk.Label(self._menu_frame,bg=conf.read_section('colours', 'widget_bg'),
+        #                                   fg=conf.read_section('colours', 'widget_text'), text="search: ")
+        #self._search_entry.bind('<Return>',lambda event: self._get_search_input(event))
 
-        self._search_label.pack(fill=Y, side='right', padx=5, pady=1)
+        #self._search_label.pack(fill=Y, side='right', padx=5, pady=1)
 
          # Select view menu button
         #menu = tk.Menubutton()
@@ -130,32 +129,25 @@ class MainWindow:
     
     '''EVENTS'''
 
+
+    #--------------------------------------------------------------------
+    # Show the search window to the user
+    #-------------------------------------------------------------------
     def _show_search_window(self, event):
         print("**** Show search window *****")
-        search_window = tk.Toplevel(self._root)
-        mult_factor = int(conf.read_section('main','screen_scale'))
-        width = 400 * mult_factor
-        height = 150 * mult_factor
-        geometry = f"{width}x{height}"
-        search_window.geometry(geometry)
-        search_entry = tk.Entry(self._menu_frame,
-                                textvariable=self._search_input,                                                         bg=conf.read_section('colours','search_bg'),
-                                fg=conf.read_section('colours','widget_text'),
-                                width=30,
-                                font='Arial 11',
-                                relief='sunken')
+        search_window.initialise_search(self._root, self, self._db)
 
-       search_entry.bind('<Return>', lambda event: ) #to do !!!!!!!!!!!!!!!!!
 
 
     #-------------------------------------------------------
+    #      DEPRECIATED!!!!!!!!!!!!!!!!
     # Event (return pressed):
     # Get search input fronm search entry widget
     #-------------------------------------------------------
-    def _get_search_input(self, event):
-        print(f"Search input is {self._search_input.get()}")
-        if len(self._search_input.get()) != 0:
-            self.get_view('search results')
+    #def _get_search_input(self, event):
+    #    print(f"Search input is {self._search_input.get()}")
+    #    if len(self._search_input.get()) != 0:
+    #        self.get_view('search results')
 
     #-------------------------------------------------------
     # Event (new notebook selected)
@@ -173,7 +165,7 @@ class MainWindow:
         if new_notebook is not None:
             self._db.addToNotebookCovers(new_notebook, conf.read_section('colours', 'default_notebook_bg'))
             messagebox.showinfo("Scribe","New notebook {} has been created".format(new_notebook))
-            self.update_currrent_view()
+            self.update_current_view()
         
 
     #-------------------------------------------------------
@@ -294,9 +286,11 @@ class MainWindow:
                 if self._selected_notebook != 'none':
                     self._get_note_pages_view(self._selected_notebook)
             case 'search results':
-                    self._new_notebook_button["state"]='disabled'
-                    self._selected_notebook = 'none'
-                    self._get_search_results_view()
+                self._new_notebook_button['state'] = 'disabled'
+                self._selected_notebook = 'none'
+                search_results = search_window.get_search_results() #will return the results from the saved current_search term
+                #print(str(search_results))
+                self.get_search_results_view(search_results)
     
 
     #-----------------------------------------------------------------------
@@ -304,7 +298,7 @@ class MainWindow:
     # This can be called by other classes if the view needs updaing i.e. a
     # note has been deleted
     #-----------------------------------------------------------------------
-    def update_currrent_view(self):        
+    def update_current_view(self):
         if self._current_view != 'none':
             self.get_view(self._current_view)
 
@@ -441,18 +435,20 @@ class MainWindow:
 
     #-------------------------------------------------------
     # Display the search result (notes)
-    # Input is taken from the search entry wodget.
+    #
     #-------------------------------------------------------
-    def _get_search_results_view(self):
+    def get_search_results_view(self, search_results):
+        self._current_view = 'search results'
+        self._selected_notebook = 'none'
         self.clear_frame()
         self._current_view = 'search results'
         self._view_label["text"] = "Viewing Search Results"
-        search_pages = self._db.getSearchResults(self._search_input.get(), 500, 0)
-        if search_pages is None:
+
+        if search_results is None:
             print("No search results notes found")
             return
 
-        self._view_label["text"] = f"Viewing Search Results ({str(len(search_pages))})"
+        self._view_label["text"] = f"Viewing Search Results ({str(len(search_results))})"
 
         pad_x = 3
         col = 0
@@ -460,7 +456,8 @@ class MainWindow:
         max_col = self.calculate_columns(self._note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
-        for search_page in search_pages:
+        for search_page in search_results:
+            #print(f"Search page: {str(search_page)}")
             note_id = search_page[COLUMN.ID]
 
             self._text_box = tk.Text(self._frame,height=15,width=self._note_width, wrap=tk.WORD,
@@ -484,7 +481,7 @@ class MainWindow:
         if colour != (None,None):
             colour = str(colour[1])
             self._db.setNotebookColour(name,colour)
-            self.update_currrent_view()
+            self.update_current_view()
 
     #-------------------------------------------------------
     # Helper function to automatically read al the script

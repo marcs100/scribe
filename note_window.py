@@ -168,14 +168,17 @@ class NoteWindow:
                                     .encode('ascii', 'ignore')).hexdigest()
 
         if self._attrib.new_note == True:
-            print("Saving new note...")
-            self._attrib.date_created = datetime.datetime.now()
-            self._attrib.date_modified = self._attrib.date_created
-            # addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
-            self._db.addNote(self._attrib.notebook, self._attrib.tag, self._text_box.get("1.0",END),
+            #print(f"note content: <{self._text_box.get('1.0',END)}>")
+            if self._text_box.get("1.0",END) != '\n': # don't save an empty new note'
+                print("Saving new note...")
+                self._attrib.date_created = datetime.datetime.now()
+                self._attrib.date_modified = self._attrib.date_created
+                # addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
+                self._db.addNote(self._attrib.notebook, self._attrib.tag, self._text_box.get("1.0",END),
                               self._attrib.date_created, self._attrib.pinned, self._attrib.colour)
-            self._attrib.new_note = False
-            self._main_window.update_currrent_view()
+                self._attrib.new_note = False
+                self._main_window.update_current_view()
+                return
             return
 
         # We also need to check if the user has switched o a different notebook - not implemented yet!!!!!!!!
@@ -187,7 +190,7 @@ class NoteWindow:
         self._attrib.date_modified = datetime.datetime.now()
         self._db.updateNote(self._note[0][COLUMN.ID], self._attrib.notebook, self._attrib.tag,
                              self._text_box.get("1.0",END), self._attrib.date_modified, self._attrib.pinned, self._attrib.colour)
-        self._main_window.update_currrent_view()
+        self._main_window.update_current_view()
 
     #--------------------------------------------------------------
     # Pin button event to toggle pinned status for pinning and
@@ -231,7 +234,7 @@ class NoteWindow:
                 self._db.deleteNoteById(self._attrib.id)
 
                 #need to tell main window to update teh current view
-                self._main_window.update_currrent_view()
+                self._main_window.update_current_view()
 
                 #close the deleted note
                 self._note_window.destroy()

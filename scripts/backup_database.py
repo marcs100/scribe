@@ -58,12 +58,13 @@ time_stamp = time_stamp.replace(":", "_") # needed for Windows OS
 
 backup_file = db_file + "-" + time_stamp + ".db"
 
-print (f"Creating backup {backup_location}{backup_file}\n")
+print (f"Creating backup file: {backup_file}\n")
+print (f"Bachup location {backup_location}\n\n")
 
 
 os.makedirs(backup_location, exist_ok=True)
 
-print(f"Copying {db_file_with_path} to {backup_location}{backup_file}")
+print(f"Copying {db_file_with_path} to {backup_location}{backup_file}\n\n")
 shutil.copyfile(db_file_with_path,backup_location+backup_file)
 
 print ("** Backup successful **")
