@@ -1,25 +1,27 @@
 import tkinter as tk
 from tkinter.constants import *
 from database import database
-import config_file as conf
-
 
 init = 0 # keeps track of open windows - we only want one open at a time.
 search_window=None
 current_search = ''
+config = None
 
 #-------------------------------------------------------
 # init funtion
 # root = main root window to attch TOP
 # main_window = reference to the MainWindow classmethod
 # database = reference to the currently initialised database
+# config = refenece to an isnatnce the Config claass
 #-------------------------------------------------------
-def initialise_search(root_ref, main_window_ref, database):
+def initialise_search(root_ref, main_window_ref, database, config):
     global init
     if init == 1:
         return # there is already a window open
     global db
     db = database;
+    global conf
+    conf = config
     global root
     root = root_ref
     global main_window
@@ -34,8 +36,8 @@ def init_window():
     global search_window
     search_window = tk.Toplevel(root)
     search_window.title('Search..')
-    frame = tk.Frame(search_window, bg=conf.read_section('colours', 'widget_bg'))
-    mult_factor = int(conf.read_section('main','screen_scale'))
+    frame = tk.Frame(search_window, bg=self._conf.read_section('colours', 'widget_bg'))
+    mult_factor = int(self._conf.read_section('main','screen_scale'))
     width = 400 * mult_factor
     height = 100 * mult_factor
     geometry = f"{width}x{height}"
@@ -44,8 +46,8 @@ def init_window():
     search_input = tk.StringVar()
     search_entry = tk.Entry(frame,
                             textvariable=search_input,
-                            bg=conf.read_section('colours','search_bg'),
-                            fg=conf.read_section('colours','widget_text'),
+                            bg=self._conf.read_section('colours','search_bg'),
+                            fg=self._conf.read_section('colours','widget_text'),
                             width=30,
                             font='Arial 12',
                             relief='sunken')
@@ -54,8 +56,8 @@ def init_window():
 
     global label
     label = tk.Label(frame, text='...',
-                     bg=conf.read_section('colours','widget_bg'),
-                     fg=conf.read_section('colours','widget_text'))
+                     bg=self._conf.read_section('colours','widget_bg'),
+                     fg=self._conf.read_section('colours','widget_text'))
 
     search_entry.pack(pady=20)
     label.pack(pady=10)

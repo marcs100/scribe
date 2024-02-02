@@ -1,60 +1,61 @@
 import os.path
 import configparser
 
-config = configparser.ConfigParser()
+class Config:
 
-def create_new_config_file():
-    config.add_section('main')
-    config.add_section('main_window')
-    #config.add_section('note_window')
-    config.add_section('colours')
-    config.add_section('main screen key bindings')
-    onfig.add_section('note page key bindings')
-    
-    config['main']['app_title'] = "Scribe v1.0"
-    config['main']['database'] = "/home/marc/Documents/marcnotes_db"
-    config['main']['recent_notes_count'] = "8"
-    config['main']['default_notebook'] = "General"
-    config['main']['screen_scale'] = "1"
-    config['main']['backup_location'] = "/home/marcDocuments/backups/"
-    
-    config['main_window']['default_view'] = "pinned"
-    config['main_window']['width'] = "1000"
-    config['main_window']['height'] = "600"
-    config['main_window']['note_width'] = "50"
-    config['main_window']['notebook_width'] = "30"
+    def __init__(self, config_file):
+        self._config_file = config_file
+        self._config = configparser.ConfigParser()
 
-    config['colours']['widget_bg'] = '#303234' # blackish
-    config['colours']['widget_text'] = '#e7edef' # off white (hint of blue)
-    config['colours']['note_text'] = '#484445'
-    config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
-    config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
-    config['colours']['widget_highlight'] = "#5f6260"
-    config['colours']['search_bg'] = "#6d7c7a"
+    def create_new_config_file(self):
+        self._config.add_section('main')
+        self._config.add_section('main_window')
+        #config.add_section('note_window')
+        self._config.add_section('colours')
+        self._config.add_section('main window key bindings')
+        self._config.add_section('note page key bindings')
 
-    config['main window key bindings']['search'] = "<Control-f>"
-    config['main window key bindings']['new note'] = "<Control-n>"
-    config['main window key bindings']['show notebook view'] = "<Control-Alt-n>"
-    config['main window key bindings']['show pinned notes view'] = "<Control-Alt-p>"
-    config['main window key bindings']['show recent notes view'] = "<Control-Alt-r>"
+        self._config['main']['app_title'] = "Scribe v1.0"
+        self._config['main']['database'] = "/home/marc/Documents/marcnotes_db"
+        self._config['main']['recent_notes_count'] = "8"
+        self._config['main']['default_notebook'] = "General"
+        self._config['main']['screen_scale'] = "1"
+        self._config['main']['backup_location'] = "/home/marcDocuments/backups/"
 
-    config['note page key bindings']['search'] = "<Control-f>"
+        self._config['main_window']['default_view'] = "pinned"
+        self._config['main_window']['width'] = "1000"
+        self._config['main_window']['height'] = "600"
+        self._config['main_window']['note_width'] = "50"
+        self._config['main_window']['notebook_width'] = "30"
 
-    
-    write_config()
+        self._config['colours']['widget_bg'] = '#303234' # blackish
+        self._config['colours']['widget_text'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['note_text'] = '#484445'
+        self._config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['widget_highlight'] = "#5f6260"
+        self._config['colours']['search_bg'] = "#6d7c7a"
 
+        self._config['main window key bindings']['search'] = "<Control-f>"
+        self._config['main window key bindings']['new note'] = "<Control-n>"
+        self._config['main window key bindings']['show notebook view'] = "<Control-Alt-n>"
+        self._config['main window key bindings']['show pinned notes view'] = "<Control-Alt-p>"
+        self._config['main window key bindings']['show recent notes view'] = "<Control-Alt-r>"
 
-def write_config():
-    with open("./scribe.config", 'w') as configfile:
-        config.write(configfile)
+        self._config['note page key bindings']['search'] = "<Control-f>"
 
-def write_section(section, param, param_value, write_to_file):
-    config[section][param] = param_value
-    if write_to_file is True:
-        write_config()
+        self.write_config()
 
 
+    def write_config(self):
+        with open(self._config_file, 'w') as configfile:
+            self._config.write(configfile)
 
-def read_section(section,parm):
-    config.read("./scribe.config")
-    return config[section][parm]
+    def write_section(self, section, param, param_value, write_to_file):
+        self._config[section][param] = param_value
+        if write_to_file == True:
+            self.write_config()
+
+    def read_section(self, section,parm):
+        self._config.read(self._config_file)
+        return self._config[section][parm]

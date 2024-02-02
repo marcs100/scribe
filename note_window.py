@@ -6,7 +6,6 @@ import columns as COLUMN
 import hashlib
 import datetime
 import datetime_format
-import config_file as conf
 import note_attributes
 from tkinter import colorchooser
 from tkinter import messagebox
@@ -14,10 +13,10 @@ from tkinter import messagebox
 
 class NoteWindow:
 
-    def __init__(self, root, main_window):
+    def __init__(self, root, main_window, config):
 
         self._note = None
-        
+        self._conf = config
         self._attrib = note_attributes.NoteAttributes()
 
         self._init_window(root, main_window)
@@ -28,7 +27,7 @@ class NoteWindow:
     def _init_window(self, root, main_window):
         self._root_window = root
         self._note_window = tk.Toplevel(self._root_window)
-        mult_factor = int(conf.read_section('main','screen_scale'))
+        mult_factor = int(self._conf.read_section('main','screen_scale'))
         width = 800 * mult_factor
         height = 550 * mult_factor
         geometry = f"{width}x{height}"
@@ -36,38 +35,38 @@ class NoteWindow:
        
         self._main_window = main_window # This is a reference to the main view window so we can tell it to update views if notes gett added or removed
 
-        self._frame = tk.Frame(self._note_window, bg=conf.read_section('colours', 'widget_bg'))
+        self._frame = tk.Frame(self._note_window, bg=self._conf.read_section('colours', 'widget_bg'))
 
-        self._menu_frame = tk.Frame(self._note_window, bg=conf.read_section('colours', 'widget_bg'))
-        spacer_label = tk.Label(self._menu_frame, text="       ", bg=conf.read_section('colours', 'widget_bg'),
-                                fg=conf.read_section('colours', 'widget_text'))
-        spacer_label2 = tk.Label(self._menu_frame, text="       ", bg=conf.read_section('colours', 'widget_bg'),
-                                fg=conf.read_section('colours', 'widget_text'))
-        spacer_label3 = tk.Label(self._menu_frame, text="  ", bg=conf.read_section('colours', 'widget_bg'),
-                              fg=conf.read_section('colours', 'widget_text'))
+        self._menu_frame = tk.Frame(self._note_window, bg=self._conf.read_section('colours', 'widget_bg'))
+        spacer_label = tk.Label(self._menu_frame, text="       ", bg=self._conf.read_section('colours', 'widget_bg'),
+                                fg=self._conf.read_section('colours', 'widget_text'))
+        spacer_label2 = tk.Label(self._menu_frame, text="       ", bg=self._conf.read_section('colours', 'widget_bg'),
+                                fg=self._conf.read_section('colours', 'widget_text'))
+        spacer_label3 = tk.Label(self._menu_frame, text="  ", bg=self._conf.read_section('colours', 'widget_bg'),
+                              fg=self._conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
         spacer_label2.pack(fill=Y, side='left')
         spacer_label3.pack(fill=Y, side='right')
 
-        self._revert_button = tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Revert",
+        self._revert_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
+                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="Revert",
                                       command=self._revert_text)
 
-        self._delete_button = tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Delete",
+        self._delete_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
+                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="Delete",
                                       command=self._delete_note)
         
-        self._colour_button =  tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Colour",
+        self._colour_button =  tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
+                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="Colour",
                                       command=self._get_colour)
-        self._pin_button = tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="Pin",
+        self._pin_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
+                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="Pin",
                                       command=self._toggle_pin)
 
          # Select notebook button
         self._notebook_button = tk.Menubutton(self._menu_frame, text="Notebook", relief="flat",
-                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
-        self._notebook_button.menu = tk.Menu(self._notebook_button, bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+                                           bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
+        self._notebook_button.menu = tk.Menu(self._notebook_button, bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
         self._notebook_button["menu"] = self._notebook_button.menu
 
         self._delete_button.pack(fill='y', side='right',  pady=2, padx=2)
@@ -121,8 +120,8 @@ class NoteWindow:
             self._pin_button['text'] = 'Pin'
             self._attrib.new_note = True
             if self._attrib.notebook == "":
-                self._attrib.notebook = conf.read_section('main', 'default_notebook')
-            self._attrib.colour = conf.read_section('colours','default_note_bg')
+                self._attrib.notebook = self._conf.read_section('main', 'default_notebook')
+            self._attrib.colour = self._conf.read_section('colours','default_note_bg')
         else:
             self._attrib.id = sqlid
             self._attrib.new_note = False
@@ -245,7 +244,7 @@ class NoteWindow:
     def _show_note_properties(self):
         properties_window = tk.Toplevel(self._note_window)
         properties_window.title('Properties')
-        mult_factor = int(conf.read_section('main','screen_scale'))
+        mult_factor = int(self._conf.read_section('main','screen_scale'))
         width = 400 * mult_factor
         height = 220 * mult_factor
         geometry = f"{width}x{height}"

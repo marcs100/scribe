@@ -5,7 +5,6 @@ from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
 import search_window as search_window
-import config_file as conf
 from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
@@ -18,9 +17,10 @@ class MainWindow:
     #-------------------------------------------------------
     # Initialise the class
     #-------------------------------------------------------
-    def __init__(self, root, database_in):
+    def __init__(self, root, database_in, config):
         self._root = root
         self._db = database_in
+        self._conf = config
        
         self.width = 0
         self.height = 0
@@ -33,79 +33,79 @@ class MainWindow:
     # Initialise the main window
     #-------------------------------------------------------
     def init_window(self):
-        self._note_width = int(conf.read_section('main_window', 'note_width'))
-        self._notebook_width = int(conf.read_section('main_window', 'notebook_width'))
+        self._note_width = int(self._conf.read_section('main_window', 'note_width'))
+        self._notebook_width = int(self._conf.read_section('main_window', 'notebook_width'))
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
-        self._main_frame = tk.Frame(self._root,bg=conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
-        self._canvas = tk.Canvas(self._main_frame, bg=conf.read_section('colours','widget_bg'))
+        self._main_frame = tk.Frame(self._root,bg=self._conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
+        self._canvas = tk.Canvas(self._main_frame, bg=self._conf.read_section('colours','widget_bg'))
         #self._scrollbar = tk.Scrollbar(self._main_frame, orient=VERTICAL, width=15,
-        #           bg=conf.read_section('colours','widget_bg'), command=self._canvas.yview)
+        #           bg=self._conf.read_section('colours','widget_bg'), command=self._canvas.yview)
         self._scrollbar = ttk.Scrollbar(self._main_frame, orient=VERTICAL, command=self._canvas.yview)
         self._scrollbar.pack(side=RIGHT, fill=Y)
         self._canvas.configure(yscrollcommand=self._scrollbar.set)
         self._canvas.bind('<Configure>', lambda e: self._canvas.configure(scrollregion=self._canvas.bbox("all")))
 
         #This is the frame inside the canvas that will be scrollable (do not pack as we will create a window in it)
-        self._frame = tk.Frame(self._canvas,bg=conf.read_section('colours','widget_bg'))
+        self._frame = tk.Frame(self._canvas,bg=self._conf.read_section('colours','widget_bg'))
         self._canvas.create_window((0,0), window=self._frame, anchor="nw")
             
 
-        self._menu_frame = tk.Frame(self._root, bg=conf.read_section('colours','widget_bg'))
+        self._menu_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget_bg'))
         self._menu_frame.pack(fill=BOTH, expand=FALSE)
         self._view_button = tk.Menubutton(self._menu_frame, text="Select View", relief="flat",
-                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
+                                           bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
                
-        self._view_label = tk.Label(self._menu_frame,text="dummy",bg=conf.read_section('colours','widget_bg'),
-                                     fg=conf.read_section('colours', 'widget_text'))
+        self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget_bg'),
+                                     fg=self._conf.read_section('colours', 'widget_text'))
         lbl_font = font.Font(weight="bold")
         self._view_label["font"] = lbl_font
         #self._frame.pack(fill=BOTH, expand=TRUE)
 
           #New Note button
-        self._new_note_button = tk.Button(self._menu_frame, bg=conf.read_section('colours', 'widget_bg'),
-                                      fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
+        self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
+                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
                                       command=self._create_new_note)
         self._new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
-        self._new_notebook_button = tk.Button(self._menu_frame,  bg=conf.read_section('colours', 'widget_bg'),
-                                        fg=conf.read_section('colours', 'widget_text'), relief="flat", text="New Notebook",
+        self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget_bg'),
+                                        fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="New Notebook",
                                         state='disabled', command=self._create_new_notebook)
         self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         #self._search_input = tk.StringVar()
-        #self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         #bg=conf.read_section('colours','search_bg'),
-        #                               fg=conf.read_section('colours','widget_text'),
+        #self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         #bg=self._conf.read_section('colours','search_bg'),
+        #                               fg=self._conf.read_section('colours','widget_text'),
         #                               width=30,
         #                               font='Arial 11',
         #                               relief='sunken')
 
         # right side spacer from edge of frame
-        spacer_label = tk.Label(self._menu_frame, text="     ", bg=conf.read_section('colours', 'widget_bg'),
-                                fg=conf.read_section('colours', 'widget_text'))
+        spacer_label = tk.Label(self._menu_frame, text="     ", bg=self._conf.read_section('colours', 'widget_bg'),
+                                fg=self._conf.read_section('colours', 'widget_text'))
         spacer_label.pack(fill=Y, side='right')
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
-                                           bg=conf.read_section('colours','widget_bg'), fg=conf.read_section('colours', 'widget_text'))
-        self._scripts_button.menu = tk.Menu(self._scripts_button, bg=conf.read_section('colours','widget_bg'),
-                                          fg=conf.read_section('colours', 'widget_text'), tearoff=0)
+                                           bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
+        self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget_bg'),
+                                          fg=self._conf.read_section('colours', 'widget_text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
         #self._search_entry.pack(side='right',padx=3, pady=5)
-        #self._search_label = tk.Label(self._menu_frame,bg=conf.read_section('colours', 'widget_bg'),
-        #                                   fg=conf.read_section('colours', 'widget_text'), text="search: ")
+        #self._search_label = tk.Label(self._menu_frame,bg=self._conf.read_section('colours', 'widget_bg'),
+        #                                   fg=self._conf.read_section('colours', 'widget_text'), text="search: ")
         #self._search_entry.bind('<Return>',lambda event: self._get_search_input(event))
 
         #self._search_label.pack(fill=Y, side='right', padx=5, pady=1)
 
          # Select view menu button
         #menu = tk.Menubutton()
-        self._view_button.menu = tk.Menu(self._view_button, bg=conf.read_section('colours','widget_bg'),
-                                          fg=conf.read_section('colours', 'widget_text'), tearoff=0)
+        self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget_bg'),
+                                          fg=self._conf.read_section('colours', 'widget_text'), tearoff=0)
         self._view_button["menu"] = self._view_button.menu
 
         self._view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
@@ -163,7 +163,7 @@ class MainWindow:
         #ask user for the new notebook name - use default colour
         new_notebook = simpledialog.askstring("Input", "Enter new notebook name...")
         if new_notebook is not None:
-            self._db.addToNotebookCovers(new_notebook, conf.read_section('colours', 'default_notebook_bg'))
+            self._db.addToNotebookCovers(new_notebook, self._conf.read_section('colours', 'default_notebook_bg'))
             messagebox.showinfo("Scribe","New notebook {} has been created".format(new_notebook))
             self.update_current_view()
         
@@ -176,7 +176,7 @@ class MainWindow:
     # notebook.
     #-------------------------------------------------------
     def _create_new_note(self):
-        note_window = NoteWindow(self._root, self)
+        note_window = NoteWindow(self._root, self, self._conf)
         if self._selected_notebook != 'none':
             note_window.set_notebook_name(self._selected_notebook)
         note_window.open_note(None, self._db)
@@ -377,7 +377,7 @@ class MainWindow:
     def _get_recent_notes_view(self):
         self.clear_frame()
         self._view_label["text"] = "Viewing: Recent Notes"
-        recent_notes = self._db.getRecentNotes(int(conf.read_section('main', 'recent_notes_count')))
+        recent_notes = self._db.getRecentNotes(int(self._conf.read_section('main', 'recent_notes_count')))
         if recent_notes is None:
             print("No recent notes found")
             return 
@@ -534,7 +534,7 @@ class MainWindow:
         '''
 
         #get screen scale value (multiplier)
-        scr_scale = int(conf.read_section('main', 'screen_scale'))
+        scr_scale = int(self._conf.read_section('main', 'screen_scale'))
 
         
         #we need this becuase initially the screen size won't be reported becuase it has not gone through mainloop yet

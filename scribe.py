@@ -9,7 +9,17 @@ from note_window import NoteWindow
 from main_window import MainWindow
 import configparser
 import os.path
-import config_file as conf
+from config_file import Config
+import platform
+from pathlib import Path
+
+####################################################################
+# Change this to Ture for released versions. This is so dev builds
+# can use a differnt scribe.config
+# The release scribe .config os loacted in ~/.config/scribe
+# This assumes all the dev will be done on linux!!
+release = False
+###################################################################
 
 def window_closed():
     width = str(root.winfo_width())
@@ -18,10 +28,22 @@ def window_closed():
     conf.write_section('main_window', 'height', height, True)
     root.destroy()
 
+conf = None
 
 def main():
 
-    config_file = "./scribe.config"
+    if(release==True):
+        if platform.system() == 'Linux':
+            config_file = str(Path.home())+"/.config/scribe/scribe.config"
+        else:
+            config_file = str(Path.home())+"/scribe.config"
+    else:
+        config_file = './scribe.config'
+
+    global conf
+    conf = Config(config_file)
+
+    print(config_file)
     check_file = os.path.isfile(config_file)
 
     if check_file == False:
@@ -49,7 +71,7 @@ def init_main_window():
     db = database(db_file)
 
     root.title(conf.read_section('main', 'app_title'))
-    main_win = MainWindow(root,db)
+    main_win = MainWindow(root,db, conf)
     
     # set default view  - read this from stored settings
     main_win.get_view(conf.read_section('main_window','default_view'))

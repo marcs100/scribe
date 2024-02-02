@@ -1,6 +1,5 @@
 from subprocess import Popen, PIPE
 import tkinter as tk
-import config_file as conf
 import platform
 
 def update_text_box(text_box, line_in):
@@ -12,10 +11,10 @@ def close_window(window):
     window.destroy()
 
 #Run a python script and pipe stdout and stderr to a tkinter window
-def run_script(script_name):
+def run_script(script_name, config):
 
     line = ""
-    mult_factor = int(conf.read_section('main','screen_scale'))
+    mult_factor = int(config.read_section('main','screen_scale'))
     width = 750 * mult_factor
     height = 500 * mult_factor
     geometry = f"{width}x{height}"
