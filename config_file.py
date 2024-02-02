@@ -1,5 +1,6 @@
 import os.path
 import configparser
+import version_info
 
 class Config:
 
@@ -16,11 +17,14 @@ class Config:
         self._config.add_section('note page key bindings')
 
         self._config['main']['app_title'] = "Scribe v1.0"
-        self._config['main']['database'] = "/home/marc/Documents/marcnotes_db"
+        if version_info.release == True:
+            self._config['main']['database'] = "/home/marc/sync/scribe/scribe_data.db"
+        else;
+            self._config['main']['database'] = "/home/marc/Documents/marcnotes_db"
         self._config['main']['recent_notes_count'] = "8"
         self._config['main']['default_notebook'] = "General"
         self._config['main']['screen_scale'] = "1"
-        self._config['main']['backup_location'] = "/home/marcDocuments/backups/"
+        self._config['main']['backup_location'] = "/home/marc/Documents/backups/"
 
         self._config['main_window']['default_view'] = "pinned"
         self._config['main_window']['width'] = "1000"

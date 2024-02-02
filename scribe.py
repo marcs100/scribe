@@ -12,14 +12,8 @@ import os.path
 from config_file import Config
 import platform
 from pathlib import Path
+import version_info
 
-####################################################################
-# Change this to Ture for released versions. This is so dev builds
-# can use a differnt scribe.config
-# The release scribe .config os loacted in ~/.config/scribe
-# This assumes all the dev will be done on linux!!
-release = False
-###################################################################
 
 def window_closed():
     width = str(root.winfo_width())
@@ -32,7 +26,7 @@ conf = None
 
 def main():
 
-    if(release==True):
+    if(version_info.release==True):
         if platform.system() == 'Linux':
             config_file = str(Path.home())+"/.config/scribe/scribe.config"
         else:
