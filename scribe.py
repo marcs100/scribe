@@ -26,18 +26,20 @@ conf = None
 
 def main():
 
+
     if(version_info.release==True):
         if platform.system() == 'Linux':
             config_file = str(Path.home())+"/.config/scribe/scribe.config"
         else:
             config_file = str(Path.home())+"/scribe.config"
     else:
+        print("**Warning** this is the development version")
         config_file = './scribe.config'
 
     global conf
     conf = Config(config_file)
 
-    print(config_file)
+    print(f"Using config file {config_file}")
     check_file = os.path.isfile(config_file)
 
     if check_file == False:
@@ -63,6 +65,8 @@ def init_main_window():
 
     db_file = conf.read_section('main', 'database')
     db = database(db_file)
+
+    print(f"Using database {db_file}")
 
     root.title(conf.read_section('main', 'app_title'))
     main_win = MainWindow(root,db, conf)
