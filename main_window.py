@@ -135,7 +135,7 @@ class MainWindow:
     #-------------------------------------------------------------------
     def _show_search_window(self, event):
         print("**** Show search window *****")
-        search_window.initialise_search(self._root, self, self._db)
+        search_window.initialise_search(self._root, self, self._db, self._conf)
 
 
 
@@ -197,7 +197,7 @@ class MainWindow:
     def _clicked_note(self,event,sqlid):
         print("note id is " + str(sqlid))
         # open note for editing in new window
-        note_window = NoteWindow(self._root, self)
+        note_window = NoteWindow(self._root, self, self._conf)
         note_window.open_note(sqlid, self._db)
 
 

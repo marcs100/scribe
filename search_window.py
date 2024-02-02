@@ -36,8 +36,8 @@ def init_window():
     global search_window
     search_window = tk.Toplevel(root)
     search_window.title('Search..')
-    frame = tk.Frame(search_window, bg=self._conf.read_section('colours', 'widget_bg'))
-    mult_factor = int(self._conf.read_section('main','screen_scale'))
+    frame = tk.Frame(search_window, bg=conf.read_section('colours', 'widget_bg'))
+    mult_factor = int(conf.read_section('main','screen_scale'))
     width = 400 * mult_factor
     height = 100 * mult_factor
     geometry = f"{width}x{height}"
@@ -46,8 +46,8 @@ def init_window():
     search_input = tk.StringVar()
     search_entry = tk.Entry(frame,
                             textvariable=search_input,
-                            bg=self._conf.read_section('colours','search_bg'),
-                            fg=self._conf.read_section('colours','widget_text'),
+                            bg=conf.read_section('colours','search_bg'),
+                            fg=conf.read_section('colours','widget_text'),
                             width=30,
                             font='Arial 12',
                             relief='sunken')
@@ -56,8 +56,8 @@ def init_window():
 
     global label
     label = tk.Label(frame, text='...',
-                     bg=self._conf.read_section('colours','widget_bg'),
-                     fg=self._conf.read_section('colours','widget_text'))
+                     bg=conf.read_section('colours','widget_bg'),
+                     fg=conf.read_section('colours','widget_text'))
 
     search_entry.pack(pady=20)
     label.pack(pady=10)
