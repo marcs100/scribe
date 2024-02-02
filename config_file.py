@@ -19,7 +19,7 @@ class Config:
         self._config['main']['app_title'] = "Scribe v1.0"
         if version_info.release == True:
             self._config['main']['database'] = "/home/marc/sync/scribe/scribe_data.db"
-        else;
+        else:
             self._config['main']['database'] = "/home/marc/Documents/marcnotes_db"
         self._config['main']['recent_notes_count'] = "8"
         self._config['main']['default_notebook'] = "General"
