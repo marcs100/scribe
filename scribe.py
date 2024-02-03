@@ -9,10 +9,12 @@ from note_window import NoteWindow
 from main_window import MainWindow
 import configparser
 import os.path
-from config_file import Config
+from app_config import Config
+import configuration_file
 import platform
 from pathlib import Path
 import version_info
+import configuration_file
 
 
 def window_closed():
@@ -26,15 +28,21 @@ conf = None
 
 def main():
 
-
+    global config_file
     if(version_info.release==True):
         if platform.system() == 'Linux':
             config_file = str(Path.home())+"/.config/scribe/scribe.config"
         else:
             config_file = str(Path.home())+"/scribe.config"
     else:
-        print("**Warning** this is the development version")
-        config_file = './scribe.config'
+        if platform.system() == 'Linux':
+            print("**Warning** this is the development version")
+            config_file = '/home/marc/source/scribe/scribe.config'
+        else:
+            print("**Warning** this is the development version")
+            config_file = './scribe.config'
+    #save the config file a setting (so it can be passed to scripts)
+    configuration_file.set_config_file(config_file)
 
     global conf
     conf = Config(config_file)
@@ -43,7 +51,7 @@ def main():
     check_file = os.path.isfile(config_file)
 
     if check_file == False:
-        print("Config file not ... Creating new config")
+        print("Config file not found ... Creating new config")
         conf.create_new_config_file()
         print("Wrote new config" + config_file)
     else:

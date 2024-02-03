@@ -497,7 +497,7 @@ class MainWindow:
             print(f"found script {script_file}")
             head, script_file_name = os.path.split(script_file)
             self._scripts_button.menu.add_command(label=script_file_name,
-                command=lambda script=script_file: run_script.run_script(script))
+                command=lambda script=script_file: run_script.run_script(script, self._conf))
 
 
     #-------------------------------------------------------
