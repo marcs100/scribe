@@ -12,7 +12,7 @@ def main():
         return
 
     conf_file = str(sys.argv[1])
-    print(f"Got argument: {conf_file}")
+    #print(f"Got argument: {conf_file}")
 
     config = configparser.ConfigParser()
     config.read(conf_file)

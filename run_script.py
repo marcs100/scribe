@@ -8,8 +8,6 @@ def update_text_box(text_box, line_in):
     text_box.update()
     text_box.update_idletasks()
 
-def close_window(window):
-    window.destroy()
 
 #Run a python script and pipe stdout and stderr to a tkinter window
 def run_script(script_name, config):
@@ -24,11 +22,6 @@ def run_script(script_name, config):
     root.title('Running python script...')
     text_box = tk.Text(root, wrap=tk.WORD, bg='#000000', fg='#ffffff')
     text_box.pack(fill='both', expand='true')
-
-    button = tk.Button(root, relief='flat', text="Close",
-                       command= lambda window=root: close_window(window))
-    button['state'] = tk.DISABLED
-    button.pack(fill='both', expand='true')
 
     root.update()
 
@@ -56,7 +49,7 @@ def run_script(script_name, config):
                     root.update()
                     if not error: break
                 if not line: break
-    button['state'] = tk.NORMAL
+
 
 
 

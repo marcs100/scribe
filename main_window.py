@@ -76,13 +76,6 @@ class MainWindow:
                                         state='disabled', command=self._create_new_notebook)
         self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
-        #self._search_input = tk.StringVar()
-        #self._search_entry = tk.Entry(self._menu_frame,textvariable=self._search_input,                                                         #bg=self._conf.read_section('colours','search_bg'),
-        #                               fg=self._conf.read_section('colours','widget_text'),
-        #                               width=30,
-        #                               font='Arial 11',
-        #                               relief='sunken')
-
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ", bg=self._conf.read_section('colours', 'widget_bg'),
                                 fg=self._conf.read_section('colours', 'widget_text'))
@@ -96,14 +89,6 @@ class MainWindow:
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
-        #self._search_entry.pack(side='right',padx=3, pady=5)
-        #self._search_label = tk.Label(self._menu_frame,bg=self._conf.read_section('colours', 'widget_bg'),
-        #                                   fg=self._conf.read_section('colours', 'widget_text'), text="search: ")
-        #self._search_entry.bind('<Return>',lambda event: self._get_search_input(event))
-
-        #self._search_label.pack(fill=Y, side='right', padx=5, pady=1)
-
-         # Select view menu button
         #menu = tk.Menubutton()
         self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget_bg'),
                                           fg=self._conf.read_section('colours', 'widget_text'), tearoff=0)
@@ -125,7 +110,7 @@ class MainWindow:
         self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
 
         #Setup key bindings
-        self._root.bind('<Control-f>', lambda event: self._show_search_window(event))
+        self._root.bind(self._conf.read_section('main window key bindings','search'), lambda event: self._show_search_window(event))
 
     
     '''EVENTS'''
@@ -138,17 +123,6 @@ class MainWindow:
         print("**** Show search window *****")
         search_window.initialise_search(self._root, self, self._db, self._conf)
 
-
-
-    #-------------------------------------------------------
-    #      DEPRECIATED!!!!!!!!!!!!!!!!
-    # Event (return pressed):
-    # Get search input fronm search entry widget
-    #-------------------------------------------------------
-    #def _get_search_input(self, event):
-    #    print(f"Search input is {self._search_input.get()}")
-    #    if len(self._search_input.get()) != 0:
-    #        self.get_view('search results')
 
     #-------------------------------------------------------
     # Event (new notebook selected)
