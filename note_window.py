@@ -9,6 +9,7 @@ import datetime_format
 import note_attributes
 from tkinter import colorchooser
 from tkinter import messagebox
+import track_open_notes as tracker
 
 
 class NoteWindow:
@@ -95,7 +96,7 @@ class NoteWindow:
         
 
     #---------------------------------------------------------
-    # Allows use to change the notbook name for current note.
+    # Allows use to change the notebook name for current note.
     #---------------------------------------------------------
     def _select_notebook(self, notebook_in):
         if self._attrib.notebook != notebook_in:
@@ -154,6 +155,7 @@ class NoteWindow:
     #-----------------------------
     def _close_note(self):
         self._save_note()
+        tracker.delete_note(self._attrib.id)
         self._note_window.destroy()
     
 
@@ -173,10 +175,16 @@ class NoteWindow:
                 self._attrib.date_created = datetime.datetime.now()
                 self._attrib.date_modified = self._attrib.date_created
                 # addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
-                self._db.addNote(self._attrib.notebook, self._attrib.tag, self._text_box.get("1.0",END),
+                sqlid = self._db.addNote(self._attrib.notebook, self._attrib.tag, self._text_box.get("1.0",END),
                               self._attrib.date_created, self._attrib.pinned, self._attrib.colour)
                 self._attrib.new_note = False
                 self._main_window.update_current_view()
+                self._attrib.id = sqlid[0]
+
+                tracker.track_note(sqlid[0])
+                #Note - for existing notes opened from the main window, the sqlid
+                #for that note has already been added to tracker by main_window,py
+
                 return
             return
 
@@ -231,6 +239,8 @@ class NoteWindow:
                                     parent=self._note_window) == True:
                 print(f"Deleting note {self._attrib.id}")
                 self._db.deleteNoteById(self._attrib.id)
+
+                tracker.delete_note(self._attrib.id)
 
                 #need to tell main window to update teh current view
                 self._main_window.update_current_view()

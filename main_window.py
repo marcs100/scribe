@@ -11,6 +11,7 @@ from tkinter import messagebox
 from tkinter import colorchooser
 import run_script
 import os, glob, sys
+import track_open_notes as tracker
 
 class MainWindow:
 
@@ -196,9 +197,10 @@ class MainWindow:
     #-------------------------------------------------------
     def _clicked_note(self,event,sqlid):
         print("note id is " + str(sqlid))
+        if tracker.track_note(sqlid) == True:
         # open note for editing in new window
-        note_window = NoteWindow(self._root, self, self._conf)
-        note_window.open_note(sqlid, self._db)
+            note_window = NoteWindow(self._root, self, self._conf)
+            note_window.open_note(sqlid, self._db)
 
 
     #-------------------------------------------------------
