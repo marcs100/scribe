@@ -355,6 +355,9 @@ class MainWindow:
             colour = self._db.getNotebookColour(notebook_name[0])
             self._text_box = tk.Text(self._frame, height=5, width=self._notebook_width, wrap=tk.WORD, bg=colour)
             self._text_box.insert(tk.END, str(notebook_name[0]))
+            num_notes = self._db.getNumberOfNotesInNotebook(notebook_name[0])
+            self._text_box.insert(tk.END, f"\n\n({str(num_notes)} notes)")
+            #print (f"Number of notes in {notebook_name[0]} is {str(num_notes)}")
             self._text_box.bind('<Double-1>',
                                  lambda event,name=str(notebook_name[0]):self._clicked_notebook(event,name))
 
