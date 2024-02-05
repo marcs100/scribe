@@ -25,6 +25,7 @@ class Config:
         self._config['main']['default_notebook'] = "General"
         self._config['main']['screen_scale'] = "1"
         self._config['main']['backup_location'] = "/home/marc/Documents/backups/"
+        self._config['main']['notes_per_page'] = "30"
 
         self._config['main_window']['default_view'] = "pinned"
         self._config['main_window']['width'] = "1000"

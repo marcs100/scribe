@@ -101,7 +101,7 @@ class MainWindow:
         #self._view_button.menu.bind("<FocusOut>", lambda event: self._close_view_menu(event))
 
         self._view_button.pack(fill=Y, side='left',padx=30,pady=3)
-        self._view_label.pack(fill=Y, anchor='center', pady=3)
+        self._view_label.pack(fill=Y, side='left', pady=3)
 
         self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
