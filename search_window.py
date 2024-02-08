@@ -3,6 +3,7 @@ from tkinter.constants import *
 from database import database
 
 
+
 global init
 init = 0 # keeps track of open windows - we only want one open at a time.
 
@@ -25,8 +26,9 @@ class SearchWindow:
         self._main_window = main_window_ref
         self._root = root_ref
         self.init_window()
-        self._notes_per_page = self._conf.read_section('main','notes per page')
+        self._notes_per_page = int(self._conf.read_section('main','notes per page'))
         self._search_query=''
+        self._got_results = False
 
     #-------------------------------------------------------
     # Initialise the main search window
@@ -72,7 +74,9 @@ class SearchWindow:
         self._search_query = self._search_input.get()
         if self._search_input.get()!= '':
             print(f"searhing for ..... {self._search_query}")
-            self._num_results = self._db.getNumberOfSearchResults(self._search_input.get())
+            self._num_results = self._get_number_search_of_results()
+            if self._num_results > 0:
+                self._got_results = True
             self._label.configure(text=f"Found {self._num_results} results")
             #Send these search results back to the main Window
             self._main_window.received_search_results(self._num_results)
@@ -81,10 +85,17 @@ class SearchWindow:
     # Fetch the search results from the database
     # Search term is in self._search_input.get()
     #-------------------------------------------------------
-    def get_number_search_results(self):
+    def _get_number_search_of_results(self):
         if(self._search_query == ''):
             return 0
         return self._db.getNumberOfSearchResults(self._search_query)
+
+    #----------------------------------------------------
+    # Public facing function to indicate if earch results
+    # have been collected
+    #----------------------------------------------------
+    def has_search_results(self):
+        return self._got_results
 
 
     #-------------------------------------------------------
@@ -102,28 +113,33 @@ class SearchWindow:
     # The serach term is in self._search_input.get()
     #-------------------------------------------------------
     def get_search_results(self, page_number):
-        #print("Entered get_search_results(page_number)")
+        print("Entered get_search_results(page_number)")
+        print(f"page number: {str(page_number)}")
         if self._search_query == '':
             #print("self._search_query is empty")
             return None
 
-        if page_number == 1:
-            offset = 0
-        else:
-            number_of_pages = self._num_results / page_number
-            #print(f"Number of pages in search: {str(number_of_pages)}")
-            if self._num_results % page_number > 0:
-                number_of_pages += 1
-            offset = (page_number - 1) * notes_per_page
-            #print(f"search offset: {str(offset)}")
-            if page_number > number_of_pages:
-                print("page number is greater than allowed!!")
-                return None
+        offset = (page_number-1) * self._notes_per_page
 
+        if offset > self._num_results:
+            return None
+
+        print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
         search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset)
-        #print(f"Got {str(len(search_results))} in get_search_results()")
+        print(f"Got {str(len(search_results))} in get_search_results()")
         return search_results
 
+
+    #---------------------------------------
+    #Return the number of pages for the
+    #currrent search results
+    #---------------------------------------
+    def get_number_of_pages(self):
+        #round down to nearest whole number
+        num_pages = self._num_results // self._notes_per_page
+        if self._num_results % self._notes_per_page > 0:
+            num_pages +=1
+        return num_pages
 
 
 

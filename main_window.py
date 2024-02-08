@@ -27,7 +27,8 @@ class MainWindow:
         self.height = 0
         self._current_view = 'none'
         self._selected_notebook = 'none'
-        self._page_number = 1;
+        self._page_number = 1
+        self._max_page = 1
         self._search_window = None
         self.init_window()
 
@@ -66,7 +67,7 @@ class MainWindow:
         self._view_label["font"] = lbl_font
         #self._frame.pack(fill=BOTH, expand=TRUE)
 
-          #New Note button
+        #New Note button
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
                                       command=self._create_new_note)
@@ -79,7 +80,8 @@ class MainWindow:
         self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         # right side spacer from edge of frame
-        spacer_label = tk.Label(self._menu_frame, text="     ", bg=self._conf.read_section('colours', 'widget bg'),
+        spacer_label = tk.Label(self._menu_frame, text="     ",
+                                bg=self._conf.read_section('colours', 'widget bg'),
                                 fg=self._conf.read_section('colours', 'widget text'))
         spacer_label.pack(fill=Y, side='right')
 
@@ -90,6 +92,25 @@ class MainWindow:
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
+
+        #Page forward button
+        self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
+                                      command=self._page_forward)
+
+        #Page back button
+        self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="<<",
+                                      command=self._page_back)
+
+        spacer_label2 = tk.Label(self._menu_frame, text="     ",
+                                bg=self._conf.read_section('colours', 'widget bg'),
+                                fg=self._conf.read_section('colours', 'widget text'))
+        spacer_label.pack(fill=Y, side='right')
+
+        spacer_label2.pack(side='right')
+        self._page_forward_button.pack(side='right',padx=3, pady=10)
+        self._page_back_button.pack(side='right', padx=3, pady=10)
 
         #menu = tk.Menubutton()
         self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget bg'),
@@ -102,12 +123,22 @@ class MainWindow:
 
         #self._view_button.menu.bind("<FocusOut>", lambda event: self._close_view_menu(event))
 
+        self._status_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
+        self._status_label = tk.Label(self._status_frame,
+                            bg=self._conf.read_section('colours','widget bg'),
+                            fg=self._conf.read_section('colours','widget text'),
+                            text='staus: blah blah',
+                            height=1,
+                            anchor="s")
+        self._status_label.pack(fill='both', expand='true')
+
         self._view_button.pack(fill=Y, side='left',padx=30,pady=3)
         self._view_label.pack(fill=Y, side='left', pady=3)
 
         self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        self._main_frame.pack(fill=BOTH, expand=TRUE)
+        self._main_frame.pack(fill=BOTH, expand='true')
+        self._status_frame.pack(fill='x', expand='false', side='bottom')
 
         self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
 
@@ -116,6 +147,53 @@ class MainWindow:
 
     
     '''EVENTS'''
+    #--------------------------------------------------------------------
+    # Move page forward
+    #-------------------------------------------------------------------
+    def _page_forward(self):
+        #print("page forward function")
+        #print(f"max page: {self._max_page}")
+        #print(f"page num: {self._page_number}")
+        if self._page_number >= self._max_page:
+            #print("page is greater then max page")
+            return
+        self._page_number += 1 # move page forward
+
+        if self._current_view == 'search results':
+            if self._search_window == None:
+                #print("search_window is None")
+                return
+            if self._search_window.has_search_results() == False:
+                #print("No results waiting")
+                return
+            search_results = self._search_window.get_search_results(self._page_number)
+            #print("page forward got search results")
+            self.get_view('search results')
+        else:
+            print("Not in search view") #place folder for note page view
+
+    #--------------------------------------------------------------------
+    # Move page back
+    #-------------------------------------------------------------------
+    def _page_back(self):
+        #print("page back function")
+        if self._page_number == 1:
+            #print("page number is 1 can't go back")
+            return
+        self._page_number -= 1 # move page back
+
+        if self._current_view == 'search results':
+            if self._search_window == None:
+                #print("not in search view")
+                return
+            if self._search_window.has_search_results() == False:
+                return
+            search_results = self._search_window.get_search_results(self._page_number)
+            self.get_view('search results')
+        else:
+            pass #will do note pages here!!!!
+
+
 
 
     #--------------------------------------------------------------------
@@ -242,7 +320,8 @@ class MainWindow:
     #---------------------------------------------------------------
     def received_search_results(self, number_of_results):
         print(f"Number of search results has been updated: {str(number_of_results)}")
-        self._page_number = 1;
+        self._page_number = 1
+        self._max_page = self._search_window.get_number_of_pages()
         self.get_view('search results')
         #search_results =
 
@@ -254,6 +333,8 @@ class MainWindow:
     def get_view(self,view):
         #print("Getting view: "+view)
         self._current_view = view
+        self._page_forward_button['state']='disabled'
+        self._page_back_button['state']='disabled'
         match view:
             case 'pinned':
                 self._new_notebook_button["state"]='disabled'
@@ -272,6 +353,8 @@ class MainWindow:
                 if self._selected_notebook != 'none':
                     self._get_note_pages_view(self._selected_notebook)
             case 'search results':
+                self._page_forward_button['state']='active'
+                self._page_back_button['state']='active'
                 self._new_notebook_button['state'] = 'disabled'
                 self._selected_notebook = 'none'
                 if(self._search_window is not None):
