@@ -21,25 +21,25 @@ class Config:
             self._config['main']['database'] = "/home/marc/sync/scribe/scribe_data.db"
         else:
             self._config['main']['database'] = "/home/marc/Documents/marcnotes_db"
-        self._config['main']['recent_notes_count'] = "8"
-        self._config['main']['default_notebook'] = "General"
-        self._config['main']['screen_scale'] = "1"
-        self._config['main']['backup_location'] = "/home/marc/Documents/backups/"
-        self._config['main']['notes_per_page'] = "30"
+        self._config['main']['recent notes count'] = "8"
+        self._config['main']['default notebook'] = "General"
+        self._config['main']['screen scale'] = "1"
+        self._config['main']['backup location'] = "/home/marc/Documents/backups/"
+        self._config['main']['notes per page'] = "30"
 
-        self._config['main_window']['default_view'] = "pinned"
+        self._config['main_window']['default view'] = "pinned"
         self._config['main_window']['width'] = "1000"
         self._config['main_window']['height'] = "600"
-        self._config['main_window']['note_width'] = "50"
-        self._config['main_window']['notebook_width'] = "30"
+        self._config['main_window']['note width'] = "50"
+        self._config['main_window']['notebook width'] = "30"
 
-        self._config['colours']['widget_bg'] = '#303234' # blackish
-        self._config['colours']['widget_text'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['widget bg'] = '#303234' # blackish
+        self._config['colours']['widget text'] = '#e7edef' # off white (hint of blue)
         self._config['colours']['note_text'] = '#484445'
-        self._config['colours']['default_note_bg'] = '#e7edef' # off white (hint of blue)
-        self._config['colours']['default_notebook_bg'] = '#e7edef' # off white (hint of blue)
-        self._config['colours']['widget_highlight'] = "#5f6260"
-        self._config['colours']['search_bg'] = "#6d7c7a"
+        self._config['colours']['default note_bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['default notebook_bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['widget highlight'] = "#5f6260"
+        self._config['colours']['search bg'] = "#6d7c7a"
 
         self._config['main window key bindings']['search'] = "<Control-f>"
         self._config['main window key bindings']['new note'] = "<Control-n>"

@@ -2,107 +2,138 @@ import tkinter as tk
 from tkinter.constants import *
 from database import database
 
+
+global init
 init = 0 # keeps track of open windows - we only want one open at a time.
-search_window=None
-current_search = ''
-config = None
-
-#-------------------------------------------------------
-# init funtion
-# root = main root window to attch TOP
-# main_window = reference to the MainWindow classmethod
-# database = reference to the currently initialised database
-# config = refenece to an isnatnce the Config claass
-#-------------------------------------------------------
-def initialise_search(root_ref, main_window_ref, database, config):
-    global init
-    if init == 1:
-        return # there is already a window open
-    global db
-    db = database;
-    global conf
-    conf = config
-    global root
-    root = root_ref
-    global main_window
-    main_window = main_window_ref
-    init_window()
-    init = 1
-
-#-------------------------------------------------------
-# Initialise the main search window
-#-------------------------------------------------------
-def init_window():
-    global search_window
-    search_window = tk.Toplevel(root)
-    search_window.title('Search..')
-    frame = tk.Frame(search_window, bg=conf.read_section('colours', 'widget_bg'))
-    mult_factor = int(conf.read_section('main','screen_scale'))
-    width = 400 * mult_factor
-    height = 100 * mult_factor
-    geometry = f"{width}x{height}"
-    search_window.geometry(geometry)
-    global search_input
-    search_input = tk.StringVar()
-    search_entry = tk.Entry(frame,
-                            textvariable=search_input,
-                            bg=conf.read_section('colours','search_bg'),
-                            fg=conf.read_section('colours','widget_text'),
-                            width=30,
-                            font='Arial 12',
-                            relief='sunken')
-
-    search_entry.bind('<Return>', lambda event: do_search(event) )
-
-    global label
-    label = tk.Label(frame, text='...',
-                     bg=conf.read_section('colours','widget_bg'),
-                     fg=conf.read_section('colours','widget_text'))
-
-    search_entry.pack(pady=20)
-    label.pack(pady=10)
-    frame.pack(fill='both', expand='true')
-
-    search_window.protocol("WM_DELETE_WINDOW", close_search_window)
-    search_window.attributes("-topmost", True)
-
-    search_entry.focus_set()
-
-#-------------------------------------------------------
-# Event - User indicated search input is complete
-#-------------------------------------------------------
-def do_search(event):
-    #print("*** event triggered -- do_search called ***");
-    global current_search
-    current_search = search_input.get()
-    if current_search != '':
-        print(f"searhing for ..... {current_search}")
-        search_results = get_search_results()
-        num_results = db.getNumberOfSearchResults(search_input.get())
-        label.configure(text=f"Found {num_results} results")
-        #Send these search results back to the main Window
-        main_window.get_search_results_view(search_results)
-
-#-------------------------------------------------------
-# Fetch the search results from the database
-# and send back to main window
-#-------------------------------------------------------
-def get_search_results():
-    global current_search
-    current_search = search_input.get();
-    search_results = db.getSearchResults(search_input.get(), 2000, 0)
-    return search_results
 
 
+class SearchWindow:
+    #-------------------------------------------------------
+    # init funtion
+    # root = main root window to attch TOP
+    # main_window = reference to the MainWindow classmethod
+    # database = reference to the currently initialised database
+    # config = refenece to an isnatnce the Config claass
+    #-------------------------------------------------------
+    def __init__(self, root_ref, main_window_ref, database, config):
+        global init
+        if init == 1:
+            return # there is already a window open
+        init = 1
+        self._db = database
+        self._conf = config
+        self._main_window = main_window_ref
+        self._root = root_ref
+        self.init_window()
+        self._notes_per_page = self._conf.read_section('main','notes per page')
+        self._search_query=''
+
+    #-------------------------------------------------------
+    # Initialise the main search window
+    #-------------------------------------------------------
+    def init_window(self):
+        self._search_window = tk.Toplevel(self._root)
+        self._search_window.title('Search..')
+        self._frame = tk.Frame(self._search_window, bg=self._conf.read_section('colours', 'widget bg'))
+        mult_factor = int(self._conf.read_section('main','screen scale'))
+        width = 400 * mult_factor
+        height = 100 * mult_factor
+        geometry = f"{width}x{height}"
+        self._search_window.geometry(geometry)
+        self._search_input = tk.StringVar()
+        self._search_entry = tk.Entry(self._frame,
+                                textvariable=self._search_input,
+                                bg=self._conf.read_section('colours','search bg'),
+                                fg=self._conf.read_section('colours','widget text'),
+                                width=30,
+                                font='Arial 12',
+                                relief='sunken')
+
+        self._search_entry.bind('<Return>', lambda event: self._do_search(event) )
+
+        self._label = tk.Label(self._frame, text='...',
+                        bg=self._conf.read_section('colours','widget bg'),
+                        fg=self._conf.read_section('colours','widget text'))
+
+        self._search_entry.pack(pady=20)
+        self._label.pack(pady=10)
+        self._frame.pack(fill='both', expand='true')
+
+        self._search_window.protocol("WM_DELETE_WINDOW", self.close_search_window)
+        self._search_window.attributes("-topmost", True)
+
+        self._search_entry.focus_set()
+
+    #-------------------------------------------------------
+    # Event - User indicated search input is complete
+    #-------------------------------------------------------
+    def _do_search(self,event):
+        #print("*** event triggered -- do_search called ***");
+        self._search_query = self._search_input.get()
+        if self._search_input.get()!= '':
+            print(f"searhing for ..... {self._search_query}")
+            self._num_results = self._db.getNumberOfSearchResults(self._search_input.get())
+            self._label.configure(text=f"Found {self._num_results} results")
+            #Send these search results back to the main Window
+            self._main_window.received_search_results(self._num_results)
+
+    #-------------------------------------------------------
+    # Fetch the search results from the database
+    # Search term is in self._search_input.get()
+    #-------------------------------------------------------
+    def get_number_search_results(self):
+        if(self._search_query == ''):
+            return 0
+        return self._db.getNumberOfSearchResults(self._search_query)
+
+
+    #-------------------------------------------------------
+    # Get all search results in one go.
+    # Search term is in self._search_input.get()
+    #-------------------------------------------------------
+    def get_search_results(self):
+        if(self._search_query == ''):
+            return None
+        search_results = self._db.getSearchResults(self._search_query)
+        return search_results
+
+    #-------------------------------------------------------
+    # Get the a page of the search results.
+    # The serach term is in self._search_input.get()
+    #-------------------------------------------------------
+    def get_search_results(self, page_number):
+        #print("Entered get_search_results(page_number)")
+        if self._search_query == '':
+            #print("self._search_query is empty")
+            return None
+
+        if page_number == 1:
+            offset = 0
+        else:
+            number_of_pages = self._num_results / page_number
+            #print(f"Number of pages in search: {str(number_of_pages)}")
+            if self._num_results % page_number > 0:
+                number_of_pages += 1
+            offset = (page_number - 1) * notes_per_page
+            #print(f"search offset: {str(offset)}")
+            if page_number > number_of_pages:
+                print("page number is greater than allowed!!")
+                return None
+
+        search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset)
+        #print(f"Got {str(len(search_results))} in get_search_results()")
+        return search_results
 
 
 
 
-#-----------------------------------------
-# Event - close the window
-# Reset init so a new window can be opened.
-#-----------------------------------------
-def close_search_window():
-    global init
-    init = 0;
-    search_window.destroy()
+    #-----------------------------------------
+    # Event - close the window
+    # Reset init so a new window can be opened.
+    #-----------------------------------------
+    def close_search_window(self):
+        global init
+        init = 0;
+        self._search_window.destroy()
+
+

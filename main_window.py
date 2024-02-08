@@ -4,7 +4,7 @@ from database import database
 from tkinter import font
 import columns as COLUMN
 from note_window import NoteWindow
-import search_window as search_window
+from search_window import SearchWindow
 from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
@@ -27,6 +27,8 @@ class MainWindow:
         self.height = 0
         self._current_view = 'none'
         self._selected_notebook = 'none'
+        self._page_number = 1;
+        self._search_window = None
         self.init_window()
 
 
@@ -34,64 +36,64 @@ class MainWindow:
     # Initialise the main window
     #-------------------------------------------------------
     def init_window(self):
-        self._note_width = int(self._conf.read_section('main_window', 'note_width'))
-        self._notebook_width = int(self._conf.read_section('main_window', 'notebook_width'))
+        self._note_width = int(self._conf.read_section('main_window', 'note width'))
+        self._notebook_width = int(self._conf.read_section('main_window', 'notebook width'))
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
-        self._main_frame = tk.Frame(self._root,bg=self._conf.read_section('colours','widget_bg')) # this frame is to hold the canvass for the scrollbar
-        self._canvas = tk.Canvas(self._main_frame, bg=self._conf.read_section('colours','widget_bg'))
+        self._main_frame = tk.Frame(self._root,bg=self._conf.read_section('colours','widget bg')) # this frame is to hold the canvass for the scrollbar
+        self._canvas = tk.Canvas(self._main_frame, bg=self._conf.read_section('colours','widget bg'))
         #self._scrollbar = tk.Scrollbar(self._main_frame, orient=VERTICAL, width=15,
-        #           bg=self._conf.read_section('colours','widget_bg'), command=self._canvas.yview)
+        #           bg=self._conf.read_section('colours','widget bg'), command=self._canvas.yview)
         self._scrollbar = ttk.Scrollbar(self._main_frame, orient=VERTICAL, command=self._canvas.yview)
         self._scrollbar.pack(side=RIGHT, fill=Y)
         self._canvas.configure(yscrollcommand=self._scrollbar.set)
         self._canvas.bind('<Configure>', lambda e: self._canvas.configure(scrollregion=self._canvas.bbox("all")))
 
         #This is the frame inside the canvas that will be scrollable (do not pack as we will create a window in it)
-        self._frame = tk.Frame(self._canvas,bg=self._conf.read_section('colours','widget_bg'))
+        self._frame = tk.Frame(self._canvas,bg=self._conf.read_section('colours','widget bg'))
         self._canvas.create_window((0,0), window=self._frame, anchor="nw")
             
 
-        self._menu_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget_bg'))
+        self._menu_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
         self._menu_frame.pack(fill=BOTH, expand=FALSE)
         self._view_button = tk.Menubutton(self._menu_frame, text="Select View", relief="flat",
-                                           bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
+                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
                
-        self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget_bg'),
-                                     fg=self._conf.read_section('colours', 'widget_text'))
+        self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget bg'),
+                                     fg=self._conf.read_section('colours', 'widget text'))
         lbl_font = font.Font(weight="bold")
         self._view_label["font"] = lbl_font
         #self._frame.pack(fill=BOTH, expand=TRUE)
 
           #New Note button
-        self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget_bg'),
-                                      fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="New Note",
+        self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
                                       command=self._create_new_note)
         self._new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
-        self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget_bg'),
-                                        fg=self._conf.read_section('colours', 'widget_text'), relief="flat", text="New Notebook",
+        self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
+                                        fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
                                         state='disabled', command=self._create_new_notebook)
         self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
 
         # right side spacer from edge of frame
-        spacer_label = tk.Label(self._menu_frame, text="     ", bg=self._conf.read_section('colours', 'widget_bg'),
-                                fg=self._conf.read_section('colours', 'widget_text'))
+        spacer_label = tk.Label(self._menu_frame, text="     ", bg=self._conf.read_section('colours', 'widget bg'),
+                                fg=self._conf.read_section('colours', 'widget text'))
         spacer_label.pack(fill=Y, side='right')
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
-                                           bg=self._conf.read_section('colours','widget_bg'), fg=self._conf.read_section('colours', 'widget_text'))
-        self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget_bg'),
-                                          fg=self._conf.read_section('colours', 'widget_text'), tearoff=0)
+                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
+        self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget bg'),
+                                          fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
         #menu = tk.Menubutton()
-        self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget_bg'),
-                                          fg=self._conf.read_section('colours', 'widget_text'), tearoff=0)
+        self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget bg'),
+                                          fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._view_button["menu"] = self._view_button.menu
 
         self._view_button.menu.add_command(label="Pinned", command=lambda view="pinned": self.get_view(view))
@@ -120,8 +122,7 @@ class MainWindow:
     # Show the search window to the user
     #-------------------------------------------------------------------
     def _show_search_window(self, event):
-        print("**** Show search window *****")
-        search_window.initialise_search(self._root, self, self._db, self._conf)
+        self._search_window = SearchWindow(self._root, self, self._db, self._conf)
 
 
     #-------------------------------------------------------
@@ -235,6 +236,15 @@ class MainWindow:
                 self.get_view(self._current_view)
 
 
+    #----------------------------------------------------------------
+    # SearchWindow has updated the number of search results
+    # Reset page number and show first page of results
+    #---------------------------------------------------------------
+    def received_search_results(self, number_of_results):
+        print(f"Number of search results has been updated: {str(number_of_results)}")
+        self._page_number = 1;
+        self.get_view('search results')
+        #search_results =
 
     '''END OF EVENTS'''
 
@@ -264,9 +274,14 @@ class MainWindow:
             case 'search results':
                 self._new_notebook_button['state'] = 'disabled'
                 self._selected_notebook = 'none'
-                search_results = search_window.get_search_results() #will return the results from the saved current_search term
-                #print(str(search_results))
-                self.get_search_results_view(search_results)
+                if(self._search_window is not None):
+                    search_results = self._search_window.get_search_results(self._page_number) #will return the results from the saved current_search term
+                    if search_results is not None:
+                        self.get_search_results_view(search_results)
+                    else:
+                        print("In get_view -(None) search results returned")
+                else:
+                    print("in get_view() no reference to SearchWindow class")
     
 
     #-----------------------------------------------------------------------
@@ -356,7 +371,7 @@ class MainWindow:
     def _get_recent_notes_view(self):
         self.clear_frame()
         self._view_label["text"] = "Viewing: Recent Notes"
-        recent_notes = self._db.getRecentNotes(int(self._conf.read_section('main', 'recent_notes_count')))
+        recent_notes = self._db.getRecentNotes(int(self._conf.read_section('main', 'recent notes count')))
         if recent_notes is None:
             print("No recent notes found")
             return 
@@ -513,7 +528,7 @@ class MainWindow:
         '''
 
         #get screen scale value (multiplier)
-        scr_scale = int(self._conf.read_section('main', 'screen_scale'))
+        scr_scale = int(self._conf.read_section('main', 'screen scale'))
 
         
         #we need this becuase initially the screen size won't be reported becuase it has not gone through mainloop yet
