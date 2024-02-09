@@ -31,6 +31,8 @@ class MainWindow:
         self._max_page = 1
         self._search_window = None
         self.init_window()
+        self._notes_per_page = int(self._conf.read_section('main','notes per page'))
+        self._number_of_notes = 0 # the number of notes in the currently selected notebook
 
 
     #-------------------------------------------------------
@@ -71,13 +73,13 @@ class MainWindow:
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
                                       command=self._create_new_note)
-        self._new_note_button.pack(fill=Y, side='left', padx=10, pady=3)
+        self._new_note_button.pack(side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
                                         fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
                                         state='disabled', command=self._create_new_notebook)
-        self._new_notebook_button.pack(fill=Y, side='left', padx=10, pady=3)
+        self._new_notebook_button.pack(side='left', padx=10, pady=3)
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ",
@@ -129,10 +131,10 @@ class MainWindow:
                             fg=self._conf.read_section('colours','widget text'),
                             text='staus: blah blah',
                             height=1,
-                            anchor="s")
-        self._status_label.pack(fill='both', expand='true')
+                            anchor="se")
+        self._status_label.pack(fill='both', expand='true', padx=25)
 
-        self._view_button.pack(fill=Y, side='left',padx=30,pady=3)
+        self._view_button.pack(side='left',padx=30,pady=3)
         self._view_label.pack(fill=Y, side='left', pady=3)
 
         self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
@@ -169,8 +171,11 @@ class MainWindow:
             search_results = self._search_window.get_search_results(self._page_number)
             #print("page forward got search results")
             self.get_view('search results')
-        else:
-            print("Not in search view") #place folder for note page view
+        elif self._current_view == 'notebook pages':
+            if self._number_of_notes == 0:
+                return
+            self.get_view('notebook pages')
+
 
     #--------------------------------------------------------------------
     # Move page back
@@ -190,10 +195,11 @@ class MainWindow:
                 return
             search_results = self._search_window.get_search_results(self._page_number)
             self.get_view('search results')
-        else:
-            pass #will do note pages here!!!!
 
-
+        elif self._current_view == 'notebook pages':
+            if self._number_of_notes == 0:
+                return
+            self.get_view('notebook pages')
 
 
     #--------------------------------------------------------------------
@@ -263,7 +269,9 @@ class MainWindow:
     def _clicked_notebook(self,event, name):
         print("notebook name is " + name)
         self._selected_notebook = name
-        self._get_note_pages_view(name)
+        self._page_number = 1 #reset page page back to e.g could be coming from page 3 of a search view
+        #self._get_note_pages_view(name)
+        self.get_view('notebook pages')
 
     #----------------------------------------------------------------
     # Event (right click on notebook)
@@ -335,23 +343,45 @@ class MainWindow:
         self._current_view = view
         self._page_forward_button['state']='disabled'
         self._page_back_button['state']='disabled'
+        self._status_label['text'] = ''
+        self._number_of_notes = 0 #reset number of notes in currrent notebook count
         match view:
             case 'pinned':
+                self._page_number = 1
                 self._new_notebook_button["state"]='disabled'
                 self._selected_notebook = 'none'
                 self._get_pinned_notes_view()
             case 'recent':
+                self._page_number = 1
                 self._new_notebook_button["state"]='disabled'
                 self._selected_notebook = 'none'
                 self._get_recent_notes_view()
             case 'notebooks':
+                self._page_number = 1
                 self._new_notebook_button["state"]='normal'
                 self._selected_notebook = 'none'
                 self._get_notebooks_view()
-            case 'notebook_pages':
+            case 'notebook pages':
+                self._page_forward_button['state']='active'
+                self._page_back_button['state']='active'
                 self._new_notebook_button["state"]='disabled'
                 if self._selected_notebook != 'none':
-                    self._get_note_pages_view(self._selected_notebook)
+                    self._number_of_notes = self._db.getNumberOfNotesInNotebook(self._selected_notebook)
+
+                    #calculate how many pages there are
+                    self._max_page = self._number_of_notes // self._notes_per_page
+                    if self._number_of_notes % self._notes_per_page > 0:
+                        self._max_page +=1
+
+                    #get the notes for the current page
+                    offset = (self._page_number-1) * self._notes_per_page
+
+                    #calculate the offset
+                    if offset > self._number_of_notes:
+                        print ("Error - note pages view: offset > number of results")
+                        return
+                    notebook_pages = self._db.getNotebookPage(self._selected_notebook, self._notes_per_page, offset)
+                    self._get_notebook_pages_view(self._selected_notebook, notebook_pages)
             case 'search results':
                 self._page_forward_button['state']='active'
                 self._page_back_button['state']='active'
@@ -379,14 +409,24 @@ class MainWindow:
     #----------------------------------------------------------------------
     # Get all the note pages from the currently selected notebook. 
     #----------------------------------------------------------------------
-    def _get_note_pages_view(self, notebook):
+    def _get_notebook_pages_view(self, notebook, notebook_pages):
         self.clear_frame()
-        self._current_view = 'notebook_pages'
+        self._current_view = 'notebook pages'
         self._view_label["text"] = "Viewing Notebook: " + notebook
-        note_pages = self._db.getNotebook(notebook)
-        if note_pages is None:
-            print("No pinned notes found")
+        if notebook_pages is None:
+            print("No pages notes found")
             return
+
+        #Update statues bar----------------------------------------------------------------------------
+        #calculate upper range
+        pages_upper_range = self._page_number * self._notes_per_page
+        if self._number_of_notes < pages_upper_range:
+            pages_upper_range = self._number_of_notes
+        #calculate lower range
+        pages_lower_range = 1 + (self._notes_per_page * self._page_number) - self._notes_per_page
+        self._status_label['text'] =  f"Page {str(self._page_number)}   Showing notes: {str(pages_lower_range)} to {str(pages_upper_range)} of  {str(self._number_of_notes)}"
+        #---------------------------------------------------------------------------------------------
+
         
         pad_x = 3
         col = 0
@@ -394,7 +434,7 @@ class MainWindow:
         max_col = self.calculate_columns(self._note_width,6)
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
-        for note_page in note_pages:
+        for note_page in notebook_pages:
             note_id = note_page[COLUMN.ID]
             self._text_box = tk.Text(self._frame, height=15, width=self._note_width, wrap=tk.WORD, bg=note_page[COLUMN.BACK_COLOUR])
             self._text_box.insert(tk.END, note_page[COLUMN.CONTENT])
@@ -526,6 +566,22 @@ class MainWindow:
             return
 
         self._view_label["text"] = f"Viewing Search Results ({str(len(search_results))})"
+
+        #Update statues bar----------------------------------------------------------------------------
+        if self._search_window is not None:
+            #update the status label
+            num_results = self._search_window.get_number_search_of_results()
+
+            #calculate upper range
+            pages_upper_range = self._page_number * self._notes_per_page
+            if num_results < pages_upper_range:
+                pages_upper_range = num_results
+
+            #calculate lower range
+            pages_lower_range = 1 + (self._notes_per_page * self._page_number) - self._notes_per_page
+
+            self._status_label['text'] =  f"Page {str(self._page_number)}   Search Results: {str(pages_lower_range)} to {str(pages_upper_range)} of  {str(num_results)}"
+        #---------------------------------------------------------------------------------------------
 
         pad_x = 3
         col = 0

@@ -90,6 +90,14 @@ class SearchWindow:
             return 0
         return self._db.getNumberOfSearchResults(self._search_query)
 
+    #-------------------------------------------------------
+    # Public facing function
+    # Return the currenlt saved number of search results
+    # withotu the need to intergatet the database
+    #-------------------------------------------------------
+    def get_number_search_of_results(self):
+        return self._num_results
+
     #----------------------------------------------------
     # Public facing function to indicate if earch results
     # have been collected

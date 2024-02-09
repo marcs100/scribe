@@ -70,17 +70,17 @@ class NoteWindow:
         self._notebook_button.menu = tk.Menu(self._notebook_button, bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
         self._notebook_button["menu"] = self._notebook_button.menu
 
-        self._delete_button.pack(fill='y', side='right',  pady=2, padx=2)
-        self._notebook_button.pack(fill='y', side='left',pady=2, padx =4)
-        self._pin_button.pack(fill='y', side='left',  pady=2, padx=4)
-        self._revert_button.pack(fill='y', side='left',  pady=2, padx=4)
-        self._colour_button.pack(fill='y', side='left',  pady=2, padx=4)
+        self._delete_button.pack(side='right',  pady=2, padx=2)
+        self._notebook_button.pack(side='left',pady=2, padx =4)
+        self._pin_button.pack(side='left',  pady=2, padx=4)
+        self._revert_button.pack(side='left',  pady=2, padx=4)
+        self._colour_button.pack(side='left',  pady=2, padx=4)
 
         self._text_box = tk.Text(self._frame, wrap=tk.WORD)
 
         #assign right click event so we can bring up a contaxt menu
         self._text_box.bind('<Button-3>', lambda event: self._right_clicked_note(event))
-        self._text_box.pack(fill='both', expand=TRUE)
+        self._text_box.pack(fill='both', expand=TRUE,padx=3)
 
         self._menu_frame.pack(fill='both', expand=FALSE)
         self._frame.pack(fill='both', expand=TRUE)
