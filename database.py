@@ -39,6 +39,16 @@ class database(object):
         self.cursor.execute("delete from notebookCovers where name not in (" + notebooksStr + ")")
         self.commit()
 
+    def deleteNotebook(self, notebook):
+        dataTuple = (str(notebook),)
+        self.cursor.execute("Delete from marcnotes where notebook = ?", dataTuple)
+        self.commit()
+
+    def deleteNotebookCover(self, notebook):
+        dataTuple = (str(notebook),)
+        self.cursor.execute("Delete from notebookCovers where name = ?", dataTuple)
+        self.commit()
+
     def addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
         dataTuple1 = (str(notebook), str(tag), str(contents),)
         dataTuple2 = (

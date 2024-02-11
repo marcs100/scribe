@@ -283,6 +283,7 @@ class MainWindow:
         print(f"Right click event for notebook {name}")
         menu = tk.Menu(self._frame, tearoff = 0)
         menu.add_command(label ="Change colour", command=lambda name=name: self._change_notebook_colour(name))
+        menu.add_command(label ="Delete notebook!", command=lambda name=name: self._delete_notebook(name))
         menu.tk_popup(event.x_root, event.y_root)
 
     #-------------------------------------------------------
@@ -615,6 +616,18 @@ class MainWindow:
             colour = str(colour[1])
             self._db.setNotebookColour(name,colour)
             self.update_current_view()
+
+    #-------------------------------------------------------
+    # Delete an enitre notebook!!!
+    #-------------------------------------------------------
+    def _delete_notebook(self, name):
+        num_notes = self._db.getNumberOfNotesInNotebook(name)
+        result = messagebox.askyesno("Delete Notebook {name}", f"Are you sure you want to delete this notebook containing {num_notes} notes?")
+        if result == True:
+            self._db.deleteNotebook(name)
+            self._db.deleteNotebookCover(name)
+            self.update_current_view()
+
 
     #-------------------------------------------------------
     # Helper function to automatically read al the script
