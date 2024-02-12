@@ -22,7 +22,7 @@ def main():
     print("---------------------------------")
     print("\n")
 
-    backup_location = config['main']['backup_location']
+    backup_location = config['main']['backup location']
     db_file_with_path = config['main']['database']
 
     #The db file imcludes the path so we need to strip the file name from it

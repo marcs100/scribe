@@ -13,7 +13,7 @@ def update_text_box(text_box, line_in):
 def run_script(script_name, config):
 
     line = ""
-    mult_factor = int(config.read_section('main','screen_scale'))
+    mult_factor = int(config.read_section('main','screen scale'))
     width = 750 * mult_factor
     height = 500 * mult_factor
     geometry = f"{width}x{height}"
