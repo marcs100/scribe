@@ -10,6 +10,7 @@ import note_attributes
 from tkinter import colorchooser
 from tkinter import messagebox
 import track_open_notes as tracker
+from snippets import snippets
 
 
 class NoteWindow:
@@ -84,6 +85,12 @@ class NoteWindow:
 
         self._menu_frame.pack(fill='both', expand=FALSE)
         self._frame.pack(fill='both', expand=TRUE)
+
+        #Bind the text snippets
+        for snippet in snippets:
+            self._text_box.bind(snippet[2], lambda event,snip_text=snippet[0], cursor_pos=snippet[1]: self._insert_snippet(event, snip_text,cursor_pos) )
+
+
 
     #---------------------------------------------------------------
     # Read all available notebooks and add the entries to a menu.
@@ -303,4 +310,30 @@ class NoteWindow:
 
     def get_previous_note(self):
         pass
+
+    #--------------------------------------------------------------
+    # event: Insert a text snippet into the note
+    # These snippets are configured in snippets.py
+    #--------------------------------------------------------------
+    def _insert_snippet(self, event, snip_text, new_cursor_pos):
+        dt = datetime.datetime.now()
+        if snip_text.find("{date}") != -1:
+            #replace {date} with actual date
+            date = dt.strftime("%d-%m-%y")
+            snip_text = snip_text.replace("{date}",date)
+        if snip_text.find("{time}") != -1:
+            #replace {time} with actual time
+            time = dt.strftime("%H:%M")
+            snip_text = snip_text.replace("{time}",time)
+
+        current_cursor = float(self._text_box.index("insert"))
+        self._text_box.insert("insert",snip_text)
+        if new_cursor_pos != -1:
+            #print("respositon cursor")
+            #move cursor to desired position references from start of snippet
+            current_cursor_row = math.floor(current_cursor)
+            current_cursor_column = (current_cursor * 10) - (10 * current_cursor_row)
+            new_cursor_column = current_cursor_column + new_cursor_pos
+            #print(f"new row is {str(current_cursor_row)}  new column is {new_cursor_column}")
+            self._text_box.mark_set("insert", "%d.%d" % (current_cursor_row, new_cursor_column))
 
