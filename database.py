@@ -97,65 +97,7 @@ class database(object):
                         tagList.append(tag)
         return tagList
 
-    # get number of results for a given search type
-    def getNumberOfSearchResults(self, searchQuery, notebook, tag):
 
-        if notebook == 'ALL' and tag == 'ALL':
-            searchTuple = (str('%' + searchQuery + '%'),)
-            self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc",
-                                searchTuple)
-        elif notebook != 'ALL' and tag != 'ALL':
-            searchTuple = (
-            str('%' + searchQuery + '%'), str(notebook), str(tag), str(tag + ',%'), str('%,' + tag + ',%'),
-            str('%,' + tag))
-            self.cursor.execute(
-                "select COUNT(*) from marcnotes where content like ? and notebook = ? and tag like ? or tag like ? or tag like ? or tag like ? order by modified desc",
-                searchTuple)
-        elif notebook != 'ALL':
-            searchTuple = (str('%' + searchQuery + '%'), str(notebook))
-            self.cursor.execute(
-                "select COUNT(*) from marcnotes where content like ? and notebook = ? order by modified desc",
-                searchTuple)
-        elif tag != 'ALL':
-            searchTuple = (
-            str('%' + searchQuery + '%'), str(tag), str(tag + ',%'), str('%,' + tag + ',%'), str('%,' + tag))
-            self.cursor.execute(
-                "select COUNT(*) from marcnotes where content like ? and tag like ? or tag like ? or tag like ? or tag like ? order by modified desc",
-                searchTuple)
-
-        rows = self.cursor.fetchall()
-        return rows[0][0]
-    '''
-    def getSearchResults(self, searchQuery, notebook, tag, resultsPerPage, startAt):
-        if notebook == 'ALL' and tag == 'ALL':
-            searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
-            self.cursor.execute(
-                "select id, notebook, tag, substr(content,0,1800) from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
-                searchTuple)
-        elif notebook != 'ALL' and tag != 'ALL':
-            searchTuple = (
-            str('%' + searchQuery + '%'), str(notebook), str(tag), str(tag + ',%'), str('%,' + tag + ',%'),
-            str('%,' + tag), str(resultsPerPage), str(startAt))
-            self.cursor.execute(
-                "select id, notebook, tag, substr(content,0,1800) from marcnotes where content like ? and notebook = ? and tag like ? or tag like ? or tag like ? or tag like ? order by modified desc LIMIT ? OFFSET ?",
-                searchTuple)
-        elif notebook != 'ALL':
-            searchTuple = (str('%' + searchQuery + '%'), str(notebook), str(resultsPerPage), str(startAt))
-            self.cursor.execute(
-                "select id, notebook, tag, substr(content,0,1800) from marcnotes where content like ? and notebook = ? order by modified desc LIMIT ? OFFSET ?",
-                searchTuple)
-        elif tag != 'ALL':
-            searchTuple = (
-            str('%' + searchQuery + '%'), str(tag), str(tag + ',%'), str('%,' + tag + ',%'), str('%,' + tag),
-            str(resultsPerPage), str(startAt))
-            self.cursor.execute(
-                "select id, notebook, tag, substr(content,0,1800) from marcnotes where content like ? and tag like ? or tag like ? or tag like ? or tag like ? order by modified desc LIMIT ? OFFSET ?",
-                searchTuple)
-
-        rows = self.cursor.fetchall()
-        return rows
-    '''
-    # get number of results for a given search type - override - removing tag search until I can reimplemenent this in the UI better than before!!!
     def getNumberOfSearchResults(self, searchQuery):
 
         searchTuple = (str('%' + searchQuery + '%'),)
@@ -175,25 +117,39 @@ class database(object):
         rows = self.cursor.fetchall()
         return rows
 
-    def getNumberOfNotesInTag(self, tagName):
-        tagTuple = (str(tagName), str(tagName + ',%'), str('%,' + tagName + ',%'), str('%,' + tagName))
-        self.cursor.execute("select COUNT(*) from marcnotes where tag like ? or tag like ? or tag like ? or tag like ?",
-                            tagTuple)
-        rows = self.cursor.fetchall()
-        return rows[0][0]
+    def searchWholeWords(self, searchQuery):
 
-    # return all notes with given tag
-    def getTagPage(self, tagName, resultsPerPage, startAt):
-        # paramTuple=(str(tagName),str(resultsPerPage), str(startAt))
-        paramTuple = (
-        str(tagName), str(tagName + ',%'), str('%,' + tagName + ',%'), str('%,' + tagName), str(resultsPerPage),
-        str(startAt))
-        # self.cursor.execute("select id, notebook, tag, substr(content,0,1800), BGColour from marcnotes where tag = ? order by modified desc LIMIT ? OFFSET ?",paramTuple)
-        self.cursor.execute(
-            "select id, notebook, tag, substr(content,0,1800), created, modified, pinned, BGColour from marcnotes where tag like ? or tag like ? or tag like ? or tag like ? order by modified desc LIMIT ? OFFSET ?",
-            paramTuple)
-        rows = self.cursor.fetchall()
-        return rows
+        search_tuple = (str(searchQuery),)
+
+        ''' THIS IS ONLY DONE ONCE _ SO NOT HERE!!!!!!!'''
+        #self.cursor.execute("CREATE VIRTUAL TABLE search_table USING FTS5(id, content)")
+
+        #delete existing content in search table
+        self.cursor.execute("delete from search_table")
+        self.commit()
+
+        #get enetries to insert into virtual table
+        records = self.cursor.execute(f"select id, content from marcnotes where content like '{searchQuery}'").fetchall()
+
+        #add records to virtual table
+        self.cursor.executemany("INSERT INTO search_table (id, content) VALUES(?,?)",records)
+        self.commit()
+
+        #NOTE: we can use AND/OR operator with match e.g. "where conent MATCH 'duck' OR content MATCH 'quack'"
+
+        #run the search query on the virtual table
+        query = f"select id, content from search_table where content MATCH '{searchQuery}'"
+        print(query)
+        self.cursor.execute(f"select id, content from search_table where content MATCH '{searchQuery}'")
+        #self.cursor.execute("select id, content from search_table where content MATCH 'DoD'")
+        results = self.cursor.fetchall()
+
+        #delete existing content in search table
+        self.cursor.execute("delete from search_table")
+        self.commit()
+
+        return results
+
 
     # return all notes that have been pinned
     def getPinnedNotes(self):
