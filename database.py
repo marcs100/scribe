@@ -86,17 +86,6 @@ class database(object):
         rows = self.cursor.fetchall()
         return rows
 
-    def getTagNames(self):
-        self.cursor.execute("select distinct tag from marcnotes order by tag asc")
-        rows = self.cursor.fetchall()
-        tagList = []
-        for row in rows:
-            for tag in row[0].split(','):
-                if len(tag) > 0:
-                    if tag not in tagList:
-                        tagList.append(tag)
-        return tagList
-
 
     def getNumberOfSearchResults(self, searchQuery):
 
