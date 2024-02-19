@@ -60,22 +60,27 @@ def main():
     #----------------------------------------------------------------
     #Experimenting with database.searchWholeWords().
     #It uses a virtual table FTS5 table and the MATCH statement.
-    #db = database("/home/marc/Documents/marcnotes_db")
+    db = database("/home/marc/Documents/marcnotes_db")
 
     #normal search result
-    #norm_results_num = db.getNumberOfSearchResults('debian')
-    #print(f"number of normal results = {str(norm_results_num)}")
+    norm_results_num = db.getNumberOfSearchResults('#monkey')
+    print(f"number of normal results = {str(norm_results_num)}")
 
     #FST5 results with MATCH
     #The problem with the FST5 table for search is that it does not allow
     #strings with '#' e.g. '#debian' they give an error. Otherwise it works.
 
-    #I coudld maybe go back to normal tables and just use like instead of MATCH.
+    #I could maybe go back to normal tables and just use like instead of MATCH.
     #e.g where content LIKE ' debian ' or content LIKE ' debian -
     #how do I do start of line and end of line that way though!'
 
-    #FST5_results = db.searchWholeWords('#debian')
+    #FST5_results = db.searchWholeWordsFST5('#debian')
     #print(f"whole words results = {str(len(FST5_results))}")
+
+    results = db.searchWholeWords("#monkey")
+    print(f"whole words results = {str(len(results))}")
+    for result in results:
+        print (result[COLUMN.CONTENT])
 
     #return
 

@@ -107,7 +107,18 @@ class database(object):
         return rows
 
     def searchWholeWords(self, searchQuery):
-        self.cursor.execute(f"selct * from marcnotes where content like chr(10) + {searchQuery} %")
+
+        search_tuple = (
+            searchQuery + ' %',
+            '% '+searchQuery+' %',
+            '% '+searchQuery+chr(10)+'%',
+            searchQuery+chr(10)+'%',
+            '%'+chr(10)+searchQuery+chr(10)+'%'
+            )
+
+        self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
+        rows = self.cursor.fetchall()
+        return rows
 
 
     def searchWholeWordsFST5(self, searchQuery):
