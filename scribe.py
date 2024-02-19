@@ -60,11 +60,11 @@ def main():
     #----------------------------------------------------------------
     #Experimenting with database.searchWholeWords().
     #It uses a virtual table FTS5 table and the MATCH statement.
-    db = database("/home/marc/Documents/marcnotes_db")
+    #db = database("/home/marc/Documents/marcnotes_db")
 
     #normal search result
-    norm_results_num = db.getNumberOfSearchResults('debian')
-    print(f"number of normal results = {str(norm_results_num)}")
+    #norm_results_num = db.getNumberOfSearchResults('debian')
+    #print(f"number of normal results = {str(norm_results_num)}")
 
     #FST5 results with MATCH
     #The problem with the FST5 table for search is that it does not allow
@@ -74,8 +74,8 @@ def main():
     #e.g where content LIKE ' debian ' or content LIKE ' debian -
     #how do I do start of line and end of line that way though!'
 
-    FST5_results = db.searchWholeWords('#debian')
-    print(f"whole words results = {str(len(FST5_results))}")
+    #FST5_results = db.searchWholeWords('#debian')
+    #print(f"whole words results = {str(len(FST5_results))}")
 
     #return
 

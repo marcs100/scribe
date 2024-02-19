@@ -261,6 +261,8 @@ class NoteWindow:
     def _show_note_properties(self):
         properties_window = tk.Toplevel(self._note_window)
         properties_window.title('Properties')
+        properties_window.attributes('-topmost', True)
+        properties_window.attributes('-type', 'dialog')
         mult_factor = int(self._conf.read_section('main','screen scale'))
         width = 400 * mult_factor
         height = 220 * mult_factor

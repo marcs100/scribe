@@ -53,16 +53,22 @@ class SearchWindow:
 
         self._search_entry.bind('<Return>', lambda event: self._do_search(event) )
 
+        self._entry_label = tk.Label(self._frame, text='Enter search term...',
+                        bg=self._conf.read_section('colours','widget bg'),
+                        fg=self._conf.read_section('colours','widget text'))
+
         self._label = tk.Label(self._frame, text='...',
                         bg=self._conf.read_section('colours','widget bg'),
                         fg=self._conf.read_section('colours','widget text'))
 
+        self._entry_label.pack()
         self._search_entry.pack(pady=20)
         self._label.pack(pady=10)
         self._frame.pack(fill='both', expand='true')
 
         self._search_window.protocol("WM_DELETE_WINDOW", self.close_search_window)
         self._search_window.attributes("-topmost", True)
+        self._search_window.attributes('-type', 'dialog')
 
         self._search_entry.focus_set()
 
