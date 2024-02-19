@@ -107,6 +107,10 @@ class database(object):
         return rows
 
     def searchWholeWords(self, searchQuery):
+        self.cursor.execute(f"selct * from marcnotes where content like chr(10) + {searchQuery} %")
+
+
+    def searchWholeWordsFST5(self, searchQuery):
 
         search_tuple = (str(searchQuery),)
 
