@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.constants import *
 from database import database
+from tkinter import ttk
 
 
 
@@ -42,6 +43,20 @@ class SearchWindow:
         height = 100 * mult_factor
         geometry = f"{width}x{height}"
         self._search_window.geometry(geometry)
+
+        #inner frame for combobox and options label
+        self._inner_frame = tk.Frame(self._search_window, bg=self._conf.read_section('colours', 'widget bg'))
+
+        combo_style = ttk.Style()
+        combo_style.configure('search.Combobox', background=self._conf.read_section('colours','search bg'),
+                        foreground=self._conf.read_section('colours','widget text'),
+                        font=('Arial', 12))
+
+        #style='search.Combobox'
+        self._combombox = ttk.Combobox(self._inner_frame, values = ['Any term', 'Whole word', 'Hash tag list'],
+                                width=15)
+
+
         self._search_input = tk.StringVar()
         self._search_entry = tk.Entry(self._frame,
                                 textvariable=self._search_input,
@@ -53,7 +68,7 @@ class SearchWindow:
 
         self._search_entry.bind('<Return>', lambda event: self._do_search(event) )
 
-        self._entry_label = tk.Label(self._frame, text='Enter search term...',
+        self._entry_label = tk.Label(self._inner_frame, text='Options..',
                         bg=self._conf.read_section('colours','widget bg'),
                         fg=self._conf.read_section('colours','widget text'))
 
@@ -61,7 +76,11 @@ class SearchWindow:
                         bg=self._conf.read_section('colours','widget bg'),
                         fg=self._conf.read_section('colours','widget text'))
 
-        self._entry_label.pack()
+
+        self._entry_label.pack(side='left')
+        self._combombox.pack(pady=6,side='right')
+
+        self._inner_frame.pack(fill='both', expand='true')
         self._search_entry.pack(pady=20)
         self._label.pack(pady=10)
         self._frame.pack(fill='both', expand='true')
