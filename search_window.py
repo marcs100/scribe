@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.constants import *
 from database import database
-from tkinter import ttk
+#from tkinter import ttk
 
 
 
@@ -44,18 +44,38 @@ class SearchWindow:
         geometry = f"{width}x{height}"
         self._search_window.geometry(geometry)
 
-        #inner frame for combobox and options label
+        #inner frame for search options and options label
         self._inner_frame = tk.Frame(self._search_window, bg=self._conf.read_section('colours', 'widget bg'))
 
+        '''
         combo_style = ttk.Style()
-        combo_style.configure('search.Combobox', background=self._conf.read_section('colours','search bg'),
+        combo_style.configure('search.TCombobox', background=self._conf.read_section('colours','widget bg'),
                         foreground=self._conf.read_section('colours','widget text'),
                         font=('Arial', 12))
 
         #style='search.Combobox'
         self._combombox = ttk.Combobox(self._inner_frame, values = ['Any term', 'Whole word', 'Hash tag list'],
-                                width=15)
+                                width=20, style='search.TCombobox')
+        '''
 
+        self._options_button = tk.Menubutton(self._inner_frame, text="Options", relief="raised",
+                                bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
+        self._options_button.menu = tk.Menu(self._options_button, bg=self._conf.read_section('colours','widget bg'),
+                                          fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
+        self._options_button["menu"] = self._options_button.menu
+        self._selected_search_option = tk.StringVar()
+
+        self._options_button.menu.add_radiobutton(label="Standard *", variable=self._selected_search_option,
+                                value = "Standard *",
+                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
+
+        self._options_button.menu.add_radiobutton(label="Whole words only", variable=self._selected_search_option,
+                                value = "Whole words only",
+                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
+
+        self._options_button.menu.add_radiobutton(label="Hash tag list", variable=self._selected_search_option,
+                                value = "Hash tag list",
+                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
 
         self._search_input = tk.StringVar()
         self._search_entry = tk.Entry(self._frame,
@@ -77,8 +97,9 @@ class SearchWindow:
                         fg=self._conf.read_section('colours','widget text'))
 
 
-        self._entry_label.pack(side='left')
-        self._combombox.pack(pady=6,side='right')
+        #self._entry_label.pack(side='left', fill='y', expand='true')
+        #self._combombox.pack(side='right', fill='y', padx=200, pady=20)
+        self._options_button.pack(side='right', pady=15, expand='true')
 
         self._inner_frame.pack(fill='both', expand='true')
         self._search_entry.pack(pady=20)
