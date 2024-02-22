@@ -40,7 +40,7 @@ class SearchWindow:
         self._frame = tk.Frame(self._search_window, bg=self._conf.read_section('colours', 'widget bg'))
         mult_factor = int(self._conf.read_section('main','screen scale'))
         width = 400 * mult_factor
-        height = 100 * mult_factor
+        height = 150 * mult_factor
         geometry = f"{width}x{height}"
         self._search_window.geometry(geometry)
 
@@ -58,24 +58,25 @@ class SearchWindow:
                                 width=20, style='search.TCombobox')
         '''
 
-        self._options_button = tk.Menubutton(self._inner_frame, text="Options", relief="raised",
+        self._options_button = tk.Menubutton(self._inner_frame, text="...", relief="raised",
                                 bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
-        self._options_button.menu = tk.Menu(self._options_button, bg=self._conf.read_section('colours','widget bg'),
-                                          fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
+        self._options_button.menu = tk.Menu(self._options_button,tearoff=0)
         self._options_button["menu"] = self._options_button.menu
-        self._selected_search_option = tk.StringVar()
+
+        self._selected_search_option = tk.StringVar(value="Standard *") # declare variable and set default radio on
 
         self._options_button.menu.add_radiobutton(label="Standard *", variable=self._selected_search_option,
-                                value = "Standard *",
-                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
+                                value = "Standard *", command=lambda label_text="Search any term *": self._update_options_label(label_text))
 
         self._options_button.menu.add_radiobutton(label="Whole words only", variable=self._selected_search_option,
-                                value = "Whole words only",
-                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
+                                value = "Whole words only", command=lambda label_text="Search whole words only": self._update_options_label(label_text))
 
         self._options_button.menu.add_radiobutton(label="Hash tag list", variable=self._selected_search_option,
-                                value = "Hash tag list",
-                                background=self._conf.read_section('colours','widget bg'), foreground=self._conf.read_section('colours', 'widget text'))
+                                value = "Hash tag list", command=lambda label_text="Search hash tags": self._update_options_label(label_text))
+
+        self._options_label = tk.Label(self._inner_frame, bg=self._conf.read_section('colours','widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), text="Search any term *",
+                                      justify='right')
 
         self._search_input = tk.StringVar()
         self._search_entry = tk.Entry(self._frame,
@@ -97,12 +98,23 @@ class SearchWindow:
                         fg=self._conf.read_section('colours','widget text'))
 
 
+        self._spacer_label_1 = tk.Label(self._inner_frame, text="                    ",
+                                bg=self._conf.read_section('colours', 'widget bg'),
+                                fg=self._conf.read_section('colours', 'widget text'))
+
+        self._spacer_label_2 = tk.Label(self._inner_frame, text="                                     ",
+                                bg=self._conf.read_section('colours', 'widget bg'),
+                                fg=self._conf.read_section('colours', 'widget text'))
+
         #self._entry_label.pack(side='left', fill='y', expand='true')
         #self._combombox.pack(side='right', fill='y', padx=200, pady=20)
-        self._options_button.pack(side='right', pady=15, expand='true')
+        self._spacer_label_1.pack(side='right', fill='none', expand = 'false')
+        self._options_button.pack(side='right',expand='false', fill='none')
+        self._spacer_label_2.pack(side='left', fill='none', expand = 'false')
+        self._options_label.pack(side='left', expand='true', fill='none')
 
         self._inner_frame.pack(fill='both', expand='true')
-        self._search_entry.pack(pady=20)
+        self._search_entry.pack(pady=1)
         self._label.pack(pady=10)
         self._frame.pack(fill='both', expand='true')
 
@@ -111,6 +123,15 @@ class SearchWindow:
         self._search_window.attributes('-type', 'dialog')
 
         self._search_entry.focus_set()
+
+
+    #---------------------------------------------------------
+    # Event to updat eoption label to corresond with selected
+    # radio buttin in search oprions menu.
+    #---------------------------------------------------------
+    def _update_options_label(self, label_text):
+        self._options_label['text']=label_text
+
 
     #-------------------------------------------------------
     # Event - User indicated search input is complete
