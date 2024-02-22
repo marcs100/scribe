@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter.constants import *
+import database
 from database import database
 #from tkinter import ttk
 
@@ -155,7 +156,21 @@ class SearchWindow:
     def _get_number_search_of_results(self):
         if(self._search_query == ''):
             return 0
-        return self._db.getNumberOfSearchResults(self._search_query)
+        mode = self._get_search_mode()
+        return self._db.getNumberOfSearchResults(self._search_query, mode)
+
+    #-------------------------------------------------------
+    # Get the current search mode
+    #-------------------------------------------------------
+    def _get_search_mode(self):
+        match self._selected_search_option.get():
+            case  "Standard *":
+                mode = database.SEARCH_STANDARD
+            case "Whole words only":
+                mode = database.SEARCH_WHOLE_WORDS
+            case "Hash tags list":
+                mode = database.SEARCH_HASH_TAGS
+        return mode
 
     #-------------------------------------------------------
     # Public facing function
@@ -180,7 +195,8 @@ class SearchWindow:
     def get_search_results(self):
         if(self._search_query == ''):
             return None
-        search_results = self._db.getSearchResults(self._search_query)
+        mode = self._get_search_mode()
+        search_results = self._db.getSearchResults(self._search_query, mode)
         return search_results
 
     #-------------------------------------------------------
@@ -200,7 +216,8 @@ class SearchWindow:
             return None
 
         print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
-        search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset)
+        mode = self._get_search_mode()
+        search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
         print(f"Got {str(len(search_results))} in get_search_results()")
         return search_results
 

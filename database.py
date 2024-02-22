@@ -6,6 +6,10 @@ from datetime import datetime
 
 
 class database(object):
+    SEARCH_STANDARD = 0
+    SEARCH_WHOLE_WORDS = 1
+    SEARCH_HASH_TAGS = 2
+
     def __init__(self, databaseFile):
         # self.dbFile= '/home/marc-pc/Documents/marcnotes_db'
         self.dbFile = databaseFile
@@ -87,40 +91,57 @@ class database(object):
         return rows
 
 
-    def getNumberOfSearchResults(self, searchQuery):
-
-        searchTuple = (str('%' + searchQuery + '%'),)
-        self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc", searchTuple)
+    def getNumberOfSearchResults(self, searchQuery, mode):
+        if mode == self.SEARCH_STANDARD:
+            print("database - standard search mode")
+            searchTuple = (str('%' + searchQuery + '%'),)
+            self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc", searchTuple)
+        elif mode == self.SEARCH_WHOLE_WORDS or mode == self.SEARCH_HASH_TAGS:
+            print("database - whole words or hash tags")
+            search_tuple = (
+                searchQuery + ' %',
+                '% '+searchQuery+' %',
+                '% '+searchQuery+chr(10)+'%',
+                searchQuery+chr(10)+'%',
+                '%'+chr(10)+searchQuery+chr(10)+'%'
+                )
+            self.cursor.execute("select COUNT(*) from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
+        else:
+            print("Error: unrecognised search mode")
+            return None
 
         rows = self.cursor.fetchall()
         return rows[0][0]
 
     # override - removing tag search until I can reimplemenent this in the UI better than before!!!
-    def getSearchResults(self, searchQuery, resultsPerPage, startAt):
+    def getSearchResults(self, searchQuery, resultsPerPage, startAt, mode):
 
-        searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
-        self.cursor.execute(
-            "select id, notebook, tag, substr(content,0,1800), created, modified, pinned, BGColour from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
-            searchTuple)
+        if mode == self.SEARCH_STANDARD:
+            searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
+            self.cursor.execute(
+                "select * from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
+                searchTuple)
+        elif mode == self.SEARCH_WHOLE_WORDS or mode == self.SEARCH_HASH_TAGS:
+            search_tuple = (
+                searchQuery + ' %',
+                '% '+searchQuery+' %',
+                '% '+searchQuery+chr(10)+'%',
+                searchQuery+chr(10)+'%',
+                '%'+chr(10)+searchQuery+chr(10)+'%',
+                str(resultsPerPage),
+                str(startAt)
+                )
+            self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ? order by modified desc LIMIT ? OFFSET ?",search_tuple)
+        else:
+            print("Error: unrecognised search mode")
+            return None
+
 
         rows = self.cursor.fetchall()
         return rows
 
-    def searchWholeWords(self, searchQuery):
 
-        search_tuple = (
-            searchQuery + ' %',
-            '% '+searchQuery+' %',
-            '% '+searchQuery+chr(10)+'%',
-            searchQuery+chr(10)+'%',
-            '%'+chr(10)+searchQuery+chr(10)+'%'
-            )
-
-        self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
-        rows = self.cursor.fetchall()
-        return rows
-
-
+    #Note - not in use for reference only
     def searchWholeWordsFST5(self, searchQuery):
 
         search_tuple = (str(searchQuery),)
