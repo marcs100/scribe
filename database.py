@@ -114,14 +114,15 @@ class database(object):
         return rows[0][0]
 
     # override - removing tag search until I can reimplemenent this in the UI better than before!!!
-    def getSearchResults(self, searchQuery, resultsPerPage, startAt, mode):
+   #Get search results a page at a time
+   def getSearchResults(self, searchQuery, resultsPerPage, startAt, mode):
 
         if mode == self.SEARCH_STANDARD:
             searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
             self.cursor.execute(
                 "select * from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
                 searchTuple)
-        elif mode == self.SEARCH_WHOLE_WORDS or mode == self.SEARCH_HASH_TAGS:
+        elif mode == self.SEARCH_WHOLE_WORDS:
             search_tuple = (
                 searchQuery + ' %',
                 '% '+searchQuery+' %',
@@ -132,6 +133,8 @@ class database(object):
                 str(startAt)
                 )
             self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ? order by modified desc LIMIT ? OFFSET ?",search_tuple)
+        elif mode == self.SEARCH_HASH_TAGS:
+            print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!")
         else:
             print("Error: unrecognised search mode")
             return None
@@ -140,6 +143,33 @@ class database(object):
         rows = self.cursor.fetchall()
         return rows
 
+     # Get all search results at once
+     def getSearchResults(self, searchQuery, mode):
+
+        if mode == self.SEARCH_STANDARD:
+            searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
+            self.cursor.execute(
+                "select * from marcnotes where content like ? order by modified desc LIMIT ? OFFSET ?",
+                searchTuple)
+        elif mode == self.SEARCH_WHOLE_WORDS:
+            search_tuple = (
+                searchQuery + ' %',
+                '% '+searchQuery+' %',
+                '% '+searchQuery+chr(10)+'%',
+                searchQuery+chr(10)+'%',
+                '%'+chr(10)+searchQuery+chr(10)+'%'
+                )
+            self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ? order by modified desc",search_tuple)
+        elif mode == self.SEARCH_HASH_TAGS:
+            print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            #build query from search list
+        else:
+            print("Error: unrecognised search mode")
+            return None
+
+
+        rows = self.cursor.fetchall()
+        return rows
 
     #Note - not in use for reference only
     def searchWholeWordsFST5(self, searchQuery):

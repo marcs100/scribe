@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter.constants import *
 import database
 from database import database
-#from tkinter import ttk
+from tkinter import messagebox
 
 
 
@@ -196,11 +196,53 @@ class SearchWindow:
         if(self._search_query == ''):
             return None
         mode = self._get_search_mode()
-        search_results = self._db.getSearchResults(self._search_query, mode)
+        if mode == self._db.SEARCH_HASH_TAGS:
+            search_list = self._convert_to_hashtag_list(self._search_query)
+            search_results = self._db.getSearchResults(search_list, mode)
+        else:
+            search_results = self._db.getSearchResults(self._search_query, mode)
         return search_results
 
+
     #-------------------------------------------------------
-    # Get the a page of the search results.
+    # Convert search string into a list of hashtags. Split
+    # by comma and space. Add '#' to start of element if it
+    # does not already start with '#'.
+    # Remove any invalid has tags and propmt ther user with
+    # a warning.
+    #-------------------------------------------------------
+    def self._convert_to_hashtag_list(search_term):
+        invalid_tags=[]
+        got_error = False
+
+        search_term = search_term.replace(',',' ') # replace any commas with a space
+        search_list = search_term.split(' ')
+        search_list = list(filter(None, search_list)) # filter out empty entries
+
+        for index, term in enumerate(search_list):
+            if term[0] != '#':
+            term = '#' + term
+            search_list[index] = term # add '#' to start of string if not there already
+
+            #check there is only one # in the 'string''
+            if term.count('#') > 1:
+                invalid_tags.append(term)
+                got_error = True
+
+        #print (search_list)
+
+        if got_error == True:
+            print("Invalid tags: ")
+            print(invalid_tags)
+            #warn the user some invalid tags are going to be removed
+            messagebox.INFO('Warning',
+                            f"Removing invalid hash tags: {str(invalid_hash_tags)}")
+            for term in invalid_tags:
+                search_list.remove(term)
+
+        return search_list
+    #-------------------------------------------------------
+    # Get a page of the search results.
     # The serach term is in self._search_input.get()
     #-------------------------------------------------------
     def get_search_results(self, page_number):
@@ -217,6 +259,14 @@ class SearchWindow:
 
         print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
         mode = self._get_search_mode()
+
+         mode = self._get_search_mode()
+        if mode == self._db.SEARCH_HASH_TAGS:
+            search_list = self._convert_to_hashtag_list(self._search_query)
+            search_results = self._db.getSearchResults(search_list, self._notes_per_page, offset, mode)
+        else:
+            search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
+
         search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
         print(f"Got {str(len(search_results))} in get_search_results()")
         return search_results
