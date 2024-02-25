@@ -163,12 +163,14 @@ class SearchWindow:
     # Get the current search mode
     #-------------------------------------------------------
     def _get_search_mode(self):
+        mode = None
+        #print(f"selected search option is {self._selected_search_option.get()}")
         match self._selected_search_option.get():
             case  "Standard *":
                 mode = database.SEARCH_STANDARD
             case "Whole words only":
                 mode = database.SEARCH_WHOLE_WORDS
-            case "Hash tags list":
+            case "Hash tag list":
                 mode = database.SEARCH_HASH_TAGS
         return mode
 
@@ -211,7 +213,7 @@ class SearchWindow:
     # Remove any invalid has tags and propmt ther user with
     # a warning.
     #-------------------------------------------------------
-    def self._convert_to_hashtag_list(search_term):
+    def _convert_to_hashtag_list(self, search_term):
         invalid_tags=[]
         got_error = False
 
@@ -221,8 +223,8 @@ class SearchWindow:
 
         for index, term in enumerate(search_list):
             if term[0] != '#':
-            term = '#' + term
-            search_list[index] = term # add '#' to start of string if not there already
+                term = '#' + term
+                search_list[index] = term # add '#' to start of string if not there already
 
             #check there is only one # in the 'string''
             if term.count('#') > 1:
@@ -260,14 +262,15 @@ class SearchWindow:
         print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
         mode = self._get_search_mode()
 
-         mode = self._get_search_mode()
+        mode = self._get_search_mode()
+        search_results = None
         if mode == self._db.SEARCH_HASH_TAGS:
             search_list = self._convert_to_hashtag_list(self._search_query)
             search_results = self._db.getSearchResults(search_list, self._notes_per_page, offset, mode)
         else:
             search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
 
-        search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
+        #search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
         print(f"Got {str(len(search_results))} in get_search_results()")
         return search_results
 

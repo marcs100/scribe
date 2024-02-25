@@ -96,7 +96,7 @@ class database(object):
             print("database - standard search mode")
             searchTuple = (str('%' + searchQuery + '%'),)
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc", searchTuple)
-        elif mode == self.SEARCH_WHOLE_WORDS or mode == self.SEARCH_HASH_TAGS:
+        elif mode == self.SEARCH_WHOLE_WORDS
             print("database - whole words or hash tags")
             search_tuple = (
                 searchQuery + ' %',
@@ -106,6 +106,8 @@ class database(object):
                 '%'+chr(10)+searchQuery+chr(10)+'%'
                 )
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
+        elif mode = db.SEARCH_HASH_TAGS:
+            print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!")
         else:
             print("Error: unrecognised search mode")
             return None
@@ -114,8 +116,8 @@ class database(object):
         return rows[0][0]
 
     # override - removing tag search until I can reimplemenent this in the UI better than before!!!
-   #Get search results a page at a time
-   def getSearchResults(self, searchQuery, resultsPerPage, startAt, mode):
+    #Get search results a page at a time
+    def getSearchResults(self, searchQuery, resultsPerPage, startAt, mode):
 
         if mode == self.SEARCH_STANDARD:
             searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
@@ -144,7 +146,7 @@ class database(object):
         return rows
 
      # Get all search results at once
-     def getSearchResults(self, searchQuery, mode):
+    def getSearchResults(self, searchQuery, mode):
 
         if mode == self.SEARCH_STANDARD:
             searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
@@ -163,6 +165,23 @@ class database(object):
         elif mode == self.SEARCH_HASH_TAGS:
             print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!")
             #build query from search list
+            sql_query = "select * from marcnotes where "
+            search_tuple = (
+                searchQuery + ' %',
+                '% '+searchQuery+' %',
+                '% '+searchQuery+chr(10)+'%',
+                searchQuery+chr(10)+'%',
+                '%'+chr(10)+searchQuery+chr(10)+'%'
+                )
+            search_args = []
+            for hashtag in searchQuery:
+                sql_query += "content like ? or content like ? or content like ? or content like ? or content like ?"
+                for index, arg in search_tuple:
+                    search_args.append(search_tuple[index])
+            print("SQL query = " + sql_query)
+            #self.cursor.execte(sql_query,search_args)
+
+
         else:
             print("Error: unrecognised search mode")
             return None
