@@ -96,7 +96,7 @@ class database(object):
             print("database - standard search mode")
             searchTuple = (str('%' + searchQuery + '%'),)
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc", searchTuple)
-        elif mode == self.SEARCH_WHOLE_WORDS
+        elif mode == self.SEARCH_WHOLE_WORDS:
             print("database - whole words or hash tags")
             search_tuple = (
                 searchQuery + ' %',
@@ -106,14 +106,14 @@ class database(object):
                 '%'+chr(10)+searchQuery+chr(10)+'%'
                 )
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
-        elif mode = db.SEARCH_HASH_TAGS:
+        elif mode == self.SEARCH_HASH_TAGS:
             print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!")
         else:
             print("Error: unrecognised search mode")
             return None
 
         rows = self.cursor.fetchall()
-        return rows[0][0]
+        return rows[0]
 
     # override - removing tag search until I can reimplemenent this in the UI better than before!!!
     #Get search results a page at a time
@@ -145,9 +145,9 @@ class database(object):
         rows = self.cursor.fetchall()
         return rows
 
-     # Get all search results at once
+    # Get all search results at once
+    '''
     def getSearchResults(self, searchQuery, mode):
-
         if mode == self.SEARCH_STANDARD:
             searchTuple = (str('%' + searchQuery + '%'), str(resultsPerPage), str(startAt))
             self.cursor.execute(
@@ -189,6 +189,7 @@ class database(object):
 
         rows = self.cursor.fetchall()
         return rows
+        '''
 
     #Note - not in use for reference only
     def searchWholeWordsFST5(self, searchQuery):
