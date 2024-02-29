@@ -132,7 +132,8 @@ class MainWindow:
                             text='staus: blah blah',
                             height=1,
                             anchor="se")
-        self._status_label.pack(fill='both', expand='true', padx=25)
+        #self._status_label.pack(fill='both', expand='true', padx=25)
+        self._status_label.grid(row=0, column=0, padx=25)
 
         self._view_button.pack(side='left',padx=30,pady=3)
         self._view_label.pack(fill=Y, side='left', pady=3)
@@ -355,7 +356,7 @@ class MainWindow:
     #Public facing function to get a main view
     #------------------------------------------------
     def get_view(self,view):
-        print("Getting view: "+view)
+        #print("Getting view: "+view)
         self._current_view = view
         self._page_forward_button['state']='disabled'
         self._page_back_button['state']='disabled'
