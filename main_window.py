@@ -145,8 +145,16 @@ class MainWindow:
         self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
 
         #Setup key bindings
-        self._root.bind(self._conf.read_section('main window key bindings','search'), lambda event: self._show_search_window(event))
-
+        self._root.bind(self._conf.read_section('main window key bindings','search'),
+                        lambda event: self._show_search_window(event))
+        self._root.bind(self._conf.read_section('main window key bindings','new note'),
+                        lambda event: self._create_new_note())
+        self._root.bind(self._conf.read_section('main window key bindings','show notebook view'),
+                        lambda event, view="notebooks": self._get_view_event(event, view))
+        self._root.bind(self._conf.read_section('main window key bindings','show pinned notes view'),
+                        lambda event, view="pinned": self._get_view_event(event, view))
+        self._root.bind(self._conf.read_section('main window key bindings','show recent notes view'),
+                        lambda event, view="recent": self._get_view_event(event, view))
     
     '''EVENTS'''
     #--------------------------------------------------------------------
@@ -334,13 +342,20 @@ class MainWindow:
         self.get_view('search results')
         #search_results =
 
+    #----------------------------------------------------------------
+    # Get view as event, although we ignore the event parameter.
+    #
+    #---------------------------------------------------------------
+    def _get_view_event(self, event, view):
+        self.get_view(view)
+
     '''END OF EVENTS'''
 
     #------------------------------------------------
     #Public facing function to get a main view
     #------------------------------------------------
     def get_view(self,view):
-        #print("Getting view: "+view)
+        print("Getting view: "+view)
         self._current_view = view
         self._page_forward_button['state']='disabled'
         self._page_back_button['state']='disabled'
