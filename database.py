@@ -93,11 +93,11 @@ class database(object):
 
     def getNumberOfSearchResults(self, searchQuery, mode):
         if mode == self.SEARCH_STANDARD:
-            print("database - standard search mode")
+            #print("database - standard search mode")
             searchTuple = (str('%' + searchQuery + '%'),)
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? order by modified desc", searchTuple)
         elif mode == self.SEARCH_WHOLE_WORDS:
-            print("database - whole words or hash tags")
+            #print("database - whole words or hash tags")
             search_tuple = (
                 searchQuery + ' %',
                 '% '+searchQuery+' %',
@@ -107,13 +107,32 @@ class database(object):
                 )
             self.cursor.execute("select COUNT(*) from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ?",search_tuple)
         elif mode == self.SEARCH_HASH_TAGS:
-            print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!")
+            #print("getting umber of results for hashtag list")
+            #print(f"search query in: {str(searchQuery)}")
+            #build query from search list
+            sql_query = "select COUNT(*) from marcnotes where "
+
+            search_args = []
+
+            for hashtag in searchQuery:
+                sql_query += "content like ? or content like ? or content like ? or content like ? or content like ? or "
+                search_args.append(hashtag + ' %')
+                search_args.append('% '+hashtag+' %')
+                search_args.append('% '+hashtag+chr(10)+'%')
+                search_args.append(hashtag+chr(10)+'%')
+                search_args.append('%'+chr(10)+hashtag+chr(10)+'%')
+
+            #print("SQL query = " + sql_query)
+            #remove last 3 characters from query -  'or '
+            sql_query = sql_query[:-3]
+            #print("modififed SQL query = " + sql_query)
+            self.cursor.execute(sql_query,search_args)
         else:
             print("Error: unrecognised search mode")
             return None
 
         rows = self.cursor.fetchall()
-        return rows[0]
+        return rows[0][0]
 
     # override - removing tag search until I can reimplemenent this in the UI better than before!!!
     #Get search results a page at a time
@@ -136,7 +155,24 @@ class database(object):
                 )
             self.cursor.execute("select * from marcnotes where content like ? or content like ? or content like ? or content like ?  or content like ? order by modified desc LIMIT ? OFFSET ?",search_tuple)
         elif mode == self.SEARCH_HASH_TAGS:
-            print("NOT IMPLEMENTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            #print("Geting hash tag search results")
+            #build query from search list
+            sql_query = "select * from marcnotes where "
+
+            search_args = []
+
+            for hashtag in searchQuery:
+                sql_query += "content like ? or content like ? or content like ? or content like ? or content like ? or "
+                search_args.append(hashtag + ' %')
+                search_args.append('% '+hashtag+' %')
+                search_args.append('% '+hashtag+chr(10)+'%')
+                search_args.append(hashtag+chr(10)+'%')
+                search_args.append('%'+chr(10)+hashtag+chr(10)+'%')
+            #print("SQL query = " + sql_query)
+            #remove last 3 characters from query -  'or '
+            sql_query = sql_query[:-3]
+            self.cursor.execute(sql_query,search_args)
+
         else:
             print("Error: unrecognised search mode")
             return None

@@ -69,8 +69,8 @@ class SearchWindow:
         self._options_button.menu.add_radiobutton(label="Standard *", variable=self._selected_search_option,
                                 value = "Standard *", command=lambda label_text="Search any term *": self._update_options_label(label_text))
 
-        self._options_button.menu.add_radiobutton(label="Whole words only", variable=self._selected_search_option,
-                                value = "Whole words only", command=lambda label_text="Search whole words only": self._update_options_label(label_text))
+        self._options_button.menu.add_radiobutton(label="Search exact term", variable=self._selected_search_option,
+                                value = "Whole words only", command=lambda label_text="Search exact term": self._update_options_label(label_text))
 
         self._options_button.menu.add_radiobutton(label="Hash tag list", variable=self._selected_search_option,
                                 value = "Hash tag list", command=lambda label_text="Search hash tags": self._update_options_label(label_text))
@@ -157,7 +157,11 @@ class SearchWindow:
         if(self._search_query == ''):
             return 0
         mode = self._get_search_mode()
-        return self._db.getNumberOfSearchResults(self._search_query, mode)
+        if mode == self._db.SEARCH_HASH_TAGS:
+            search_list = self._convert_to_hashtag_list(self._search_query)
+            return self._db.getNumberOfSearchResults(search_list, mode)
+        else:
+            return self._db.getNumberOfSearchResults(self._search_query, mode)
 
     #-------------------------------------------------------
     # Get the current search mode
@@ -194,6 +198,7 @@ class SearchWindow:
     # Get all search results in one go.
     # Search term is in self._search_input.get()
     #-------------------------------------------------------
+    ''' No function overiding in python!!!
     def get_search_results(self):
         if(self._search_query == ''):
             return None
@@ -204,7 +209,7 @@ class SearchWindow:
         else:
             search_results = self._db.getSearchResults(self._search_query, mode)
         return search_results
-
+    '''
 
     #-------------------------------------------------------
     # Convert search string into a list of hashtags. Split
@@ -234,8 +239,8 @@ class SearchWindow:
         #print (search_list)
 
         if got_error == True:
-            print("Invalid tags: ")
-            print(invalid_tags)
+            #print("Invalid tags: ")
+            #print(invalid_tags)
             #warn the user some invalid tags are going to be removed
             messagebox.INFO('Warning',
                             f"Removing invalid hash tags: {str(invalid_hash_tags)}")
