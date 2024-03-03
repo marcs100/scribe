@@ -11,6 +11,7 @@ from tkinter import colorchooser
 from tkinter import messagebox
 import track_open_notes as tracker
 from snippets import snippets
+from note_mode import NoteMode
 
 
 class NoteWindow:
@@ -20,6 +21,7 @@ class NoteWindow:
         self._note = None
         self._conf = config
         self._attrib = note_attributes.NoteAttributes()
+        self._mode = None # mode variable for NoteMode.INSERT or NoteMode.VISUAL
 
         self._init_window(root, main_window)
                            
@@ -90,6 +92,30 @@ class NoteWindow:
         for snippet in snippets:
             self._text_box.bind(snippet[2], lambda event,snip_text=snippet[0], cursor_pos=snippet[1]: self._insert_snippet(event, snip_text,cursor_pos) )
 
+        #Bind keys to note window
+        self._note_window.bind(self._conf.read_section('note page key bindings','insert mode'), lambda event: self._set_insert_mode(event))
+        self._note_window.bind(self._conf.read_section('note page key bindings','visual mode'), lambda event: self._set_visual_mode(event))
+
+
+    #-----------------------------------------------------
+    # Set insert mode (for editing text)
+    #-----------------------------------------------------
+    def _set_insert_mode(self, event):
+        self._mode = NoteMode.INSERT
+        print ("Insert mode is set")
+        #set textbox mode to normal
+        self._text_box['state'] = 'normal'
+
+
+    #-----------------------------------------------------
+    # Set visual mode (for showing formatting -
+    # no edit allowed)
+    #-----------------------------------------------------
+    def _set_visual_mode(self, event):
+        self._mode = NoteMode.INSERT
+        print ("Visual mode is set")
+        #set textbox mode to disabled
+        self._text_box['state'] = 'disabled'
 
 
     #---------------------------------------------------------------
@@ -287,6 +313,10 @@ class NoteWindow:
     def set_notebook_name(self, notebook_name):
         self._attrib.notebook = notebook_name
 
+
+    #----------------------------------------------------------
+    # User can select a colour for the note.
+    #----------------------------------------------------------
     def _get_colour(self):
         col = colorchooser.askcolor(title="Choose note colour", parent=self._note_window)
         if col != (None,None):
