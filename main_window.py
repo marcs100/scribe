@@ -39,8 +39,8 @@ class MainWindow:
     # Initialise the main window
     #-------------------------------------------------------
     def init_window(self):
-        self._note_width = int(self._conf.read_section('main_window', 'note width'))
-        self._notebook_width = int(self._conf.read_section('main_window', 'notebook width'))
+        self._note_width = int(self._conf.read_section('main window', 'note width'))
+        self._notebook_width = int(self._conf.read_section('main window', 'notebook width'))
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!

@@ -95,9 +95,15 @@ class NoteWindow:
             self._text_box.bind(snippet[2], lambda event,snip_text=snippet[0], cursor_pos=snippet[1]: self._insert_snippet(event, snip_text,cursor_pos) )
 
         #Bind keys to note window
-        self._note_window.bind(self._conf.read_section('note page key bindings','insert mode'), lambda event: self._set_insert_mode(event))
+        self._note_window.bind(self._conf.read_section('note page key bindings','insert mode'), lambda event:   self._set_insert_mode(event))
         self._note_window.bind(self._conf.read_section('note page key bindings','visual mode'), lambda event: self._set_visual_mode(event))
 
+        #set font for text box
+        font_name = self._conf.read_section('note window','text font name')
+        font_size = self._conf.read_section('note window','text font size')
+        font_type = self._conf.read_section('note window','text font type')
+        text_font = (font_name,int(font_size),font_type)
+        self._text_box.configure(font=text_font)
 
     #--------------------------------------------------------------------
     # Open and display a new note or an existing note based on sql id.
@@ -199,11 +205,14 @@ class NoteWindow:
         if len(self._bold_tag_indexes) % 2 != 0:
             self._bold_tag_indexes.pop() # remove last elemnt as there is not a matching one
 
-        text_font = self._text_box.cget("font")
-        print(text_font)
+        font_name = self._conf.read_section('note window','text font name')
+        font_size = self._conf.read_section('note window','text font size')
+        font_type = ('bold')
+        text_font = (font_name,int(font_size),font_type)
+        #print(text_font)
         #How can we get the font as a tuple ??????????????
 
-        self._text_box.tag_configure("boldtext",font=("Monospace",12,'bold'))
+        self._text_box.tag_configure("boldtext",font=text_font)
 
         mod=0
         last_row=None
@@ -215,7 +224,7 @@ class NoteWindow:
                 last_row = row
             elif row != last_row:
                 #the modifier need to be reset for a new row
-                print("resetting mod for new row")
+                #print("resetting mod for new row")
                 mod=0
 
             # this get a bit complicated as we have to adjust the indexes
@@ -229,13 +238,14 @@ class NoteWindow:
 
 
     #--------------------------------------------------------------
-    # Remove bold tags and insert '**' back at start and end of
-    # bold text
+    # Remove bold tags and title tags. Insert '**' back at start
+    # and end of bold text
     #--------------------------------------------------------------
     def _set_normal_text(self):
 
         #remove bold text tags
         self._text_box.tag_remove("boldtext",'1.0', 'end-1c')
+        self._text_box.tag_remove("titletext",'1.0', 'end-1c')
 
         #insert back in '**'
         for index in range(0,len(self._bold_markers_indexes)-1,2):
@@ -277,6 +287,9 @@ class NoteWindow:
     # note has been detected.
     #-------------------------------------------------------------
     def _save_note(self):
+        if self._mode == NoteMode.VISUAL:
+                self._set_insert_mode(event=None)
+
         #check hash to see if note has changed
         current_hash = hashlib.sha1(self._text_box.get("1.0","end-1c")
                                     .encode('ascii', 'ignore')).hexdigest()
@@ -284,8 +297,6 @@ class NoteWindow:
         if self._attrib.new_note == True:
             #print(f"note content: <{self._text_box.get('1.0',END)}>")
             if self._text_box.get("1.0",END) != '\n': # don't save an empty new note'
-                if self._mode == NoteMode.VISUAL:
-                    self._set_insert_mode
                 print("Saving new note...")
                 self._attrib.date_created = datetime.datetime.now()
                 self._attrib.date_modified = self._attrib.date_created
@@ -308,8 +319,8 @@ class NoteWindow:
             print("Note has not changed")
             return
         
-        if self._mode == NoteMode.VISUAL:
-                self._set_insert_mode
+        #print("current hash " + current_hash)
+        #print("orig hash    " + self._attrib.hash)
         print("Saving existing note with id " + str(self._note[0][COLUMN.ID]))
         self._attrib.date_modified = datetime.datetime.now()
         self._db.updateNote(self._note[0][COLUMN.ID], self._attrib.notebook, self._attrib.tag,
@@ -332,6 +343,7 @@ class NoteWindow:
             pass
         self._attrib.modified = True # note will get updated on save
         #self._save_note()
+
 
     #-------------------------------------------------------
     # Revert text to the original as saved in the database.

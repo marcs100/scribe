@@ -20,8 +20,8 @@ import configuration_file
 def window_closed():
     width = str(root.winfo_width())
     height = str(root.winfo_height())
-    conf.write_section('main_window','width',width,False)
-    conf.write_section('main_window', 'height', height, True)
+    conf.write_section('main window','width',width,False)
+    conf.write_section('main window', 'height', height, True)
     root.destroy()
 
 conf = None
@@ -98,8 +98,8 @@ def init_main_window():
     #print ("Width = " + str(width))
     #print("Height = " + str(height))
     #print(geometry)
-    width = conf.read_section('main_window','width')
-    height = conf.read_section('main_window','height')
+    width = conf.read_section('main window','width')
+    height = conf.read_section('main window','height')
     root.geometry(f'{width}x{height}')
 
     db_file = conf.read_section('main', 'database')
@@ -111,7 +111,7 @@ def init_main_window():
     main_win = MainWindow(root,db, conf)
     
     # set default view  - read this from stored settings
-    main_win.get_view(conf.read_section('main_window','default view'))
+    main_win.get_view(conf.read_section('main window','default view'))
     root.protocol("WM_DELETE_WINDOW", window_closed)
 
     root.mainloop()
