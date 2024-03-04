@@ -22,6 +22,8 @@ class NoteWindow:
         self._conf = config
         self._attrib = note_attributes.NoteAttributes()
         self._mode = None # mode variable for NoteMode.INSERT or NoteMode.VISUAL
+        self._bold_tag_indexes=[] # start and end indexes for bold text tags
+        self._bold_markers_indexes=[] #store index for inserting back in bold marker '**'
 
         self._init_window(root, main_window)
                            
@@ -97,48 +99,6 @@ class NoteWindow:
         self._note_window.bind(self._conf.read_section('note page key bindings','visual mode'), lambda event: self._set_visual_mode(event))
 
 
-    #-----------------------------------------------------
-    # Set insert mode (for editing text)
-    #-----------------------------------------------------
-    def _set_insert_mode(self, event):
-        self._mode = NoteMode.INSERT
-        print ("Insert mode is set")
-        #set textbox mode to normal
-        self._text_box['state'] = 'normal'
-
-
-    #-----------------------------------------------------
-    # Set visual mode (for showing formatting -
-    # no edit allowed)
-    #-----------------------------------------------------
-    def _set_visual_mode(self, event):
-        self._mode = NoteMode.INSERT
-        print ("Visual mode is set")
-        #set textbox mode to disabled
-        self._text_box['state'] = 'disabled'
-
-
-    #---------------------------------------------------------------
-    # Read all available notebooks and add the entries to a menu.
-    #--------------------------------------------------------------
-    def _populate_notebook_menu(self):
-        notebooks = self._db.getNotebookNames()
-        for notebook in notebooks:
-             notebook_str = str(notebook[0])
-             self._notebook_button.menu.add_command(label=notebook_str, command=lambda notebook_in=notebook_str: self._select_notebook(notebook_in))
-        
-
-    #---------------------------------------------------------
-    # Allows use to change the notebook name for current note.
-    #---------------------------------------------------------
-    def _select_notebook(self, notebook_in):
-        if self._attrib.notebook != notebook_in:
-            self._attrib.notebook = notebook_in
-            print(notebook_in)
-            self._note_window.title("Notebook: " + self._attrib.notebook)
-            self._attrib.modified = True # Set this so the change will be saved
-    
-    
     #--------------------------------------------------------------------
     # Open and display a new note or an existing note based on sql id.
     #--------------------------------------------------------------------
@@ -146,7 +106,7 @@ class NoteWindow:
         self._db = db_in
 
         self._populate_notebook_menu()
-        
+
         #determine if this is a new note or an existing note
         if sqlid == None:
             self._attrib.id = 0
@@ -179,11 +139,131 @@ class NoteWindow:
             self._attrib.date_created = self._note[0][COLUMN.CREATED]
             self._attrib.date_modified = self._note[0][COLUMN.MODIFIED]
             self._attrib.tag = self._note[0][COLUMN.TAG]
-        
+
         self._note_window.title("Notebook: " + self._attrib.notebook)
         self._note_window.protocol("WM_DELETE_WINDOW", self._close_note)
 
-    #------------------------------
+        self._mode = None
+        if  self._attrib.new_note == True:
+            self._set_insert_mode(event=None) # open new notes in insert mode
+        else:
+            self._set_visual_mode(event=None) # open existing notes in visual mode
+
+
+    #-----------------------------------------------------
+    # Set insert mode (for editing text)
+    #-----------------------------------------------------
+    def _set_insert_mode(self, event):
+        if self._mode == NoteMode.INSERT:
+            return
+
+        self._mode = NoteMode.INSERT
+        print ("Insert mode is set")
+        #set textbox mode to normal
+        self._text_box['state'] = 'normal'
+        self._set_normal_text()
+
+
+
+    #-----------------------------------------------------
+    # Set visual mode (for showing formatting -
+    # no edit allowed)
+    #-----------------------------------------------------
+    def _set_visual_mode(self, event):
+        if self._mode == NoteMode.VISUAL:
+            return
+        self._mode = NoteMode.VISUAL
+        print ("Visual mode is set")
+        #set textbox mode to disabled
+        self._set_bold_text()
+        self._text_box['state'] = 'disabled'
+
+
+    #----------------------------------------------------
+    # Look for  words/phrases surrounded by '**'
+    # Set bold text and remove '**'''
+    #----------------------------------------------------
+    def _set_bold_text(self):
+        self._bold_tag_indexes = []
+        self._bold_markers_indexes = []
+        pos = "1.0"
+        while pos != "":
+            pos = self._text_box.search("**",pos,'end-1c')
+            if pos != "":
+                #delete the '**'
+                row,col = pos.split('.',1)
+                col_int = int(col)+2
+                self._text_box.delete(pos,f"{row}.{str(col_int)}")
+                self._bold_tag_indexes.append(pos) # save the index
+
+        if len(self._bold_tag_indexes) % 2 != 0:
+            self._bold_tag_indexes.pop() # remove last elemnt as there is not a matching one
+
+        text_font = self._text_box.cget("font")
+        print(text_font)
+        #How can we get the font as a tuple ??????????????
+
+        self._text_box.tag_configure("boldtext",font=("Monospace",12,'bold'))
+
+        mod=0
+        last_row=None
+        for index in range(0,len(self._bold_tag_indexes)-1,2):
+            self._text_box.tag_add("boldtext",self._bold_tag_indexes[index],self._bold_tag_indexes[index+1])
+            #now modify marker index to be able to insert back in '**' later
+            row, col = self._bold_tag_indexes[index].split('.',1)
+            if last_row == None:
+                last_row = row
+            elif row != last_row:
+                #the modifier need to be reset for a new row
+                print("resetting mod for new row")
+                mod=0
+
+            # this get a bit complicated as we have to adjust the indexes
+            # as the characters get inserted.
+            col1_int = int(col)+mod
+            row, col = self._bold_tag_indexes[index+1].split('.',1)
+            col2_int = int(col)+2+mod
+            self._bold_markers_indexes.append(f"{row}.{str(col1_int)}")
+            self._bold_markers_indexes.append(f"{row}.{str(col2_int)}")
+            mod+=4
+
+
+    #--------------------------------------------------------------
+    # Remove bold tags and insert '**' back at start and end of
+    # bold text
+    #--------------------------------------------------------------
+    def _set_normal_text(self):
+
+        #remove bold text tags
+        self._text_box.tag_remove("boldtext",'1.0', 'end-1c')
+
+        #insert back in '**'
+        for index in range(0,len(self._bold_markers_indexes)-1,2):
+            self._text_box.insert(self._bold_markers_indexes[index],"**")
+            self._text_box.insert(self._bold_markers_indexes[index+1],"**")
+
+    #---------------------------------------------------------------
+    # Read all available notebooks and add the entries to a menu.
+    #--------------------------------------------------------------
+    def _populate_notebook_menu(self):
+        notebooks = self._db.getNotebookNames()
+        for notebook in notebooks:
+             notebook_str = str(notebook[0])
+             self._notebook_button.menu.add_command(label=notebook_str, command=lambda notebook_in=notebook_str: self._select_notebook(notebook_in))
+        
+
+    #---------------------------------------------------------
+    # Allows use to change the notebook name for current note.
+    #---------------------------------------------------------
+    def _select_notebook(self, notebook_in):
+        if self._attrib.notebook != notebook_in:
+            self._attrib.notebook = notebook_in
+            print(notebook_in)
+            self._note_window.title("Notebook: " + self._attrib.notebook)
+            self._attrib.modified = True # Set this so the change will be saved
+
+
+    #-----------------------------
     # Note closing event
     #-----------------------------
     def _close_note(self):
@@ -204,6 +284,8 @@ class NoteWindow:
         if self._attrib.new_note == True:
             #print(f"note content: <{self._text_box.get('1.0',END)}>")
             if self._text_box.get("1.0",END) != '\n': # don't save an empty new note'
+                if self._mode == NoteMode.VISUAL:
+                    self._set_insert_mode
                 print("Saving new note...")
                 self._attrib.date_created = datetime.datetime.now()
                 self._attrib.date_modified = self._attrib.date_created
@@ -226,6 +308,8 @@ class NoteWindow:
             print("Note has not changed")
             return
         
+        if self._mode == NoteMode.VISUAL:
+                self._set_insert_mode
         print("Saving existing note with id " + str(self._note[0][COLUMN.ID]))
         self._attrib.date_modified = datetime.datetime.now()
         self._db.updateNote(self._note[0][COLUMN.ID], self._attrib.notebook, self._attrib.tag,
@@ -280,6 +364,7 @@ class NoteWindow:
 
                 #close the deleted note
                 self._note_window.destroy()
+
 
     #-------------------------------------------------------
     # Dsiplay a window showing current note properties
