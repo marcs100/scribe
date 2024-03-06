@@ -119,6 +119,7 @@ class NoteWindow:
             self._attrib.pinned= 0
             self._pin_button['text'] = 'Pin'
             self._attrib.new_note = True
+            tracker.track_new_note() # keep track of this note
             if self._attrib.notebook == "":
                 self._attrib.notebook = self._conf.read_section('main', 'default notebook')
             self._attrib.colour = self._conf.read_section('colours','default note_bg')
@@ -279,6 +280,10 @@ class NoteWindow:
     def _close_note(self):
         self._save_note()
         tracker.delete_note(self._attrib.id)
+        if self._attrib.new_note:
+            #if it is still labelled as a new note atfer saving
+            #then we can assuem this is an empty new note.
+            tracker.delete_new_note()
         self._note_window.destroy()
     
 
@@ -307,7 +312,8 @@ class NoteWindow:
                 self._main_window.update_current_view()
                 self._attrib.id = sqlid[0]
 
-                tracker.track_note(sqlid[0])
+                tracker.delete_new_note() # Will not be a new note any more!
+                tracker.track_note(sqlid[0]) # kepp track of this note.
                 #Note - for existing notes opened from the main window, the sqlid
                 #for that note has already been added to tracker by main_window,py
 

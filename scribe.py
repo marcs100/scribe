@@ -15,9 +15,15 @@ import platform
 from pathlib import Path
 import version_info
 import configuration_file
+import track_open_notes as tracker
+from tkinter import messagebox
 
 
 def window_closed():
+    if len(tracker.get_opened_notes()) != 0 or tracker.get_new_note_count() > 0:
+        #print("There are notes open, please close them first")
+        messagebox.showwarning("Warning","There are still notes open, please close them first",parent=root)
+        return
     width = str(root.winfo_width())
     height = str(root.winfo_height())
     conf.write_section('main window','width',width,False)
