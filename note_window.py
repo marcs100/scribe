@@ -171,7 +171,7 @@ class NoteWindow:
         #set textbox mode to normal
         self._text_box['state'] = 'normal'
         #self._set_normal_text()
-        self._text_formatter._set_normal_text(self._text_box)
+        self._text_formatter.set_normal_text(self._text_box)
 
 
 
@@ -184,8 +184,8 @@ class NoteWindow:
             return
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
-        #self._set_bold_text()
-        self._text_formatter._set_bold_text(self._text_box)
+        self._text_formatter.set_bold_text(self._text_box)
+        self._text_formatter.set_title_text(self._text_box)
         #set textbox mode to disabled
         self._text_box['state'] = 'disabled'
 
