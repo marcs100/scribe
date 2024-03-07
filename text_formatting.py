@@ -108,13 +108,9 @@ class TextFormatter:
 
         #now apply the title formmatting to the text widget
         for index in range(0,len(self._title_tag_indexes)):
-            print("will apply title text formatting...")
             # apply the formatting tag to the text
-            text_widget.tag_add("titletext",self._title_tag_indexes[index],f"{self._bold_tag_indexes[index]} lineend")
+            text_widget.tag_add("titletext",self._title_tag_indexes[index],f"{self._title_tag_indexes[index]} lineend")
 
-
-        print("title tag indexes:")
-        print(self._title_tag_indexes)
 
 
     #--------------------------------------------------------------
@@ -127,14 +123,14 @@ class TextFormatter:
         text_widget.tag_remove("boldtext",'1.0', 'end-1c')
         text_widget.tag_remove("titletext",'1.0', 'end-1c')
 
-        #insert back in '**'
-        for index in range(0,len(self._bold_markers_indexes)-1,2):
-            text_widget.insert(self._bold_markers_indexes[index],"**")
-            text_widget.insert(self._bold_markers_indexes[index+1],"**")
-
         #insert '##' back in
         for index in range(0,len(self._title_tag_indexes)):
             text_widget.insert(self._title_tag_indexes[index],"##")
+
+             #insert back in '**'
+        for index in range(0,len(self._bold_markers_indexes)-1,2):
+            text_widget.insert(self._bold_markers_indexes[index],"**")
+            text_widget.insert(self._bold_markers_indexes[index+1],"**")
 
 
 

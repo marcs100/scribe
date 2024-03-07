@@ -92,6 +92,16 @@ class NoteWindow:
         self._menu_frame.pack(fill='both', expand=FALSE)
         self._frame.pack(fill='both', expand=TRUE)
 
+        self._status_frame = tk.Frame(self._note_window, bg=self._conf.read_section('colours','widget bg'))
+        self._status_label = tk.Label(self._status_frame,
+                            bg=self._conf.read_section('colours','widget bg'),
+                            fg=self._conf.read_section('colours','widget text'),
+                            text='',
+                            height=1,
+                            anchor="se")
+        self._status_label.pack(fill='both', expand='true', padx=25)
+        self._status_frame.pack(fill='x', expand='false', side='bottom')
+
         #Bind the text snippets
         for snippet in snippets:
             self._text_box.bind(snippet[2], lambda event,snip_text=snippet[0], cursor_pos=snippet[1]: self._insert_snippet(event, snip_text,cursor_pos) )
@@ -168,9 +178,9 @@ class NoteWindow:
 
         self._mode = NoteMode.INSERT
         print ("Insert mode is set")
+        self._status_label['text'] = 'mode: insert'
         #set textbox mode to normal
         self._text_box['state'] = 'normal'
-        #self._set_normal_text()
         self._text_formatter.set_normal_text(self._text_box)
 
 
@@ -184,6 +194,7 @@ class NoteWindow:
             return
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
+        self._status_label['text'] = 'mode: visual'
         self._text_formatter.set_bold_text(self._text_box)
         self._text_formatter.set_title_text(self._text_box)
         #set textbox mode to disabled
@@ -391,10 +402,10 @@ class NoteWindow:
         dt = datetime.datetime.now()
         if snip_text.find("{date}") != -1:
             #replace {date} with actual date
-            date = dt.strftime("%d-%m-%y")
+            date = dt.strftime("%d/%m/%Y")
             snip_text = snip_text.replace("{date}",date)
         if snip_text.find("{time}") != -1:
-            #replace {time} with actual time
+            #replace {time} with atual time
             time = dt.strftime("%H:%M")
             snip_text = snip_text.replace("{time}",time)
 
