@@ -12,6 +12,7 @@ from tkinter import messagebox
 import track_open_notes as tracker
 from snippets import snippets
 from note_mode import NoteMode
+from text_formatting import TextFormatter
 
 
 class NoteWindow:
@@ -22,8 +23,9 @@ class NoteWindow:
         self._conf = config
         self._attrib = note_attributes.NoteAttributes()
         self._mode = None # mode variable for NoteMode.INSERT or NoteMode.VISUAL
-        self._bold_tag_indexes=[] # start and end indexes for bold text tags
-        self._bold_markers_indexes=[] #store index for inserting back in bold marker '**'
+
+        self._text_formatter = TextFormatter(self._conf)
+
 
         self._init_window(root, main_window)
                            
@@ -168,7 +170,8 @@ class NoteWindow:
         print ("Insert mode is set")
         #set textbox mode to normal
         self._text_box['state'] = 'normal'
-        self._set_normal_text()
+        #self._set_normal_text()
+        self._text_formatter._set_normal_text(self._text_box)
 
 
 
@@ -181,77 +184,11 @@ class NoteWindow:
             return
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
+        #self._set_bold_text()
+        self._text_formatter._set_bold_text(self._text_box)
         #set textbox mode to disabled
-        self._set_bold_text()
         self._text_box['state'] = 'disabled'
 
-
-    #----------------------------------------------------
-    # Look for  words/phrases surrounded by '**'
-    # Set bold text and remove '**'''
-    #----------------------------------------------------
-    def _set_bold_text(self):
-        self._bold_tag_indexes = []
-        self._bold_markers_indexes = []
-        pos = "1.0"
-        while pos != "":
-            pos = self._text_box.search("**",pos,'end-1c')
-            if pos != "":
-                #delete the '**'
-                row,col = pos.split('.',1)
-                col_int = int(col)+2
-                self._text_box.delete(pos,f"{row}.{str(col_int)}")
-                self._bold_tag_indexes.append(pos) # save the index
-
-        if len(self._bold_tag_indexes) % 2 != 0:
-            self._bold_tag_indexes.pop() # remove last elemnt as there is not a matching one
-
-        font_name = self._conf.read_section('note window','text font name')
-        font_size = self._conf.read_section('note window','text font size')
-        font_type = ('bold')
-        text_font = (font_name,int(font_size),font_type)
-        #print(text_font)
-        #How can we get the font as a tuple ??????????????
-
-        self._text_box.tag_configure("boldtext",font=text_font)
-
-        mod=0
-        last_row=None
-        for index in range(0,len(self._bold_tag_indexes)-1,2):
-            self._text_box.tag_add("boldtext",self._bold_tag_indexes[index],self._bold_tag_indexes[index+1])
-            #now modify marker index to be able to insert back in '**' later
-            row, col = self._bold_tag_indexes[index].split('.',1)
-            if last_row == None:
-                last_row = row
-            elif row != last_row:
-                #the modifier need to be reset for a new row
-                #print("resetting mod for new row")
-                mod=0
-
-            # this get a bit complicated as we have to adjust the indexes
-            # as the characters get inserted.
-            col1_int = int(col)+mod
-            row, col = self._bold_tag_indexes[index+1].split('.',1)
-            col2_int = int(col)+2+mod
-            self._bold_markers_indexes.append(f"{row}.{str(col1_int)}")
-            self._bold_markers_indexes.append(f"{row}.{str(col2_int)}")
-            mod+=4
-
-
-    #--------------------------------------------------------------
-    # Remove bold tags and title tags. Insert '**' back at start
-    # and end of bold text
-    #--------------------------------------------------------------
-    def _set_normal_text(self):
-
-        #remove bold text tags
-        self._text_box.tag_remove("boldtext",'1.0', 'end-1c')
-        self._text_box.tag_remove("titletext",'1.0', 'end-1c')
-
-        #insert back in '**'
-        for index in range(0,len(self._bold_markers_indexes)-1,2):
-            self._text_box.insert(self._bold_markers_indexes[index],"**")
-            self._text_box.insert(self._bold_markers_indexes[index+1],"**")
 
     #---------------------------------------------------------------
     # Read all available notebooks and add the entries to a menu.

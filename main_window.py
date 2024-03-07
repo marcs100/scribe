@@ -59,12 +59,12 @@ class MainWindow:
             
 
         self._menu_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
-        self._menu_frame.pack(fill=BOTH, expand=FALSE)
-        self._view_button = tk.Menubutton(self._menu_frame, text="Select View", relief="flat",
+        self._menu_frame.pack(fill='both', expand=FALSE)
+        self._view_button = tk.Menubutton(self._menu_frame, height=1, text="Select View", relief="flat",
                                            bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
                
         self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget bg'),
-                                     fg=self._conf.read_section('colours', 'widget text'))
+                                     height=1, fg=self._conf.read_section('colours', 'widget text'))
         lbl_font = font.Font(weight="bold")
         self._view_label["font"] = lbl_font
         #self._frame.pack(fill=BOTH, expand=TRUE)
@@ -72,23 +72,27 @@ class MainWindow:
         #New Note button
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
-                                      command=self._create_new_note)
+                                      command=self._create_new_note,
+                                      height=1)
         self._new_note_button.pack(side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
                                         fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
-                                        state='disabled', command=self._create_new_notebook)
+                                        state='disabled', command=self._create_new_notebook,
+                                        height=1)
         self._new_notebook_button.pack(side='left', padx=10, pady=3)
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),
-                                fg=self._conf.read_section('colours', 'widget text'))
+                                fg=self._conf.read_section('colours', 'widget text'),
+                                height=1)
         spacer_label.pack(fill=Y, side='right')
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
-                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
+                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'),
+                                           height=1)
         self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget bg'),
                                           fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
@@ -98,16 +102,19 @@ class MainWindow:
         #Page forward button
         self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
-                                      command=self._page_forward)
+                                      command=self._page_forward,
+                                      height=1)
 
         #Page back button
         self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="<<",
-                                      command=self._page_back)
+                                      command=self._page_back,
+                                      height=1)
 
         spacer_label2 = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),
-                                fg=self._conf.read_section('colours', 'widget text'))
+                                fg=self._conf.read_section('colours', 'widget text'),
+                                height=1)
         spacer_label.pack(fill=Y, side='right')
 
         spacer_label2.pack(side='right')
