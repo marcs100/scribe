@@ -248,6 +248,8 @@ class SearchWindow:
                 search_list.remove(term)
 
         return search_list
+
+
     #-------------------------------------------------------
     # Get a page of the search results.
     # The serach term is in self._search_input.get()
