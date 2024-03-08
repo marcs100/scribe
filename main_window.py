@@ -12,6 +12,7 @@ from tkinter import colorchooser
 import run_script
 import os, glob, sys
 import track_open_notes as tracker
+from text_formatting import TextFormatter
 
 class MainWindow:
 
@@ -33,6 +34,7 @@ class MainWindow:
         self.init_window()
         self._notes_per_page = int(self._conf.read_section('main','notes per page'))
         self._number_of_notes = 0 # the number of notes in the currently selected notebook
+        self._text_formatter = TextFormatter(self._conf)
 
 
     #-------------------------------------------------------
@@ -464,6 +466,8 @@ class MainWindow:
             self._text_box.insert(tk.END, note_page[COLUMN.CONTENT])
             self._text_box.bind('<Double-1>', lambda event, sqlid=note_id: self._clicked_note(event, sqlid))
             self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_formatter.set_bold_text(self._text_box)
+            self._text_formatter.set_title_text(self._text_box)
             self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
@@ -536,6 +540,8 @@ class MainWindow:
             self._text_box.insert(tk.END, recent_note[COLUMN.CONTENT])
             self._text_box.bind('<Double-1>', lambda event,sqlid=note_id: self._clicked_note(event,sqlid))
             self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_formatter.set_bold_text(self._text_box)
+            self._text_formatter.set_title_text(self._text_box)
             self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
@@ -566,6 +572,8 @@ class MainWindow:
             self._text_box.insert(tk.END, pinned_note[COLUMN.CONTENT])
             self._text_box.bind('<Double-1>', lambda event, sqlid=note_id: self._clicked_note(event, sqlid))
             self._text_box.grid(row=row, column=col, pady=3, padx=pad_x)
+            self._text_formatter.set_bold_text(self._text_box)
+            self._text_formatter.set_title_text(self._text_box)
             self._text_box['state'] = 'disabled'
             if col == max_col:
                 col = 0
