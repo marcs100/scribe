@@ -85,7 +85,7 @@ class NoteWindow:
 
         self._text_box = tk.Text(self._frame, wrap=tk.WORD)
 
-        #assign right click event so we can bring up a contaxt menu
+        #assign right click event so we can bring up a context menu
         self._text_box.bind('<Button-3>', lambda event: self._right_clicked_note(event))
         self._text_box.pack(fill='both', expand=TRUE,padx=3)
 
@@ -99,7 +99,25 @@ class NoteWindow:
                             text='',
                             height=1,
                             anchor="se")
-        self._status_label.pack(fill='both', expand='true', padx=25)
+
+        spacer_label4= tk.Label(self._status_frame,
+                            bg=self._conf.read_section('colours','widget bg'),
+                            fg=self._conf.read_section('colours','widget text'),
+                            text='   ',
+                            height=1,
+                            anchor="se")
+
+        self._mode_label = tk.Label(self._status_frame,
+                            bg='#c1c1c1',
+                            fg='#006700',
+                            text='V',
+                            height=1,
+                            width=3,
+                            anchor="se")
+
+        spacer_label4.pack(fill='x', expand='false', padx=0, side='right')
+        self._status_label.pack(fill='x', expand='false', padx=0, pady=0, side='right')
+        self._mode_label.pack(fill='x', expand='false', padx=15, pady=0, side ='right')
         self._status_frame.pack(fill='x', expand='false', side='bottom')
 
         #Bind the text snippets
@@ -116,6 +134,13 @@ class NoteWindow:
         font_type = self._conf.read_section('note window','text font type')
         text_font = (font_name,int(font_size),font_type)
         self._text_box.configure(font=text_font)
+
+        #set font for status labels (mode)
+        mode_font_sym = (font_name,8,'bold')
+        mode_font_text = (font_name,8,'normal')
+        self._mode_label.configure(font=mode_font_sym)
+        self._status_label.configure(font=mode_font_text)
+
 
     #--------------------------------------------------------------------
     # Open and display a new note or an existing note based on sql id.
@@ -176,6 +201,10 @@ class NoteWindow:
         if self._mode == NoteMode.INSERT:
             return
 
+        self._mode_label['fg'] = '#c1c1c1'
+        self._mode_label['bg'] = '#9a0000'
+        self._mode_label['text'] = 'I '
+
         self._mode = NoteMode.INSERT
         print ("Insert mode is set")
         self._status_label['text'] = 'mode: insert'
@@ -192,6 +221,11 @@ class NoteWindow:
     def _set_visual_mode(self, event):
         if self._mode == NoteMode.VISUAL:
             return
+
+        self._mode_label['fg'] = '#c1c1c1'
+        self._mode_label['bg'] = '#006700'
+        self._mode_label['text'] = ' V '
+
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
         self._status_label['text'] = 'mode: visual'
