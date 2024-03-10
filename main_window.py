@@ -43,6 +43,10 @@ class MainWindow:
     def init_window(self):
         self._note_width = int(self._conf.read_section('main window', 'note width'))
         self._notebook_width = int(self._conf.read_section('main window', 'notebook width'))
+
+        # This is a hack!!
+        # if we add an image to a button we can set button size in pixelsrather than text.
+        self._button_image = tk.PhotoImage(width=1, height=1)
         
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
@@ -62,8 +66,13 @@ class MainWindow:
 
         self._menu_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
         self._menu_frame.pack(fill='both', expand=FALSE)
-        self._view_button = tk.Menubutton(self._menu_frame, height=1, text="Select View", relief="flat",
-                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
+        self._view_button = tk.Menubutton(self._menu_frame, text="Select View", relief="flat",
+                                    bg=self._conf.read_section('colours','widget bg'),
+                                    fg=self._conf.read_section('colours', 'widget text'),
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=8,
+                                    width=55)
                
         self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget bg'),
                                      height=1, fg=self._conf.read_section('colours', 'widget text'))
@@ -73,17 +82,23 @@ class MainWindow:
 
         #New Note button
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
-                                      command=self._create_new_note,
-                                      height=1)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
+                                    command=self._create_new_note,
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=8,
+                                    width=55)
         self._new_note_button.pack(side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
-                                        fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
-                                        state='disabled', command=self._create_new_notebook,
-                                        height=1)
-        self._new_notebook_button.pack(side='left', padx=10, pady=3)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
+                                    state='disabled', command=self._create_new_notebook,
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=8,
+                                    width=65)
+        self._new_notebook_button.pack(side='left', padx=10)
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ",
@@ -93,25 +108,38 @@ class MainWindow:
         spacer_label.pack(fill=Y, side='right')
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
-                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'),
-                                           height=1)
+                                    bg=self._conf.read_section('colours','widget bg'),
+                                    fg=self._conf.read_section('colours', 'widget text'),
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=30)
+
         self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget bg'),
                                           fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
         self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
 
+
+
         #Page forward button
         self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
                                       command=self._page_forward,
-                                      height=1)
+                                      image = self._button_image,
+                                      compound = 'c',
+                                      height=5,
+                                      width=12)
 
         #Page back button
         self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="<<",
                                       command=self._page_back,
-                                      height=1)
+                                      image = self._button_image,
+                                      compound = 'c',
+                                      height=5,
+                                      width=12)
 
         spacer_label2 = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),

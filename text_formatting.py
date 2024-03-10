@@ -74,7 +74,7 @@ class TextFormatter:
 
 
     #----------------------------------------------------
-    # Look for  words/phrases surrounded by '##'
+    # Look for  words/phrases starting with '##'
     # Set title text and remove '##'
     # Tile is per line. Only use thefirst '##' found in
     # the current line.
