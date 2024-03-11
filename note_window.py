@@ -448,6 +448,9 @@ class NoteWindow:
     def _right_clicked_note(self, event):
         #create a contaxt menu
         menu = tk.Menu(self._frame, tearoff = 0)
+        menu.add_command(label ="Toggle PIN", command=self._toggle_pin)
+        menu.add_command(label ="Change Colour", command=self._get_colour)
+        menu.add_command(label ="Delete", command=self._delete_note)
         menu.add_command(label ="Properties", command=self._show_note_properties)
         menu.tk_popup(event.x_root, event.y_root)
 
