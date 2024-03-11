@@ -23,7 +23,6 @@ class MainWindow:
         self._root = root
         self._db = database_in
         self._conf = config
-       
         self.width = 0
         self.height = 0
         self._current_view = 'none'
@@ -32,9 +31,23 @@ class MainWindow:
         self._max_page = 1
         self._search_window = None
         self.init_window()
+        self.width = self._root.winfo_width()
+        self.height = self._root.winfo_height()
         self._notes_per_page = int(self._conf.read_section('main','notes per page'))
         self._number_of_notes = 0 # the number of notes in the currently selected notebook
         self._text_formatter = TextFormatter(self._conf)
+
+
+
+    #-----------------------------------------------------------------------
+    # Resize the window width +1 then back to original size!
+    # This is only needed because the scrollbar does not seem to indicate
+    # a scrollable region unless the winow is resized with the mouse.
+    #------------------------------------------------------------------------
+    def _force_resize(self):
+        #print("in _force_resize()")
+        self._root.geometry(f"{str(self._root.winfo_width()+1)}x{str(self._root.winfo_height())}")
+        self._root.geometry(f"{str(self._root.winfo_width()-1)}x{str(self._root.winfo_height())}")
 
 
     #-------------------------------------------------------
@@ -193,6 +206,7 @@ class MainWindow:
                         lambda event, view="pinned": self._get_view_event(event, view))
         self._root.bind(self._conf.read_section('main window key bindings','show recent notes view'),
                         lambda event, view="recent": self._get_view_event(event, view))
+
     
     '''EVENTS'''
     #--------------------------------------------------------------------
@@ -369,6 +383,7 @@ class MainWindow:
                 self.get_view(self._current_view)
 
 
+
     #----------------------------------------------------------------
     # SearchWindow has updated the number of search results
     # Reset page number and show first page of results
@@ -449,7 +464,8 @@ class MainWindow:
                         print("In get_view -(None) search results returned")
                 else:
                     print("in get_view() no reference to SearchWindow class")
-    
+
+        self._force_resize() # force a resize window - to get scrollbar to behave!
 
     #-----------------------------------------------------------------------
     # public facing funtion to update current view (assuming it has been set
@@ -581,6 +597,7 @@ class MainWindow:
     # Dsiplay all the pinned notes from the database.
     #-------------------------------------------------------
     def _get_pinned_notes_view(self):
+        print("In get pinned notes view!!!!!!!!!")
         self.clear_frame()
         self._view_label["text"] = "Viewing: Pinned Notes"
         pinned_notes = self._db.getPinnedNotes()
@@ -609,6 +626,7 @@ class MainWindow:
             else:
                 col += 1
 
+        #self._force_resize() #experiemnt only!!!!!!!!
 
     #-------------------------------------------------------
     # Display the search result (notes)
@@ -737,6 +755,8 @@ class MainWindow:
         On main PC (HD screen) screen size for 3 notes is 1240, so 1240/150 = 8 pixels per character.
         This makes sens becuase my laptop is scaled to 200% - not sure how python could detect that fact!!!!!
         '''
+
+
 
         #get screen scale value (multiplier)
         scr_scale = int(self._conf.read_section('main', 'screen scale'))

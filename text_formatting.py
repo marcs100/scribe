@@ -90,8 +90,8 @@ class TextFormatter:
             pos = text_widget.search("##",pos,'end-1c')
             if pos != "":
                 #delete the '**'
-                print("Found title")
-                print(pos)
+                #print("Found title")
+                #print(pos)
                 row,col = pos.split('.',1)
                 col_int = int(col)+2
                 if last_row_matched != row: # only one title per line

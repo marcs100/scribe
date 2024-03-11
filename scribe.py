@@ -89,8 +89,8 @@ def init_main_window():
     main_win = MainWindow(root,db, conf)
     
     # set default view  - read this from stored settings
-    main_win.get_view(conf.read_section('main window','default view'))
     root.protocol("WM_DELETE_WINDOW", window_closed)
+    main_win.get_view(conf.read_section('main window','default view'))
 
     root.mainloop()
 
