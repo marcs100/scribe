@@ -249,6 +249,8 @@ class NoteWindow:
         if self._mode == NoteMode.VISUAL:
             return
 
+        self._save_note()
+
         self._mode_label['fg'] = '#c1c1c1'
         self._mode_label['bg'] = '#006700'
         self._mode_label['text'] = ' V '
