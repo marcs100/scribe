@@ -269,7 +269,7 @@ class MainWindow:
         #ask user for the new notebook name - use default colour
         new_notebook = simpledialog.askstring("Input", "Enter new notebook name...")
         if new_notebook is not None:
-            self._db.addToNotebookCovers(new_notebook, self._conf.read_section('colours', 'default_notebook_bg'))
+            self._db.addToNotebookCovers(new_notebook, self._conf.read_section('colours', 'default notebook bg'))
             messagebox.showinfo("Scribe","New notebook {} has been created".format(new_notebook))
             self.update_current_view()
         
@@ -309,7 +309,7 @@ class MainWindow:
 
 
     #-------------------------------------------------------
-    # Event (notebook clocked)
+    # Event (notebook clicked)
     # Open the notebook the user has clicked on.
     #-------------------------------------------------------
     def _clicked_notebook(self,event, name):

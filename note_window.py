@@ -186,7 +186,7 @@ class NoteWindow:
             tracker.track_new_note() # keep track of this note
             if self._attrib.notebook == "":
                 self._attrib.notebook = self._conf.read_section('main', 'default notebook')
-            self._attrib.colour = self._conf.read_section('colours','default note_bg')
+            self._attrib.colour = self._conf.read_section('colours','default note bg')
         else:
             self._attrib.id = sqlid
             self._attrib.new_note = False
