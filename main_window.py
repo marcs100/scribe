@@ -119,7 +119,7 @@ class MainWindow:
                                           fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
-        self._scripts_button.pack(fill=Y, side='right', padx=3, pady=1)
+        self._scripts_button.pack(side='right', padx=3, pady=1)
 
 
 

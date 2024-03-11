@@ -40,6 +40,10 @@ class NoteWindow:
         height = 550 * mult_factor
         geometry = f"{width}x{height}"
         self._note_window.geometry(geometry)
+
+         # This is a hack!!
+        # if we add an image to a button we can set button size in pixelsrather than text.
+        self._button_image = tk.PhotoImage(width=1, height=1)
        
         self._main_window = main_window # This is a reference to the main view window so we can tell it to update views if notes gett added or removed
 
@@ -57,23 +61,46 @@ class NoteWindow:
         spacer_label3.pack(fill=Y, side='right')
 
         self._revert_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Revert",
-                                      command=self._revert_text)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Revert",
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=30,
+                                    command=self._revert_text)
 
         self._delete_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Delete",
-                                      command=self._delete_note)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Delete",
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=30,
+                                    command=self._delete_note)
         
         self._colour_button =  tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Colour",
-                                      command=self._get_colour)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Colour",
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=30,
+                                    command=self._get_colour)
+
         self._pin_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                      fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Pin",
-                                      command=self._toggle_pin)
+                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Pin",
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=30,
+                                    command=self._toggle_pin)
 
          # Select notebook button
         self._notebook_button = tk.Menubutton(self._menu_frame, text="Notebook", relief="flat",
-                                           bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
+                                    bg=self._conf.read_section('colours','widget bg'),
+                                    fg=self._conf.read_section('colours', 'widget text'),
+                                    image = self._button_image,
+                                    compound = 'c',
+                                    height=5,
+                                    width=45)
+
         self._notebook_button.menu = tk.Menu(self._notebook_button, bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
         self._notebook_button["menu"] = self._notebook_button.menu
 
