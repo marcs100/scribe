@@ -134,8 +134,6 @@ class MainWindow:
         self._populate_scripts_menu()
         self._scripts_button.pack(side='right', padx=3, pady=1)
 
-
-
         #Page forward button
         self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
@@ -341,7 +339,10 @@ class MainWindow:
     #----------------------------------------------------------------
     def _right_click_notebook(self, event, name, textbox):
         print(f"Right click event for notebook {name}")
-        menu = tk.Menu(self._frame, tearoff = 0)
+        menu = tk.Menu(self._frame,
+                       tearoff = 0,
+                        bg=self._conf.read_section('colours','widget bg'),
+                       fg=self._conf.read_section('colours','widget text'))
         menu.add_command(label ="Change colour", command=lambda name=name: self._change_notebook_colour(name))
         menu.add_command(label ="Delete notebook!", command=lambda name=name: self._delete_notebook(name))
         menu.tk_popup(event.x_root, event.y_root)
