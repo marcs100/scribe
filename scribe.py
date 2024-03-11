@@ -17,6 +17,7 @@ import version_info
 import configuration_file
 import track_open_notes as tracker
 from tkinter import messagebox
+import version_info
 
 
 def window_closed():
@@ -84,7 +85,7 @@ def init_main_window():
         root.iconphoto(True, icon)
 
 
-    root.title(conf.read_section('main', 'app_title'))
+    root.title(f"Scribe {version_info.APP_VERSION}")
     main_win = MainWindow(root,db, conf)
     
     # set default view  - read this from stored settings
