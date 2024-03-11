@@ -16,7 +16,6 @@ class Config:
         self._config.add_section('main window key bindings')
         self._config.add_section('note page key bindings')
 
-        self._config['main']['app_title'] = "Scribe v1.0"
         if version_info.release == True:
             self._config['main']['database'] = "/home/marc/sync/scribe/scribe_data.db"
         else:
@@ -44,8 +43,8 @@ class Config:
         self._config['colours']['widget bg'] = '#303234' # blackish
         self._config['colours']['widget text'] = '#e7edef' # off white (hint of blue)
         self._config['colours']['note_text'] = '#484445'
-        self._config['colours']['default note_bg'] = '#e7edef' # off white (hint of blue)
-        self._config['colours']['default notebook_bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['default note bg'] = '#e7edef' # off white (hint of blue)
+        self._config['colours']['default notebook bg'] = '#e7edef' # off white (hint of blue)
         self._config['colours']['widget highlight'] = "#5f6260"
         self._config['colours']['search bg'] = "#6d7c7a"
 
