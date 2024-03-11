@@ -390,7 +390,7 @@ class MainWindow:
     # Reset page number and show first page of results
     #---------------------------------------------------------------
     def received_search_results(self, number_of_results):
-        print(f"Number of search results has been updated: {str(number_of_results)}")
+        #print(f"Number of search results has been updated: {str(number_of_results)}")
         self._page_number = 1
         self._max_page = self._search_window.get_number_of_pages()
         self.get_view('search results')

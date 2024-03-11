@@ -141,7 +141,7 @@ class SearchWindow:
         #print("*** event triggered -- do_search called ***");
         self._search_query = self._search_input.get()
         if self._search_input.get()!= '':
-            print(f"searhing for ..... {self._search_query}")
+            #print(f"searhing for ..... {self._search_query}")
             self._num_results = self._get_number_search_of_results()
             if self._num_results > 0:
                 self._got_results = True
@@ -187,7 +187,7 @@ class SearchWindow:
         return self._num_results
 
     #----------------------------------------------------
-    # Public facing function to indicate if earch results
+    # Public facing function to indicate if search results
     # have been collected
     #----------------------------------------------------
     def has_search_results(self):
@@ -255,8 +255,8 @@ class SearchWindow:
     # The serach term is in self._search_input.get()
     #-------------------------------------------------------
     def get_search_results(self, page_number):
-        print("Entered get_search_results(page_number)")
-        print(f"page number: {str(page_number)}")
+        #print("Entered get_search_results(page_number)")
+        #print(f"page number: {str(page_number)}")
         if self._search_query == '':
             #print("self._search_query is empty")
             return None
@@ -266,7 +266,7 @@ class SearchWindow:
         if offset > self._num_results:
             return None
 
-        print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
+        #print(f"notes per page: {str(self._notes_per_page)} offset: {str(offset)}")
         mode = self._get_search_mode()
 
         mode = self._get_search_mode()
@@ -278,7 +278,7 @@ class SearchWindow:
             search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
 
         #search_results = self._db.getSearchResults(self._search_query, self._notes_per_page, offset, mode)
-        print(f"Got {str(len(search_results))} in get_search_results()")
+        #print(f"Got {str(len(search_results))} in get_search_results()")
         return search_results
 
 
