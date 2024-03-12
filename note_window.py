@@ -338,9 +338,9 @@ class NoteWindow:
         
         #print("current hash " + current_hash)
         #print("orig hash    " + self._attrib.hash)
-        print("Saving existing note with id " + str(self._note[0][COLUMN.ID]))
+        print("Saving existing note with id " + str(self._attrib.id))
         self._attrib.date_modified = datetime.datetime.now()
-        self._db.updateNote(self._note[0][COLUMN.ID], self._attrib.notebook, self._attrib.tag,
+        self._db.updateNote(self._attrib.id, self._attrib.notebook, self._attrib.tag,
                              self._text_box.get("1.0",END), self._attrib.date_modified, self._attrib.pinned, self._attrib.colour)
         self._main_window.update_current_view()
 
