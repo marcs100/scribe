@@ -610,7 +610,7 @@ class MainWindow:
         row = 0
         pad_x = 3
         max_col = self.calculate_columns(self._note_width,6)
-        max_col -= 1 # -1 becuase of zero based index for grid
+        max_col -= 1 # -1 because of zero based index for grid
         num_widgets_in_row = 1
         for pinned_note in pinned_notes:
             note_id = pinned_note[COLUMN.ID]

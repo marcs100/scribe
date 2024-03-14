@@ -231,7 +231,7 @@ class NoteWindow:
 
         self._mode_label['fg'] = '#c1c1c1'
         #self._mode_label['bg'] = '#9a0000'
-        self._mode_label['bg'] = '#1c4fad'
+        self._mode_label['bg'] = '#163f8b'
         self._mode_label['text'] = '_i '
 
         self._mode = NoteMode.INSERT
@@ -254,7 +254,7 @@ class NoteWindow:
         self._save_note()
 
         self._mode_label['fg'] = '#c1c1c1'
-        self._mode_label['bg'] = '#006700'
+        self._mode_label['bg'] = '#005000'
         self._mode_label['text'] = ' V '
 
         self._mode = NoteMode.VISUAL
