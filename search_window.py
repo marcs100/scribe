@@ -121,7 +121,8 @@ class SearchWindow:
 
         self._search_window.protocol("WM_DELETE_WINDOW", self.close_search_window)
         self._search_window.attributes("-topmost", True)
-        self._search_window.attributes('-type', 'dialog')
+        if platform.system() == 'Linux':
+            self._search_window.attributes('-type', 'dialog')
 
         self._search_entry.focus_set()
 
