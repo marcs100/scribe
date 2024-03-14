@@ -13,6 +13,7 @@ import track_open_notes as tracker
 from snippets import snippets
 from note_mode import NoteMode
 from text_formatting import TextFormatter
+import platform
 
 
 class NoteWindow:
@@ -229,8 +230,9 @@ class NoteWindow:
             return
 
         self._mode_label['fg'] = '#c1c1c1'
-        self._mode_label['bg'] = '#9a0000'
-        self._mode_label['text'] = 'I '
+        #self._mode_label['bg'] = '#9a0000'
+        self._mode_label['bg'] = '#1c4fad'
+        self._mode_label['text'] = '_i '
 
         self._mode = NoteMode.INSERT
         print ("Insert mode is set")
@@ -402,7 +404,8 @@ class NoteWindow:
         properties_window = tk.Toplevel(self._note_window)
         properties_window.title('Properties')
         properties_window.attributes('-topmost', True)
-        properties_window.attributes('-type', 'dialog')
+        if platform.system() == 'Linux':
+            properties_window.attributes('-type', 'dialog')
         mult_factor = int(self._conf.read_section('main','screen scale'))
         width = 400 * mult_factor
         height = 220 * mult_factor

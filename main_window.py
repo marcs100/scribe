@@ -530,7 +530,7 @@ class MainWindow:
         row=0
         pad_x = 3
         max_col = self.calculate_columns(self._notebook_width,pad_x)
-        max_col -= 1 # -1 becuase of zero based index for grid
+        max_col -= 1 # -1 because of zero based index for grid
         num_widgets_in_row = 1
         notebook_names = self._db.getNotebookNames()
         if notebook_names is None:
@@ -576,7 +576,7 @@ class MainWindow:
         col=0
         row=0
         max_col = self.calculate_columns(self._note_width,pad_x)
-        max_col -= 1 # -1 becuase of zero based index for grid
+        max_col -= 1 # -1 because of zero based index for grid
         num_widgets_in_row = 1
 
         for recent_note in recent_notes:
