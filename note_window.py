@@ -105,7 +105,28 @@ class NoteWindow:
         self._notebook_button.menu = tk.Menu(self._notebook_button, bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
         self._notebook_button["menu"] = self._notebook_button.menu
 
-        self._delete_button.pack(side='right',  pady=2, padx=2)
+         #Page forward button
+        self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
+                                      command=self._page_forward,
+                                      image = self._button_image,
+                                      compound = 'c',
+                                      height=5,
+                                      width=12)
+
+        #Page back button
+        self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="<<",
+                                      command=self._page_back,
+                                      image = self._button_image,
+                                      compound = 'c',
+                                      height=5,
+                                      width=12)
+
+        self._page_forward_button.pack(side='right',  pady=2, padx=2)
+        self._page_back_button.pack(side='right',  pady=2, padx=2)
+
+
         self._notebook_button.pack(side='left',pady=2, padx =4)
         self._pin_button.pack(side='left',  pady=2, padx=4)
         self._revert_button.pack(side='left',  pady=2, padx=4)
@@ -222,6 +243,24 @@ class NoteWindow:
             self._set_visual_mode(event=None) # open existing notes in visual mode
 
 
+    #--------------------------------------------------
+    # Move page forwards in current notebook
+    # Note:
+    # Button should be disabled if in insert mode
+    #--------------------------------------------------
+    def _page_forward(self):
+        print("Page forward....")
+
+
+    #--------------------------------------------------
+    # Move page back note in current notebook
+    # Note:
+    # Button should be disbaled if in insert mode
+    #--------------------------------------------------
+    def _page_back(self):
+        print("Page back....")
+
+
     #-----------------------------------------------------
     # Set insert mode (for editing text)
     #-----------------------------------------------------
@@ -233,6 +272,10 @@ class NoteWindow:
         #self._mode_label['bg'] = '#9a0000'
         self._mode_label['bg'] = '#163f8b'
         self._mode_label['text'] = '_i '
+
+        # disable page forward and back buttons
+        self._page_forward_button["state"]='disabled'
+        self._page_back_button["state"]='disabled'
 
         self._mode = NoteMode.INSERT
         print ("Insert mode is set")
@@ -256,6 +299,11 @@ class NoteWindow:
         self._mode_label['fg'] = '#c1c1c1'
         self._mode_label['bg'] = '#005000'
         self._mode_label['text'] = ' V '
+
+        # enable page forward and back buttons
+        self._page_forward_button["state"]='normal'
+        self._page_back_button["state"]='normal'
+
 
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
@@ -369,7 +417,7 @@ class NoteWindow:
     #-------------------------------------------------------
     def _revert_text(self):
         if self._attrib.new_note == False:
-            #if it is not a new note then we shoul dhave the note id.
+            #if it is not a new note then we should have the note id.
             original_note = self._db.getNoteByID(self._attrib.id)
             self._attrib.content = original_note[0][COLUMN.CONTENT]
             self._text_box.delete('1.0', END)
