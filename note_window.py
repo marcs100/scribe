@@ -27,6 +27,8 @@ class NoteWindow:
 
         self._text_formatter = TextFormatter(self._conf)
 
+        #used to store a list of all the sqlids contained in the current notbook
+        self._notebook_ids = []
 
         self._init_window(root, main_window)
                            
@@ -123,6 +125,7 @@ class NoteWindow:
                                       height=5,
                                       width=12)
 
+        self._delete_button.pack(side='right', pady=2, padx=2)
         self._page_forward_button.pack(side='right',  pady=2, padx=2)
         self._page_back_button.pack(side='right',  pady=2, padx=2)
 
@@ -223,6 +226,8 @@ class NoteWindow:
             self._attrib.colour = self._note[0][COLUMN.BACK_COLOUR]
             self._text_box['bg'] = self._attrib.colour
             self._attrib.content = self._note[0][COLUMN.CONTENT]
+            self._text_box['state'] = 'normal'
+            self._text_box.delete('1.0', tk.END)
             self._text_box.insert(tk.END, self._attrib.content)
             self._attrib.pinned = self._note[0][COLUMN.PINNED]
             if self._attrib.pinned == 0:
@@ -235,6 +240,8 @@ class NoteWindow:
 
         self._note_window.title("Notebook: " + self._attrib.notebook)
         self._note_window.protocol("WM_DELETE_WINDOW", self._close_note)
+
+        self._get_all_note_ids() #get all ids in current notebook
 
         self._mode = None
         if  self._attrib.new_note == True:
@@ -250,7 +257,15 @@ class NoteWindow:
     #--------------------------------------------------
     def _page_forward(self):
         print("Page forward....")
-
+        if self._attrib.id != self._notebook_ids[-1]:
+            #print(f"current id = {str(self._attrib.id)}")
+            next_index = self._notebook_ids.index(self._attrib.id) + 1
+            next_id = self._notebook_ids[next_index]
+            #print(f"next id = {str(next_id)}")
+            tracker.delete_note(self._attrib.id)
+            self.open_note(next_id, self._db)
+        else:
+            print("already at end of notebook!!!!")
 
     #--------------------------------------------------
     # Move page back note in current notebook
@@ -259,6 +274,16 @@ class NoteWindow:
     #--------------------------------------------------
     def _page_back(self):
         print("Page back....")
+        if self._attrib.id != self._notebook_ids[0]:
+            #print(f"current id = {str(self._attrib.id)}")
+            next_index = self._notebook_ids.index(self._attrib.id) - 1
+            next_id = self._notebook_ids[next_index]
+            #print(f"next id = {str(next_id)}")
+            tracker.delete_note(self._attrib.id)
+            self.open_note(next_id, self._db)
+        else:
+            print("aleady at beginning of notebook!!!!")
+
 
 
     #-----------------------------------------------------
@@ -374,7 +399,7 @@ class NoteWindow:
                 self._attrib.id = sqlid[0]
 
                 tracker.delete_new_note() # Will not be a new note any more!
-                tracker.track_note(sqlid[0]) # kepp track of this note.
+                tracker.track_note(sqlid[0]) # keep track of this note.
                 #Note - for existing notes opened from the main window, the sqlid
                 #for that note has already been added to tracker by main_window,py
 
@@ -438,7 +463,7 @@ class NoteWindow:
 
                 tracker.delete_note(self._attrib.id)
 
-                #need to tell main window to update teh current view
+                #need to tell main window to update the current view
                 self._main_window.update_current_view()
 
                 #close the deleted note
@@ -490,7 +515,21 @@ class NoteWindow:
                 self._attrib.colour = col
                 self._text_box['bg'] = self._attrib.colour
                 self._attrib.modified = True
-    
+
+
+    #----------------------------------------------------------
+    # Get a list all the sql ids for the current notebook
+    # The datbase returns a list of tuples (with one element)
+    # Convert to list of just sql ids.
+    # Note: the list is already sorted sqlid low to high.
+    #----------------------------------------------------------
+    def _get_all_note_ids(self):
+        self._notebook_ids.clear()
+        ids = self._db.getNotebookSqlIDs(self._attrib.notebook)
+        #print (ids)
+        for sql_id in ids:
+            self._notebook_ids.append(sql_id[0])
+        #print(self._notebook_ids)
 
     #--------------------------------------------------------------
     # event when user right clicks the current note.
@@ -526,7 +565,7 @@ class NoteWindow:
             date = dt.strftime("%d/%m/%Y")
             snip_text = snip_text.replace("{date}",date)
         if snip_text.find("{time}") != -1:
-            #replace {time} with atual time
+            #replace {time} with actual time
             time = dt.strftime("%H:%M")
             snip_text = snip_text.replace("{time}",time)
 
