@@ -45,7 +45,7 @@ class NoteWindow:
         self._note_window.geometry(geometry)
 
          # This is a hack!!
-        # if we add an image to a button we can set button size in pixelsrather than text.
+        # if we add an image to a button we can set button size in pixels rather than text.
         self._button_image = tk.PhotoImage(width=1, height=1)
        
         self._main_window = main_window # This is a reference to the main view window so we can tell it to update views if notes gett added or removed
@@ -302,6 +302,9 @@ class NoteWindow:
         self._page_forward_button["state"]='disabled'
         self._page_back_button["state"]='disabled'
 
+        #enable notebooks button
+        self._notebook_button['state'] = 'normal'
+
         self._mode = NoteMode.INSERT
         print ("Insert mode is set")
         self._status_label['text'] = 'mode: insert'
@@ -329,6 +332,8 @@ class NoteWindow:
         self._page_forward_button["state"]='normal'
         self._page_back_button["state"]='normal'
 
+        # disable notebooks button
+        self._notebook_button["state"] = 'disabled'
 
         self._mode = NoteMode.VISUAL
         print ("Visual mode is set")
@@ -358,6 +363,8 @@ class NoteWindow:
             print(notebook_in)
             self._note_window.title("Notebook: " + self._attrib.notebook)
             self._attrib.modified = True # Set this so the change will be saved
+            self._save_note()
+            self._get_all_note_ids() #update sqlids for new notebook, so we can browse the updated notebook
 
 
     #-----------------------------
