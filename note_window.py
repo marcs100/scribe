@@ -167,9 +167,17 @@ class NoteWindow:
                             width=3,
                             anchor="se")
 
+        self._page_label = tk.Label(self._status_frame,
+                            bg=self._conf.read_section('colours','widget bg'),
+                            fg=self._conf.read_section('colours','widget text'),
+                            text='Page x of x',
+                            height=1,
+                            anchor="se")
+
         spacer_label4.pack(fill='x', expand='false', padx=0, side='right')
         self._status_label.pack(fill='x', expand='false', padx=0, pady=0, side='right')
         self._mode_label.pack(fill='x', expand='false', padx=15, pady=0, side ='right')
+        self._page_label.pack(fill='x', expand='false', padx=15, pady=0, side ='right')
         self._status_frame.pack(fill='x', expand='false', side='bottom')
 
         #Bind the text snippets
@@ -242,12 +250,23 @@ class NoteWindow:
         self._note_window.protocol("WM_DELETE_WINDOW", self._close_note)
 
         self._get_all_note_ids() #get all ids in current notebook
+        self._display_page_number()
 
         self._mode = None
         if  self._attrib.new_note == True:
             self._set_insert_mode(event=None) # open new notes in insert mode
         else:
             self._set_visual_mode(event=None) # open existing notes in visual mode
+
+
+    #----------------------------------------------------------
+    # Display the current page number (page n of n) in
+    # bottom status bar
+    #----------------------------------------------------------
+    def _display_page_number(self):
+        max_page = len(self._notebook_ids)
+        current_page = self._notebook_ids.index(self._attrib.id) + 1
+        self._page_label['text'] = f"page {current_page} of {max_page}"
 
 
     #--------------------------------------------------
@@ -264,6 +283,7 @@ class NoteWindow:
             #print(f"next id = {str(next_id)}")
             tracker.delete_note(self._attrib.id)
             self.open_note(next_id, self._db)
+            self._display_page_number()
         else:
             print("already at end of notebook!!!!")
 
@@ -281,6 +301,7 @@ class NoteWindow:
             #print(f"next id = {str(next_id)}")
             tracker.delete_note(self._attrib.id)
             self.open_note(next_id, self._db)
+            self._display_page_number()
         else:
             print("aleady at beginning of notebook!!!!")
 
