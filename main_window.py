@@ -205,6 +205,11 @@ class MainWindow:
         self._root.bind(self._conf.read_section('main window key bindings','show recent notes view'),
                         lambda event, view="recent": self._get_view_event(event, view))
 
+        self._root.bind(self._conf.read_section('main window key bindings','page forward'),
+                        lambda event: self._page_forward())
+        self._root.bind(self._conf.read_section('main window key bindings','page back'),
+                        lambda event: self._page_back())
+
     
     '''EVENTS'''
     #--------------------------------------------------------------------
@@ -214,6 +219,10 @@ class MainWindow:
         #print("page forward function")
         #print(f"max page: {self._max_page}")
         #print(f"page num: {self._page_number}")
+
+        if self._page_forward_button['state'] == 'disabled':
+            return
+
         if self._page_number >= self._max_page:
             #print("page is greater then max page")
             return
@@ -240,6 +249,11 @@ class MainWindow:
     #-------------------------------------------------------------------
     def _page_back(self):
         #print("page back function")
+
+        if self._page_back_button['state'] == 'disabled':
+            return
+
+
         if self._page_number == 1:
             #print("page number is 1 can't go back")
             return

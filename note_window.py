@@ -187,6 +187,8 @@ class NoteWindow:
         #Bind keys to note window
         self._note_window.bind(self._conf.read_section('note page key bindings','insert mode'), lambda event:   self._set_insert_mode(event))
         self._note_window.bind(self._conf.read_section('note page key bindings','visual mode'), lambda event: self._set_visual_mode(event))
+        self._note_window.bind(self._conf.read_section('note page key bindings','page forward'), lambda event: self._page_forward())
+        self._note_window.bind(self._conf.read_section('note page key bindings','page back'), lambda event: self._page_back())
 
         #set font for text box
         font_name = self._conf.read_section('note window','text font name')
@@ -276,6 +278,10 @@ class NoteWindow:
     #--------------------------------------------------
     def _page_forward(self):
         print("Page forward....")
+
+        if self._page_forward_button["state"] == 'disabled':
+            return
+
         if self._attrib.id != self._notebook_ids[-1]:
             #print(f"current id = {str(self._attrib.id)}")
             next_index = self._notebook_ids.index(self._attrib.id) + 1
@@ -294,6 +300,10 @@ class NoteWindow:
     #--------------------------------------------------
     def _page_back(self):
         print("Page back....")
+
+        if self._page_back_button["state"] == 'disabled':
+            return
+
         if self._attrib.id != self._notebook_ids[0]:
             #print(f"current id = {str(self._attrib.id)}")
             next_index = self._notebook_ids.index(self._attrib.id) - 1

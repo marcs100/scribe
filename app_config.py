@@ -53,10 +53,15 @@ class Config:
         self._config['main window key bindings']['show notebook view'] = "<Control-Alt-b>"
         self._config['main window key bindings']['show pinned notes view'] = "<Control-Alt-p>"
         self._config['main window key bindings']['show recent notes view'] = "<Control-Alt-r>"
+        self._config['main window key bindings']['page forward'] = "<Alt-Right>"
+        self._config['main window key bindings']['page back'] = "<Alt-Left>"
 
         self._config['note page key bindings']['search'] = "<Control-f>"
         self._config['note page key bindings']['insert mode'] = "<i>"
         self._config['note page key bindings']['visual mode'] = "<Escape>"
+        self._config['note page key bindings']['page forward'] = "<Alt-Right>"
+        self._config['note page key bindings']['page back'] = "<Alt-Left>"
+
 
         self.write_config()
 
