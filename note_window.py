@@ -296,7 +296,7 @@ class NoteWindow:
     #--------------------------------------------------
     # Move page back note in current notebook
     # Note:
-    # Button should be disbaled if in insert mode
+    # Button shoulwd be disbaled if in insert mode
     #--------------------------------------------------
     def _page_back(self):
         print("Page back....")
