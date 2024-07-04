@@ -85,7 +85,7 @@ class MainWindow:
                                     image = self._button_image,
                                     compound = 'c',
                                     height=8,
-                                    width=55)
+                                    width=65)
                
         self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget bg'),
                                      height=1, fg=self._conf.read_section('colours', 'widget text'))
@@ -95,22 +95,25 @@ class MainWindow:
 
         #New Note button
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Note",
+                                    fg=self._conf.read_section('colours', 'widget text'), relief=FLAT, text="New Note",
                                     command=self._create_new_note,
+                                    borderwidth=0,
+                                    anchor=tk.CENTER,
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=8,
+                                    height=15,
                                     width=55)
         self._new_note_button.pack(side='left', padx=10, pady=3)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
-                                    fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="New Notebook",
+                                    fg=self._conf.read_section('colours', 'widget text'), relief=FLAT, text="New Notebook",
                                     state='disabled', command=self._create_new_notebook,
+                                    anchor=tk.CENTER,
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=8,
-                                    width=65)
+                                    height=15,
+                                    width=75)
         self._new_notebook_button.pack(side='left', padx=10)
 
         # right side spacer from edge of frame
