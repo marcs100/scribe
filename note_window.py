@@ -248,11 +248,11 @@ class NoteWindow:
             self._attrib.date_modified = self._note[0][COLUMN.MODIFIED]
             self._attrib.tag = self._note[0][COLUMN.TAG]
 
+            self._get_all_note_ids() #get all ids in current notebook
+            self._display_page_number()
+
         self._note_window.title("Notebook: " + self._attrib.notebook)
         self._note_window.protocol("WM_DELETE_WINDOW", self._close_note)
-
-        self._get_all_note_ids() #get all ids in current notebook
-        self._display_page_number()
 
         self._mode = None
         if  self._attrib.new_note == True:
@@ -342,6 +342,8 @@ class NoteWindow:
         #set textbox mode to normal
         self._text_box['state'] = 'normal'
         self._text_formatter.set_normal_text(self._text_box)
+
+        self._text_box.focus() # make sure text box is fouced so user can start typing straight away!
 
 
 

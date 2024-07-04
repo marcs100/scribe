@@ -702,7 +702,7 @@ class MainWindow:
                 col += 1
 
     #-------------------------------------------------------
-    # Allow the user to slect a new notebook colour
+    # Allow the user to select a new notebook colour
     #-------------------------------------------------------
     def _change_notebook_colour(self, name):
         print (f"Will chnage notebook colour for {name}")
