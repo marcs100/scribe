@@ -1,4 +1,4 @@
-# This is a sample Python script.
+#!/usr/bin/env python3
 import tkinter
 from tkinter.constants import *
 from database import database
@@ -80,7 +80,7 @@ def init_main_window():
     #root.iconbitmap(r"/home/marc/.local/bin/scribe/resources/notes.svg")
 
     if platform.system() == 'Linux':
-        icon = tk.PhotoImage(file="/usr/share/pixmaps/notebook.png")
+        icon = tk.PhotoImage(file="~/.local/bin/scribe/resources/scribe_taskbar.png")
         # Set it as the window icon.
         root.iconphoto(True, icon)
 
