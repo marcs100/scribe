@@ -38,6 +38,7 @@ class SearchWindow:
     #-------------------------------------------------------
     def init_window(self):
         self._search_window = tk.Toplevel(self._root)
+        #self._search_window = tk.Toplevel()
         self._search_window.title('Search..')
         self._frame = tk.Frame(self._search_window, bg=self._conf.read_section('colours', 'widget bg'))
         mult_factor = int(self._conf.read_section('main','screen scale'))

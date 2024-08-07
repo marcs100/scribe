@@ -14,6 +14,8 @@ import os, glob, sys
 import track_open_notes as tracker
 from text_formatting import TextFormatter
 
+#current_view = 'nada'
+
 class MainWindow:
 
     #-------------------------------------------------------
@@ -36,6 +38,7 @@ class MainWindow:
         self._notes_per_page = int(self._conf.read_section('main','notes per page'))
         self._number_of_notes = 0 # the number of notes in the currently selected notebook
         self._text_formatter = TextFormatter(self._conf)
+        self._previous_veiw = None # save the previous view in case we waant to swithc back
 
 
 
@@ -212,6 +215,7 @@ class MainWindow:
                         lambda event: self._page_forward())
         self._root.bind(self._conf.read_section('main window key bindings','page back'),
                         lambda event: self._page_back())
+        self._root.bind('<Escape>',lambda event: self._get_previous_view())
 
     
     '''EVENTS'''
@@ -222,7 +226,6 @@ class MainWindow:
         #print("page forward function")
         #print(f"max page: {self._max_page}")
         #print(f"page num: {self._page_number}")
-
         if self._page_forward_button['state'] == 'disabled':
             return
 
@@ -252,10 +255,8 @@ class MainWindow:
     #-------------------------------------------------------------------
     def _page_back(self):
         #print("page back function")
-
         if self._page_back_button['state'] == 'disabled':
             return
-
 
         if self._page_number == 1:
             #print("page number is 1 can't go back")
@@ -282,6 +283,7 @@ class MainWindow:
     #-------------------------------------------------------------------
     def _show_search_window(self, event):
         self._search_window = SearchWindow(self._root, self, self._db, self._conf)
+        #self._search_window = SearchWindow('none', self, self._db, self._conf)
 
 
     #-------------------------------------------------------
@@ -352,7 +354,6 @@ class MainWindow:
     # Event (right click on notebook)
     # Show the context menu now that user has right click the mouse
     #    Change notebook colour
-    #    Delete notebook - ** to do **
     #----------------------------------------------------------------
     def _right_click_notebook(self, event, name, textbox):
         print(f"Right click event for notebook {name}")
@@ -373,7 +374,6 @@ class MainWindow:
     #-------------------------------------------------------
     def _window_resized(self,event):
         # we will save these parameters to the config file on the window closed event
-        #print("*** In Resize window eevent ***")
         #try and control the amount og times the screen will get redrawn
         prev_width = int(self.width)
         prev_height = int(self.height)
@@ -407,11 +407,9 @@ class MainWindow:
     # Reset page number and show first page of results
     #---------------------------------------------------------------
     def received_search_results(self, number_of_results):
-        #print(f"Number of search results has been updated: {str(number_of_results)}")
         self._page_number = 1
         self._max_page = self._search_window.get_number_of_pages()
         self.get_view('search results')
-        #search_results =
 
     #----------------------------------------------------------------
     # Get view as event, although we ignore the event parameter.
@@ -420,13 +418,22 @@ class MainWindow:
     def _get_view_event(self, event, view):
         self.get_view(view)
 
+    #----------------------------------------------------------------
+    # Get the previous view
+    # only if current view is search results
+    #---------------------------------------------------------------
+    def _get_previous_view(self):
+        print('current view (current_view) ' + self._current_view)
+        if self._current_view == 'search results':
+            self.get_view(self._previous_veiw)
+
     '''END OF EVENTS'''
 
     #------------------------------------------------
     #Public facing function to get a main view
     #------------------------------------------------
     def get_view(self,view):
-        #print("Getting view: "+view)
+        self._previous_veiw = self._current_view
         self._current_view = view
         self._page_forward_button['state']='disabled'
         self._page_back_button['state']='disabled'
@@ -469,11 +476,12 @@ class MainWindow:
                         return
                     notebook_pages = self._db.getNotebookPage(self._selected_notebook, self._notes_per_page, offset)
                     self._get_notebook_pages_view(self._selected_notebook, notebook_pages)
+                    self._previous_view = 'notebook pages'
             case 'search results':
                 self._page_forward_button['state']='active'
                 self._page_back_button['state']='active'
-                self._new_notebook_button['state'] = 'disabled'
                 self._selected_notebook = 'none'
+                self._current_view = 'search_results'
                 if(self._search_window is not None):
                     search_results = self._search_window.get_search_results(self._page_number) #will return the results from the saved current_search term
                     if search_results is not None:
@@ -502,7 +510,6 @@ class MainWindow:
         self._current_view = 'notebook pages'
         self._view_label["text"] = "Viewing Notebook: " + notebook
         if notebook_pages is None:
-            print("No pages notes found")
             return
 
         #Update statues bar----------------------------------------------------------------------------
@@ -543,6 +550,7 @@ class MainWindow:
     def _get_notebooks_view(self):
         self.clear_frame()
         self._view_label["text"] = "Viewing: Notebooks"
+        self._current_view = 'notebooks'
         col=0
         row=0
         pad_x = 3
@@ -559,7 +567,6 @@ class MainWindow:
             self._text_box.insert(tk.END, str(notebook_name[0]))
             num_notes = self._db.getNumberOfNotesInNotebook(notebook_name[0])
             self._text_box.insert(tk.END, f"\n\n({str(num_notes)} notes)")
-            #print (f"Number of notes in {notebook_name[0]} is {str(num_notes)}")
             self._text_box.bind('<Double-1>',
                                  lambda event,name=str(notebook_name[0]):self._clicked_notebook(event,name))
 
@@ -585,6 +592,7 @@ class MainWindow:
         self.clear_frame()
         self._view_label["text"] = "Viewing: Recent Notes"
         recent_notes = self._db.getRecentNotes(int(self._conf.read_section('main', 'recent notes count')))
+        self._current_view = 'recent notes'
         if recent_notes is None:
             print("No recent notes found")
             return 
@@ -615,14 +623,13 @@ class MainWindow:
     # Dsiplay all the pinned notes from the database.
     #-------------------------------------------------------
     def _get_pinned_notes_view(self):
-        print("In get pinned notes view!!!!!!!!!")
         self.clear_frame()
         self._view_label["text"] = "Viewing: Pinned Notes"
+        self._current_view = 'pinned'
         pinned_notes = self._db.getPinnedNotes()
         if pinned_notes is None:
-            print("No pinned notes found")
             return 
-
+        self._current_view = 'pinned'
         col = 0
         row = 0
         pad_x = 3
@@ -654,7 +661,6 @@ class MainWindow:
         self._current_view = 'search results'
         self._selected_notebook = 'none'
         self.clear_frame()
-        self._current_view = 'search results'
         self._view_label["text"] = "Viewing Search Results"
 
         if search_results is None:
@@ -686,7 +692,6 @@ class MainWindow:
         max_col -= 1 # -1 becuase of zero based index for grid
         num_widgets_in_row = 1
         for search_page in search_results:
-            #print(f"Search page: {str(search_page)}")
             note_id = search_page[COLUMN.ID]
 
             self._text_box = tk.Text(self._frame,height=15,width=self._note_width, wrap=tk.WORD,
@@ -705,7 +710,6 @@ class MainWindow:
     # Allow the user to select a new notebook colour
     #-------------------------------------------------------
     def _change_notebook_colour(self, name):
-        print (f"Will chnage notebook colour for {name}")
         colour = colorchooser.askcolor(title="Choose notebook colour", parent=self._frame)
         if colour != (None,None):
             colour = str(colour[1])
@@ -735,7 +739,6 @@ class MainWindow:
         script_files = glob.glob(script_dir+"*.py")
 
         for script_file in script_files:
-            print(f"found script {script_file}")
             head, script_file_name = os.path.split(script_file)
             self._scripts_button.menu.add_command(label=script_file_name,
                 command=lambda script=script_file: run_script.run_script(script, self._conf))

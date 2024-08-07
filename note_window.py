@@ -227,7 +227,7 @@ class NoteWindow:
             self._attrib.new_note = False
             self._note = self._db.getNoteByID(self._attrib.id)
             if self._note is None:
-                print("Note not found: sql id is" + self._attrib.id)
+                #print("Note not found: sql id is" + self._attrib.id)
                 return
             self._attrib.new_note = False
             self._attrib.hash = hashlib.sha1(self._note[0][COLUMN.CONTENT].encode('ascii', 'ignore')).hexdigest()
@@ -277,21 +277,16 @@ class NoteWindow:
     # Button should be disabled if in insert mode
     #--------------------------------------------------
     def _page_forward(self):
-        print("Page forward....")
-
         if self._page_forward_button["state"] == 'disabled':
             return
 
         if self._attrib.id != self._notebook_ids[-1]:
-            #print(f"current id = {str(self._attrib.id)}")
             next_index = self._notebook_ids.index(self._attrib.id) + 1
             next_id = self._notebook_ids[next_index]
-            #print(f"next id = {str(next_id)}")
             tracker.delete_note(self._attrib.id)
             self.open_note(next_id, self._db)
             self._display_page_number()
-        else:
-            print("already at end of notebook!!!!")
+
 
     #--------------------------------------------------
     # Move page back note in current notebook
@@ -299,22 +294,15 @@ class NoteWindow:
     # Button shoulwd be disbaled if in insert mode
     #--------------------------------------------------
     def _page_back(self):
-        print("Page back....")
-
         if self._page_back_button["state"] == 'disabled':
             return
 
         if self._attrib.id != self._notebook_ids[0]:
-            #print(f"current id = {str(self._attrib.id)}")
             next_index = self._notebook_ids.index(self._attrib.id) - 1
             next_id = self._notebook_ids[next_index]
-            #print(f"next id = {str(next_id)}")
             tracker.delete_note(self._attrib.id)
             self.open_note(next_id, self._db)
             self._display_page_number()
-        else:
-            print("aleady at beginning of notebook!!!!")
-
 
 
     #-----------------------------------------------------
@@ -337,8 +325,8 @@ class NoteWindow:
         self._notebook_button['state'] = 'normal'
 
         self._mode = NoteMode.INSERT
-        print ("Insert mode is set")
         self._status_label['text'] = 'mode: insert'
+
         #set textbox mode to normal
         self._text_box['state'] = 'normal'
         self._text_formatter.set_normal_text(self._text_box)
@@ -369,7 +357,6 @@ class NoteWindow:
         self._notebook_button["state"] = 'disabled'
 
         self._mode = NoteMode.VISUAL
-        print ("Visual mode is set")
         self._status_label['text'] = 'mode: visual'
         self._text_formatter.set_bold_text(self._text_box)
         self._text_formatter.set_title_text(self._text_box)
@@ -393,7 +380,6 @@ class NoteWindow:
     def _select_notebook(self, notebook_in):
         if self._attrib.notebook != notebook_in:
             self._attrib.notebook = notebook_in
-            print(notebook_in)
             self._note_window.title("Notebook: " + self._attrib.notebook)
             self._attrib.modified = True # Set this so the change will be saved
             self._save_note()
@@ -428,7 +414,7 @@ class NoteWindow:
         if self._attrib.new_note == True:
             #print(f"note content: <{self._text_box.get('1.0',END)}>")
             if self._text_box.get("1.0",END) != '\n': # don't save an empty new note'
-                print("Saving new note...")
+                #print("Saving new note...")
                 self._attrib.date_created = datetime.datetime.now()
                 self._attrib.date_modified = self._attrib.date_created
                 # addNote(self, notebook, tag, contents, datestamp, pinnedStatus, backColour):
@@ -451,12 +437,12 @@ class NoteWindow:
 
         # We also need to check if the user has switched o a different notebook - not implemented yet!!!!!!!!
         if (current_hash == self._attrib.hash) and (self._attrib.modified == False):
-            print("Note has not changed")
+            #print("Note has not changed")
             return
         
         #print("current hash " + current_hash)
         #print("orig hash    " + self._attrib.hash)
-        print("Saving existing note with id " + str(self._attrib.id))
+        #print("Saving existing note with id " + str(self._attrib.id))
         self._attrib.date_modified = datetime.datetime.now()
         self._db.updateNote(self._attrib.id, self._attrib.notebook, self._attrib.tag,
                              self._text_box.get("1.0",END), self._attrib.date_modified, self._attrib.pinned, self._attrib.colour)
@@ -501,7 +487,6 @@ class NoteWindow:
             if  messagebox.askyesno("Delete Note",
                                     "Are you sure you want to delete this note?",
                                     parent=self._note_window) == True:
-                print(f"Deleting note {self._attrib.id}")
                 self._db.deleteNoteById(self._attrib.id)
 
                 tracker.delete_note(self._attrib.id)
