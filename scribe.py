@@ -73,18 +73,22 @@ def init_main_window():
     root.geometry(f'{width}x{height}')
 
     db_file = conf.read_section('main', 'database')
-    db = database(db_file)
 
     print(f"Using database {db_file}")
 
     #check if the database file exists, if not create an new scribe database.
-    #to do ........
+    if os.path.isfile(db_file) is False:
+        db = database(db_file)
+        table1 = "create table if not exists marcnotes (id INTEGER,notebook TEXT, tag TEXT,content TEXT, created TEXT,modified TEXT, pinned INTEGER,BGColour TEXT)"
+        table2 = "create table if not exists notebookcovers (name TEXT,colour TEXT)"
+    else:
+        db = database(db_file)
 
     #root.iconbitmap(r"/home/marc/.local/bin/scribe/resources/notes.svg")
 
     if platform.system() == 'Linux':
         icon = tk.PhotoImage(file="~/.local/bin/scribe/resources/scribe_taskbar.png")
-        # Set it as the window icon.
+        # Set it as the window icon
         root.iconphoto(True, icon)
 
 
