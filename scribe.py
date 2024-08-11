@@ -77,6 +77,9 @@ def init_main_window():
 
     print(f"Using database {db_file}")
 
+    #check if the database file exists, if not create an new scribe database.
+    #to do ........
+
     #root.iconbitmap(r"/home/marc/.local/bin/scribe/resources/notes.svg")
 
     if platform.system() == 'Linux':
