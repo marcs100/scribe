@@ -31,6 +31,10 @@ class database(object):
 
         self.conn.commit()
 
+    def executeQuery(self, query):
+        self.cursor.execute(query)
+        self.commit()
+
     # delete and notebookCovers entries that are no longer required
     def cleanNotebookCovers(self):
         self.cursor.execute("select distinct notebook from marcnotes")

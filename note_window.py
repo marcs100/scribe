@@ -429,8 +429,8 @@ class NoteWindow:
                 #Note - for existing notes opened from the main window, the sqlid
                 #for that note has already been added to tracker by main_window,py
 
-                self._get_all_note_ids() #get all ids in current notebook
-                self._display_page_number()
+                if self._get_all_note_ids() is not None: #get all ids in current notebook
+                    self._display_page_number()
 
                 return
             return

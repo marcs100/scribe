@@ -78,18 +78,24 @@ def init_main_window():
 
     #check if the database file exists, if not create an new scribe database.
     if os.path.isfile(db_file) is False:
+        print("Database not found, it will now be created...")
         db = database(db_file)
-        table1 = "create table if not exists marcnotes (id INTEGER,notebook TEXT, tag TEXT,content TEXT, created TEXT,modified TEXT, pinned INTEGER,BGColour TEXT)"
+        table1 = "create table if not exists marcnotes (id INTEGER PRIMARY KEY, notebook TEXT, tag TEXT,content TEXT, created TEXT,modified TEXT, pinned INTEGER,BGColour TEXT)"
         table2 = "create table if not exists notebookcovers (name TEXT,colour TEXT)"
+        db.executeQuery(table1)
+        db.executeQuery(table2)
+        db.addToNotebookCovers("General", conf.read_section('colours', 'default notebook bg')) #we need at least one notebook to startt with
+        print(f"Scribe database succesfully created: {db_file}")
     else:
         db = database(db_file)
 
     #root.iconbitmap(r"/home/marc/.local/bin/scribe/resources/notes.svg")
 
     if platform.system() == 'Linux':
-        icon = tk.PhotoImage(file="~/.local/bin/scribe/resources/scribe_taskbar.png")
-        # Set it as the window icon
-        root.iconphoto(True, icon)
+         if(version_info.release==True):
+            icon = tk.PhotoImage(file="~/.local/bin/scribe/resources/scribe_taskbar.png")
+            # Set it as the window icon
+            root.iconphoto(True, icon)
 
 
     root.title(f"Scribe {version_info.APP_VERSION}")
