@@ -38,9 +38,9 @@ class NoteWindow:
     def _init_window(self, root, main_window):
         self._root_window = root
         self._note_window = tk.Toplevel(self._root_window)
-        mult_factor = int(self._conf.read_section('main','screen scale'))
-        width = 800 * mult_factor
-        height = 550 * mult_factor
+        self._scr_scale = int(self._conf.read_section('main','screen scale'))
+        width = 800 * self._scr_scale
+        height = 550 * self._scr_scale
         geometry = f"{width}x{height}"
         self._note_window.geometry(geometry)
 
@@ -67,32 +67,32 @@ class NoteWindow:
                                     fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Revert",
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=30,
+                                    height=5 * self._scr_scale,
+                                    width=30 * self._scr_scale,
                                     command=self._revert_text)
 
         self._delete_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                     fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Delete",
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=30,
+                                    height=5 * self._scr_scale,
+                                    width=30 * self._scr_scale,
                                     command=self._delete_note)
         
         self._colour_button =  tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                     fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Colour",
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=30,
+                                    height=5 * self._scr_scale,
+                                    width=30 * self._scr_scale,
                                     command=self._get_colour)
 
         self._pin_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                     fg=self._conf.read_section('colours', 'widget text'), relief="flat", text="Pin",
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=30,
+                                    height=5 * self._scr_scale,
+                                    width=30 * self._scr_scale,
                                     command=self._toggle_pin)
 
          # Select notebook button
@@ -101,8 +101,8 @@ class NoteWindow:
                                     fg=self._conf.read_section('colours', 'widget text'),
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=45)
+                                    height=5 * self._scr_scale,
+                                    width=45 * self._scr_scale)
 
         self._notebook_button.menu = tk.Menu(self._notebook_button, bg=self._conf.read_section('colours','widget bg'), fg=self._conf.read_section('colours', 'widget text'))
         self._notebook_button["menu"] = self._notebook_button.menu
@@ -113,8 +113,8 @@ class NoteWindow:
                                       command=self._page_forward,
                                       image = self._button_image,
                                       compound = 'c',
-                                      height=5,
-                                      width=12)
+                                      height=5 * self._scr_scale,
+                                      width=12 * self._scr_scale)
 
         #Page back button
         self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
@@ -122,24 +122,24 @@ class NoteWindow:
                                       command=self._page_back,
                                       image = self._button_image,
                                       compound = 'c',
-                                      height=5,
-                                      width=12)
+                                      height=5 * self._scr_scale,
+                                      width=12 * self._scr_scale)
 
-        self._delete_button.pack(side='right', pady=2, padx=2)
-        self._page_forward_button.pack(side='right',  pady=2, padx=2)
-        self._page_back_button.pack(side='right',  pady=2, padx=2)
+        self._delete_button.pack(side='right', pady=2 * self._scr_scale, padx=2 * self._scr_scale)
+        self._page_forward_button.pack(side='right',  pady=2 * self._scr_scale, padx=2 * self._scr_scale)
+        self._page_back_button.pack(side='right',  pady=2 * self._scr_scale, padx=2 * self._scr_scale)
 
 
-        self._notebook_button.pack(side='left',pady=2, padx =4)
-        self._pin_button.pack(side='left',  pady=2, padx=4)
-        self._revert_button.pack(side='left',  pady=2, padx=4)
-        self._colour_button.pack(side='left',  pady=2, padx=4)
+        self._notebook_button.pack(side='left',pady=2 * self._scr_scale, padx =4 * self._scr_scale)
+        self._pin_button.pack(side='left',  pady=2 * self._scr_scale, padx=4 * self._scr_scale)
+        self._revert_button.pack(side='left',  pady=2 * self._scr_scale, padx=4 * self._scr_scale)
+        self._colour_button.pack(side='left',  pady=2 * self._scr_scale, padx=4 * self._scr_scale)
 
         self._text_box = tk.Text(self._frame, wrap=tk.WORD)
 
         #assign right click event so we can bring up a context menu
         self._text_box.bind('<Button-3>', lambda event: self._right_clicked_note(event))
-        self._text_box.pack(fill='both', expand=TRUE,padx=3)
+        self._text_box.pack(fill='both', expand=TRUE,padx=3 * self._scr_scale)
 
         self._menu_frame.pack(fill='both', expand=FALSE)
         self._frame.pack(fill='both', expand=TRUE)
@@ -164,7 +164,7 @@ class NoteWindow:
                             fg='#006700',
                             text='V',
                             height=1,
-                            width=3,
+                            width=3 * self._scr_scale,
                             anchor="se")
 
         self._page_label = tk.Label(self._status_frame,
@@ -176,8 +176,8 @@ class NoteWindow:
 
         spacer_label4.pack(fill='x', expand='false', padx=0, side='right')
         self._status_label.pack(fill='x', expand='false', padx=0, pady=0, side='right')
-        self._mode_label.pack(fill='x', expand='false', padx=15, pady=0, side ='right')
-        self._page_label.pack(fill='x', expand='false', padx=15, pady=0, side ='right')
+        self._mode_label.pack(fill='x', expand='false', padx=15 * self._scr_scale, pady=0, side ='right')
+        self._page_label.pack(fill='x', expand='false', padx=15 * self._scr_scale, pady=0, side ='right')
         self._status_frame.pack(fill='x', expand='false', side='bottom')
 
         #Bind the text snippets

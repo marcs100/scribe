@@ -1,4 +1,4 @@
-APP_VERSION = '1.3.1'
+APP_VERSION = '1.3.2'
 
 ####################################################################
 # Change this to True for released versions. This is so dev builds

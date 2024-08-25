@@ -59,6 +59,7 @@ class MainWindow:
     def init_window(self):
         self._note_width = int(self._conf.read_section('main window', 'note width'))
         self._notebook_width = int(self._conf.read_section('main window', 'notebook width'))
+        self._scr_scale = int(self._conf.read_section('main','screen scale'))
 
         # This is a hack!!
         # if we add an image to a button we can set button size in pixelsrather than text.
@@ -87,11 +88,11 @@ class MainWindow:
                                     fg=self._conf.read_section('colours', 'widget text'),
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=8,
-                                    width=65)
+                                    height=8 * self._scr_scale,
+                                    width=65 * self._scr_scale)
                
         self._view_label = tk.Label(self._menu_frame,text="dummy",bg=self._conf.read_section('colours','widget bg'),
-                                     height=1, fg=self._conf.read_section('colours', 'widget text'))
+                                     height=1 * self._scr_scale, fg=self._conf.read_section('colours', 'widget text'))
         lbl_font = font.Font(weight="bold")
         self._view_label["font"] = lbl_font
         #self._frame.pack(fill=BOTH, expand=TRUE)
@@ -104,9 +105,9 @@ class MainWindow:
                                     anchor=tk.CENTER,
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=15,
-                                    width=55)
-        self._new_note_button.pack(side='left', padx=10, pady=3)
+                                    height=15 * self._scr_scale,
+                                    width=55 * self._scr_scale)
+        self._new_note_button.pack(side='left', padx=10 * self._scr_scale, pady=3 * self._scr_scale)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
@@ -115,15 +116,15 @@ class MainWindow:
                                     anchor=tk.CENTER,
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=15,
-                                    width=75)
-        self._new_notebook_button.pack(side='left', padx=10)
+                                    height=15 * self._scr_scale,
+                                    width=75 * self._scr_scale)
+        self._new_notebook_button.pack(side='left', padx=10 * self._scr_scale)
 
         # right side spacer from edge of frame
         spacer_label = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),
                                 fg=self._conf.read_section('colours', 'widget text'),
-                                height=1)
+                                height=1 * self._scr_scale)
         spacer_label.pack(fill=Y, side='right')
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
@@ -131,14 +132,14 @@ class MainWindow:
                                     fg=self._conf.read_section('colours', 'widget text'),
                                     image = self._button_image,
                                     compound = 'c',
-                                    height=5,
-                                    width=30)
+                                    height=5 * self._scr_scale,
+                                    width=30 * self._scr_scale)
 
         self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget bg'),
                                           fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
         self._scripts_button["menu"] = self._scripts_button.menu
         self._populate_scripts_menu()
-        self._scripts_button.pack(side='right', padx=3, pady=1)
+        self._scripts_button.pack(side='right', padx=3 * self._scr_scale, pady=1 * self._scr_scale)
 
         #Page forward button
         self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
@@ -146,8 +147,8 @@ class MainWindow:
                                       command=self._page_forward,
                                       image = self._button_image,
                                       compound = 'c',
-                                      height=5,
-                                      width=12)
+                                      height=5 * self._scr_scale,
+                                      width=12 * self._scr_scale)
 
         #Page back button
         self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
@@ -155,18 +156,18 @@ class MainWindow:
                                       command=self._page_back,
                                       image = self._button_image,
                                       compound = 'c',
-                                      height=5,
-                                      width=12)
+                                      height=5 * self._scr_scale,
+                                      width=12 * self._scr_scale)
 
         spacer_label2 = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),
                                 fg=self._conf.read_section('colours', 'widget text'),
-                                height=1)
+                                height=1 * self._scr_scale)
         spacer_label.pack(fill=Y, side='right')
 
         spacer_label2.pack(side='right')
-        self._page_forward_button.pack(side='right',padx=3, pady=10)
-        self._page_back_button.pack(side='right', padx=3, pady=10)
+        self._page_forward_button.pack(side='right',padx=3 * self._scr_scale, pady=10 * self._scr_scale)
+        self._page_back_button.pack(side='right', padx=3 * self._scr_scale, pady=10 * self._scr_scale)
 
         #menu = tk.Menubutton()
         self._view_button.menu = tk.Menu(self._view_button, bg=self._conf.read_section('colours','widget bg'),
@@ -186,11 +187,11 @@ class MainWindow:
                             text='staus: blah blah',
                             height=1,
                             anchor="se")
-        self._status_label.pack(fill='both', expand='true', padx=25)
+        self._status_label.pack(fill='both', expand='true', padx=25 * self._scr_scale)
         #self._status_label.grid(row=0, column=0, padx=25)
 
-        self._view_button.pack(side='left',padx=30,pady=3)
-        self._view_label.pack(fill=Y, side='left', pady=3)
+        self._view_button.pack(side='left',padx=30 * self._scr_scale,pady=3 * self._scr_scale)
+        self._view_label.pack(fill=Y, side='left', pady=3 * self._scr_scale)
 
         self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
