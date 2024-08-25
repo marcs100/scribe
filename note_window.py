@@ -39,8 +39,10 @@ class NoteWindow:
         self._root_window = root
         self._note_window = tk.Toplevel(self._root_window)
         self._scr_scale = int(self._conf.read_section('main','screen scale'))
-        width = 800 * self._scr_scale
-        height = 550 * self._scr_scale
+        #width = 800 * self._scr_scale
+        width = 800 
+        height = 550 
+        #height = 550 * self._scr_scale
         geometry = f"{width}x{height}"
         self._note_window.geometry(geometry)
 
