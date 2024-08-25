@@ -395,7 +395,7 @@ class MainWindow:
         self.width = event.width
         self.height = event.height       
 
-        if diff1 > 25 or diff2 > 25:
+        if diff1 > (25 * self._scr_scale) or diff2 > (25 * self._scr_scale):
             #resize the widgets in the current view
             #print("*** Redrwing screen ***")
             if self._current_view != 'none':
@@ -492,7 +492,7 @@ class MainWindow:
                 else:
                     print("in get_view() no reference to SearchWindow class")
 
-        self._force_resize() # force a resize window - to get scrollbar to behave!
+        #self._force_resize() # force a resize window - to get scrollbar to behave!
 
     #-----------------------------------------------------------------------
     # public facing funtion to update current view (assuming it has been set
@@ -790,7 +790,8 @@ class MainWindow:
 
         screen_size = self._root.winfo_width()
 
-        num_chars = round(screen_size / (8 * scr_scale))
+        #num_chars = round(screen_size / (8 * scr_scale))
+        num_chars = round(screen_size / 8)
 
         #number of widgets that can fit horizintally on screen
         num_columns = round(num_chars  / (widget_width + border_size))
