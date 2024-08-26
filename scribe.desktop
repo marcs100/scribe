@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Application
+Icon=/home/marc/.local/bin/scribe/resources/notes.svg
+Name=Scribe
+Name[en]=Scribe
+Name[en_US]=Scribe
+Name[en_US.UTF-8]=Scribe
+Comment=Note taking application
+Comment[en]=Note taking application
+Comment[en_US]=Note taking application
+Comment[en_US.UTF-8]=Note taking application
+Categories=Utility
+Exec=/home/marc/.local/bin/run_scribe_container.sh
+Hidden=false
+NoDisplay=false
+StartupNotify=true
+Terminal=false
+

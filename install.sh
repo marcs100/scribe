@@ -16,6 +16,9 @@ cp $src_dir/scripts/* $dest_dir/scripts
 cp $src_dir/resources/* $dest_dir/resources
 cp $src_dir/scribe.config $conf_dir
 
+#remove original config file
+#rm $dest_dir/scribe.conifg
+
 # Set release to True
 file=$dest_dir/version_info.py
 sed -i -e 's/release = False/release = True/g' $file
