@@ -5,11 +5,11 @@ CURRENTEPOCTIME=`date +"%s"`
 
 echo ${CURRENTDATE}_${CURRENTEPOCTIME}
 
-mkdir -p ~/.local/bin/scribe
+mkdir -p ~/.local/bin/Scribe
 mkdir -p ~/.config/scribe
 
-echo Creating backup ~/.local/bin/scribe_${CURRENTDATE}${CURRENTEPOCTIME}
-mv ~/.local/bin/scribe ~/.local/bin/scribe_${CURRENTDATE}${CURRENTEPOCTIME}
+echo Creating backup ~/.local/bin/Scribe_${CURRENTDATE}${CURRENTEPOCTIME}
+mv ~/.local/bin/scribe ~/.local/bin/Scribe_${CURRENTDATE}${CURRENTEPOCTIME}
 
 #in future we should handle the config file better
 #back up old config

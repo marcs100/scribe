@@ -93,7 +93,7 @@ def init_main_window():
 
     if platform.system() == 'Linux':
          if(version_info.release==True):
-            icon = tk.PhotoImage(file="~/.local/bin/scribe/resources/scribe_taskbar.png")
+            icon = tk.PhotoImage(file="~/.local/bin/Scribe/resources/scribe_taskbar.png")
             # Set it as the window icon
             root.iconphoto(True, icon)
 

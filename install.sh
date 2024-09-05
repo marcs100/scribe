@@ -2,7 +2,7 @@
 #script to install scribe to ~/.local/bin
 echo ===== Scribe install script ========
 src_dir=.
-dest_dir=~/.local/bin/scribe
+dest_dir=~/.local/bin/Scribe
 conf_dir=~/.config/scribe
 release_db="/home/marc/Sync/scribe/scibe_data.db"
 
