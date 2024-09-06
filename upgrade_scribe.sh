@@ -9,7 +9,7 @@ mkdir -p ~/.local/bin/Scribe
 mkdir -p ~/.config/scribe
 
 echo Creating backup ~/.local/bin/Scribe_${CURRENTDATE}${CURRENTEPOCTIME}
-mv ~/.local/bin/scribe ~/.local/bin/Scribe_${CURRENTDATE}${CURRENTEPOCTIME}
+mv ~/.local/bin/Scribe ~/.local/bin/Scribe_${CURRENTDATE}${CURRENTEPOCTIME}
 
 #in future we should handle the config file better
 #back up old config
