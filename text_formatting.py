@@ -87,7 +87,7 @@ class TextFormatter:
 
         #get indexes for title text and remove the tag markers for titile texy  - '##'
         while pos != "":
-            pos = text_widget.search("##",pos,'end-1c')
+            pos = text_widget.search("# ",pos,'end-1c')
             if pos != "":
                 #delete the '**'
                 #print("Found title")
@@ -125,7 +125,7 @@ class TextFormatter:
 
         #insert '##' back in
         for index in range(0,len(self._title_tag_indexes)):
-            text_widget.insert(self._title_tag_indexes[index],"##")
+            text_widget.insert(self._title_tag_indexes[index],"# ")
 
              #insert back in '**'
         for index in range(0,len(self._bold_markers_indexes)-1,2):
