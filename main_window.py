@@ -9,6 +9,7 @@ from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
 from tkinter import colorchooser
+from tkinter import PanedWindow
 import run_script
 import os, glob, sys
 import track_open_notes as tracker
@@ -65,6 +66,17 @@ class MainWindow:
         # if we add an image to a button we can set button size in pixelsrather than text.
         self._button_image = tk.PhotoImage(width=1, height=1)
         
+        self._paned_window = PanedWindow(self._root, orient=HORIZONTAL)
+        #Right side Frame ****NEW ****************
+        self._side_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
+        #self._paned_window_left = PanedWindow(self._root, orient=VERTICAL)
+        self._test_label = tk.Label(self._side_frame,
+                            bg=self._conf.read_section('colours','widget bg'),
+                            fg=self._conf.read_section('colours','widget text'),
+                            text='staus: blah blah',
+                            height=1,
+                            anchor="se")
+        self._test_label.pack(fill='both', expand='true', padx=25 * self._scr_scale)
 
         #Adding a scrollbar is tricky in tkinter!!!!!!
         self._main_frame = tk.Frame(self._root,bg=self._conf.read_section('colours','widget bg')) # this frame is to hold the canvass for the scrollbar
@@ -191,12 +203,20 @@ class MainWindow:
         #self._status_label.grid(row=0, column=0, padx=25)
 
         self._view_button.pack(side='left',padx=30 * self._scr_scale,pady=3 * self._scr_scale)
+
         self._view_label.pack(fill=Y, side='left', pady=3 * self._scr_scale)
 
         self._canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
         self._main_frame.pack(fill=BOTH, expand='true')
         self._status_frame.pack(fill='x', expand='false', side='bottom')
+
+
+        self._paned_window.add(self._side_frame)
+        self._paned_window.add(self._main_frame)
+
+        self._paned_window.pack(fill=BOTH, expand=1)
+        #self._paned_window_right.pack(fill=BOTH, expand=1)
 
         self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
 
