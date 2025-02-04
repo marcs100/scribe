@@ -121,7 +121,7 @@ class MainWindow:
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                     fg=self._conf.read_section('colours', 'widget text'),
                                     relief=FLAT,
-                                    text=" New Notexxx ",
+                                    text=" New Note ",
                                     bd=10,
                                     command=self._create_new_note,
                                     borderwidth=0,
