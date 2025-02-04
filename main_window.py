@@ -53,6 +53,9 @@ class MainWindow:
         self._root.geometry(f"{str(self._root.winfo_width()+1)}x{str(self._root.winfo_height())}")
         self._root.geometry(f"{str(self._root.winfo_width()-1)}x{str(self._root.winfo_height())}")
 
+    def test_command(self):
+        print("test command")
+
 
     #-------------------------------------------------------
     # Initialise the main window
@@ -66,6 +69,8 @@ class MainWindow:
         # if we add an image to a button we can set button size in pixelsrather than text.
         self._button_image = tk.PhotoImage(width=1, height=1)
         
+        #TESTING PANED WINDOW HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ''''
         self._paned_window = PanedWindow(self._root, orient=HORIZONTAL)
         #Right side Frame ****NEW ****************
         self._side_frame = tk.Frame(self._root, bg=self._conf.read_section('colours','widget bg'))
@@ -73,11 +78,14 @@ class MainWindow:
         self._test_label = tk.Label(self._side_frame,
                             bg=self._conf.read_section('colours','widget bg'),
                             fg=self._conf.read_section('colours','widget text'),
-                            text='staus: blah blah',
+                            text='Views',
                             height=1,
-                            anchor="se")
+                            anchor="ne")
         self._test_label.pack(fill='both', expand='true', padx=25 * self._scr_scale)
-
+        self._test_button = tk.Button(self._side_frame,  bg=self._conf.read_section('colours', 'widget bg'),
+                                      fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="  Some Test  ",
+                                      command=self.test_command)
+        '''
         #Adding a scrollbar is tricky in tkinter!!!!!!
         self._main_frame = tk.Frame(self._root,bg=self._conf.read_section('colours','widget bg')) # this frame is to hold the canvass for the scrollbar
         self._canvas = tk.Canvas(self._main_frame, bg=self._conf.read_section('colours','widget bg'))
@@ -111,25 +119,28 @@ class MainWindow:
 
         #New Note button
         self._new_note_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
-                                    fg=self._conf.read_section('colours', 'widget text'), relief=FLAT, text="New Note",
+                                    fg=self._conf.read_section('colours', 'widget text'),
+                                    relief=FLAT,
+                                    text=" New Notexxx ",
+                                    bd=10,
                                     command=self._create_new_note,
                                     borderwidth=0,
-                                    anchor=tk.CENTER,
-                                    image = self._button_image,
-                                    compound = 'c',
-                                    height=15 * self._scr_scale,
-                                    width=55 * self._scr_scale)
+                                    anchor=tk.CENTER)
+                                    #image = self._button_image,
+                                    #compound = 'c',
+                                    #height=15 * self._scr_scale,
+                                    #width=55 * self._scr_scale)
         self._new_note_button.pack(side='left', padx=10 * self._scr_scale, pady=3 * self._scr_scale)
 
         # This should only be enabled when in 'view notebooks' view
         self._new_notebook_button = tk.Button(self._menu_frame,  bg=self._conf.read_section('colours', 'widget bg'),
                                     fg=self._conf.read_section('colours', 'widget text'), relief=FLAT, text="New Notebook",
                                     state='disabled', command=self._create_new_notebook,
-                                    anchor=tk.CENTER,
-                                    image = self._button_image,
-                                    compound = 'c',
-                                    height=15 * self._scr_scale,
-                                    width=75 * self._scr_scale)
+                                    anchor=tk.CENTER)
+                                    #image = self._button_image,
+                                    #compound = 'c',
+                                    #height=15 * self._scr_scale,
+                                    #width=75 * self._scr_scale)
         self._new_notebook_button.pack(side='left', padx=10 * self._scr_scale)
 
         # right side spacer from edge of frame
@@ -141,11 +152,11 @@ class MainWindow:
 
         self._scripts_button = tk.Menubutton(self._menu_frame, text="Scripts", relief="flat",
                                     bg=self._conf.read_section('colours','widget bg'),
-                                    fg=self._conf.read_section('colours', 'widget text'),
-                                    image = self._button_image,
-                                    compound = 'c',
-                                    height=5 * self._scr_scale,
-                                    width=30 * self._scr_scale)
+                                    fg=self._conf.read_section('colours', 'widget text'))
+                                    #image = self._button_image,
+                                    #compound = 'c',
+                                    #height=5 * self._scr_scale,
+                                    #width=30 * self._scr_scale)
 
         self._scripts_button.menu = tk.Menu(self._scripts_button, bg=self._conf.read_section('colours','widget bg'),
                                           fg=self._conf.read_section('colours', 'widget text'), tearoff=0)
@@ -156,20 +167,20 @@ class MainWindow:
         #Page forward button
         self._page_forward_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text=">>",
-                                      command=self._page_forward,
-                                      image = self._button_image,
-                                      compound = 'c',
-                                      height=5 * self._scr_scale,
-                                      width=12 * self._scr_scale)
+                                      command=self._page_forward)
+                                      #image = self._button_image,
+                                      #compound = 'c',
+                                      #height=5 * self._scr_scale,
+                                      #width=12 * self._scr_scale)
 
         #Page back button
         self._page_back_button = tk.Button(self._menu_frame, bg=self._conf.read_section('colours', 'widget bg'),
                                       fg=self._conf.read_section('colours', 'widget text'), relief="raised", text="<<",
-                                      command=self._page_back,
-                                      image = self._button_image,
-                                      compound = 'c',
-                                      height=5 * self._scr_scale,
-                                      width=12 * self._scr_scale)
+                                      command=self._page_back)
+                                      #image = self._button_image,
+                                      #compound = 'c',
+                                      #height=5 * self._scr_scale,
+                                      #width=12 * self._scr_scale)
 
         spacer_label2 = tk.Label(self._menu_frame, text="     ",
                                 bg=self._conf.read_section('colours', 'widget bg'),
@@ -212,11 +223,10 @@ class MainWindow:
         self._status_frame.pack(fill='x', expand='false', side='bottom')
 
 
-        self._paned_window.add(self._side_frame)
-        self._paned_window.add(self._main_frame)
+        #self._paned_window.add(self._side_frame)
+        #self._paned_window.add(self._main_frame)
 
-        self._paned_window.pack(fill=BOTH, expand=1)
-        #self._paned_window_right.pack(fill=BOTH, expand=1)
+       # self._paned_window.pack(fill=BOTH, expand=1)
 
         self._main_frame.bind("<Configure>", lambda event: self._window_resized(event))
 
